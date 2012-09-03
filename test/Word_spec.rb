@@ -1,7 +1,7 @@
 #
 # test_Word.rb
 #
-# Time-stamp: <2012-09-01 14:08:06 (ryosuke)>
+# Time-stamp: <2012-09-03 08:23:47 (ryosuke)>
 #
 
 src_path = Dir.pwd + '/../src'
@@ -33,49 +33,66 @@ describe Word, "when initializing" do
     Word.new('aBA3$#e0-c:').should == 'aBAec'
   end
 #
+  it "should raise error when a string without alphabet given" do
+    ['0', '2', '00', '28302370', '&;/:;*+]['].each do |str| 
+      expect{ Word.new(str) }.to raise_error(Word::InvalidArgument)
+    end
+  end
+#
 end 
 
-#   must "raise an error when a string without alphabet given" do
-#     ['0', '2', '00', '28302370', '&;/:;*+]['].each do |str| 
-#       assert_raises(Word::InvalidArgument){Word.new(str)}
-#     end
-#   end
+describe Word, "#show" do
+  it "should show information in hash table style" do
+    info = Word.new('aioStwfmXb').show
+    info.class.name.should == 'Hash'
+    info.keys.should == [:value, :obj_id]
+  end
+#
+end
 
-#   must "show information in hash table style" do
-#     assert_equal Hash, @word.show.class 
-#     assert_equal [:value, :obj_id], @word.show.keys 
-#   end
+describe Word, "#==" do
+  it "should compare words without contraction" do
+    mwrd = Word.new('aBAa')
+    (mwrd == Word.new('aB')).should be_false 
+    (mwrd == Word.new('a3B-+A_a')).should be_true
+  end
+end
+    
+describe Word, "#replace" do
+  it "should replace word's content to given string" do
+    mwrd = Word.new('abC')
+    id = mwrd.show[:obj_id]
+    ['aBA3', 'aB#&/A', 'a?BA^', ':++aBA'].each do |str|
+      mwrd.replace(str)
+      mwrd.should == 'aBA' 
+      mwrd.show[:obj_id].should == id
+     end
+   end
+#
+end    
 
-#   must "replace word's content right" do
-#     id = @word.show[:obj_id]
-#      ['aBA3', 'aB#&/A', 'a?BA^', ':++aBA'].each do |str|
-#       @word.replace(str)
-#       assert_equal 'aBA', @word
-#       assert_equal id, @word.show[:obj_id]
-#      end
-#    end
-    
-#   must "compare words right without contraction" do
-#     mword = Word.new('aBAa')
-#     assert_equal false, @word == mword
-#     assert_equal true, @word.replace('aBAa') == mword
-#    end
-    
-#   must "contract right" do
-#     @word.replace('aBAa')
-#     assert_equal 'aB', @word.contract
-#   end
-# #    
-#   must "be 1 when contract the product of a word with its inverse" do
-#     @word.replace('aBcdE')
-#     assert_equal '1', (@word.invert*@word).contract
-#   end
-# #    
-#   must "compare with contraction rightly" do
-#     @word.replace('aBc')
-#     assert_equal true, @word === Word.new('aBsSc')
-#    end
-# #    
+describe Word, "#contract" do
+  before(:all) do
+    @myw = Word.new('a')
+  end
+#
+  it "should make a word the shortest express" do
+    @myw.replace('aBAa').contract.should == 'aB' 
+    @myw.replace('aBsAaSkKb').contract.should == 'a'
+  end
+#    
+  it "should contract a product of a word with its inverse into 1" do
+    (@myw*(@myw.replace('aBcdE').invert)).contract.should == '1' 
+  end
+#    
+end
+#
+describe Word, "#===" do
+  it "should compare words by using contraction" do
+    (Word.new('aBc') === Word.new('aBsSc')).should be_true
+  end
+end
+#    
 #   must "product words right" do
 #     @word.replace('aBc')
 #     assert_equal 'aBcxYz', @word*Word.new('xYz')
