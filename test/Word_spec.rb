@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-03 21:29:58 (ryosuke)>
+# Time-stamp: <2012-09-04 08:05:33 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -16,7 +16,7 @@ describe Word, "when initializing" do
   it "should be right" do
     @word.should == @mstr
     %w[a A x 1 aA].each{ |c| Word.new(c).should == c}
-    # assert_equal %w[a b c x y z], @word.G.alphabet
+    # @word.G.alphabet.should == %w[a b c x y z] 
    end
 #
   it "should raise error if no arguments" do
