@@ -1,7 +1,7 @@
 #
 # test_Word.rb
 #
-# Time-stamp: <2012-09-03 08:23:47 (ryosuke)>
+# Time-stamp: <2012-09-03 20:37:00 (ryosuke)>
 #
 
 src_path = Dir.pwd + '/../src'
@@ -93,13 +93,19 @@ describe Word, "#===" do
   end
 end
 #    
-#   must "product words right" do
-#     @word.replace('aBc')
-#     assert_equal 'aBcxYz', @word*Word.new('xYz')
-#     assert_equal 'aBc', @word*Word.new('1')
-#     assert_equal 'aBc', Word.new('1')*@word
-#     assert_equal 'aBcCbA', @word*@word.invert
-#   end
+describe Word, "#product" do
+  before do
+    @myw = Word.new('aBc')
+  end
+  it "should just join two words" do
+    @myw*Word.new('xYz').should == 'aBcxYz'
+    @myw*@myw.invert.should == 'aBcCbA'
+  end
+#
+  it "should " do
+    @myw*Word.new('1').should == 'aBc' 
+    Word.new('1')*@myw.should == 'aBc'
+  end
 # #    
 #   must "allow to take product with string" do
 #     @word.replace('aBc')
@@ -107,6 +113,7 @@ end
 #     assert_kind_of Word, @word*'xYz'
 # #    assert_equal 'z', (@word*'xYz').G.generators[:z].to_c
 #   end
+end
 # #    
 #   must "inverse a word right" do
 #     @word.replace('abCd')
