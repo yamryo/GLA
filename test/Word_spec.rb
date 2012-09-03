@@ -1,12 +1,15 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-04 08:05:33 (ryosuke)>
+# Time-stamp: <2012-09-04 08:47:59 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
-require('Word.rb')
+require('rubygems')
+require('pry')
 
+require('Word.rb')
+#--------------------------------------------------
 describe Word, "when initializing" do
   before(:all) do
     @mstr = 'xaybzc'
@@ -95,14 +98,15 @@ describe Word, "#product" do
   before do
     @myw = Word.new('aBc')
   end
+
   it "should just join two words" do
-    @myw*Word.new('xYz').should == 'aBcxYz'
-    @myw*@myw.invert.should == 'aBcCbA'
+    (@myw*Word.new('xYz')).should == 'aBcxYz'
+    (@myw*(@myw.invert)).should == 'aBcCbA'
   end
 #
-  it "should " do
-    @myw*Word.new('1').should == 'aBc' 
-    Word.new('1')*@myw.should == 'aBc'
+  it "with 1 should not change a word" do
+    (@myw*Word.new('1')).should == 'aBc' 
+    (Word.new('1')*@myw).should == 'aBc'
   end
 # #    
 #   must "allow to take product with string" do
@@ -112,6 +116,7 @@ describe Word, "#product" do
 # #    assert_equal 'z', (@word*'xYz').G.generators[:z].to_c
 #   end
 end
+#--------------------------------------------------
 # #    
 #   must "inverse a word right" do
 #     @word.replace('abCd')
@@ -158,4 +163,6 @@ end
 # #   
 #----------
 
-#End of File
+#--------------------------------------------------
+# End of File
+#--------------------------------------------------
