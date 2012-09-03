@@ -1,11 +1,9 @@
 #
 # test_Word.rb
 #
-# Time-stamp: <2012-09-03 08:23:47 (ryosuke)>
+# Time-stamp: <2012-09-03 20:55:10 (ryosuke)>
 #
-
-src_path = Dir.pwd + '/../src'
-$:.unshift(src_path)
+$LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
 require('Word.rb')
 
