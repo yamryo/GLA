@@ -1,13 +1,15 @@
 #
-# test_Word.rb
+# Word_spec.rb
 #
-# Time-stamp: <2012-09-06 20:44:29 (ryosuke)>
+# Time-stamp: <2012-09-06 21:00:03 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
-require('Word.rb')
+require('rubygems')
+require('pry')
 
-#------------------------    
+require('Word.rb')
+#--------------------------------------------------
 describe Word, "when initializing" do
   before(:all) do
     @mstr = 'xaybzc'
@@ -89,84 +91,88 @@ describe Word, "#contract" do
 end
 #------------------------    
 describe Word, "#===" do
-  it "should compare words by using contraction" do
+  it "should compare words after contraction" do
     (Word.new('aBc') === Word.new('aBsSc')).should be_true
   end
 end
 #------------------------    
 # describe Word, "#product" do
-#   before :all do
-#     @mwd = Word.new('aBc')
-#   end
-# #
-#   context "with another normal Word" do
-#     subject { @mwd*Word.new('xYz')}
-#     it { should eq 'aBcxYz'}
-#   end
-# #    
-#   context "with the inverse" do
-#     subject { @mwd*@mwd.invert} 
-#     it { should eq 'aBcCbA'}
-#   end
-# #
-#   context "with the identity" do
-#     it { @mwd*Word.new('1').should eq @mwd }
-#     it { Word.new('1')*@mwd.should eq @mwd }
-#   end
-# #
-# end
+#    before :all do
+#      @mwd = Word.new('aBc')
+#    end
+#  #
+#    context "with another normal Word" do
+#      subject { @mwd*Word.new('xYz')}
+#      it { should eq 'aBcxYz'}
+#    end
+#  #    
+#    context "with the inverse" do
+#      subject { @mwd*@mwd.invert} 
+#      it { should eq 'aBcCbA'}
+#    end
+#  #
+#    context "with the identity" do
+#      it { @mwd*Word.new('1').should eq @mwd }
+#      it { Word.new('1')*@mwd.should eq @mwd }
+#    end
+#  #
+#end
 #------------------------    
-#    
-#   must "allow to take product with string" do
-#     @word.replace('aBc')
-#     assert_equal 'aBcxYz', @word*'xYz'
-#     assert_kind_of Word, @word*'xYz'
-# #    assert_equal 'z', (@word*'xYz').G.generators[:z].to_c
-#   end
 # #    
-#   must "inverse a word right" do
-#     @word.replace('abCd')
-#     assert_equal 'DcBA', @word.invert
-#   end
-# #    
-#   must "get nth power of a word" do
-#     @word.replace('abC')
-#     assert_equal 'abCabCabC', @word^3
-#   end
-# #    
-#   must "get 1 when word is powered by zero" do
-#     ['a', 'A', '1', 'ab', 'abC'].each do |str|
-#       assert_equal '1', @word.replace(str)^0
-#     end
-#   end
-# #    
-#  must "take a conjugate of word" do
-#     @word.replace('a')
-#     other = Word.new('b')
-#     assert_equal 'Bab', @word.conj(other)
+# #   must "allow to take product with string" do
+# #     @word.replace('aBc')
+# #     assert_equal 'aBcxYz', @word*'xYz'
+# #     assert_kind_of Word, @word*'xYz'
+# # #    assert_equal 'z', (@word*'xYz').G.generators[:z].to_c
+# #   end
+# #end
+# #--------------------------------------------------
+# # #    
+# #   must "inverse a word right" do
+# #     @word.replace('abCd')
+# #     assert_equal 'DcBA', @word.invert
+# #   end
+# # #    
+# #   must "get nth power of a word" do
+# #     @word.replace('abC')
+# #     assert_equal 'abCabCabC', @word^3
+# #   end
+# # #    
+# #   must "get 1 when word is powered by zero" do
+# #     ['a', 'A', '1', 'ab', 'abC'].each do |str|
+# #       assert_equal '1', @word.replace(str)^0
+# #     end
+# #   end
+# # #    
+# #  must "take a conjugate of word" do
+# #     @word.replace('a')
+# #     other = Word.new('b')
+# #     assert_equal 'Bab', @word.conj(other)
+# 
+# #     @word.replace('aBcde')
+# #     other = Word.new('dgKy')
+# #     assert_equal 'YkGDaBcdedgKy', @word.conj(other)
+# #     assert_equal (other.invert)*@word*other, @word.conj(other)
+# #   end
+# # #    
+# #   must "act rightly with random words" do
+# #     mstr = ''
+# #     alph = ('a'..'z').to_a.concat(('A'..'Z').to_a) 
+# #     20.times{ |k| mstr += alph[rand(alph.size)] }
+# 
+# #     assert_nothing_raised do
+# #       @word.replace(mstr)
+# #       @word.to_s
+# #       @word.invert
+# #       @word.contract
+# #       @word*@word
+# #       @word*Word.new('abcde')
+# #       (@word*@word.invert).contract
+# #     end
+# #   end
+# # #   
+# #----------
 
-#     @word.replace('aBcde')
-#     other = Word.new('dgKy')
-#     assert_equal 'YkGDaBcdedgKy', @word.conj(other)
-#     assert_equal (other.invert)*@word*other, @word.conj(other)
-#   end
-# #    
-#   must "act rightly with random words" do
-#     mstr = ''
-#     alph = ('a'..'z').to_a.concat(('A'..'Z').to_a) 
-#     20.times{ |k| mstr += alph[rand(alph.size)] }
-
-#     assert_nothing_raised do
-#       @word.replace(mstr)
-#       @word.to_s
-#       @word.invert
-#       @word.contract
-#       @word*@word
-#       @word*Word.new('abcde')
-#       (@word*@word.invert).contract
-#     end
-#   end
-# #   
-#----------
-
-#End of File
+#--------------------------------------------------
+# End of File
+#--------------------------------------------------
