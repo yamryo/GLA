@@ -1,8 +1,11 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-06 20:47:19 (ryosuke)>
+# Time-stamp: <2012-09-07 01:35:01 (ryosuke)>
 #
+
+require('rubygems')
+require('pry')
 
 require('Generator')
 
@@ -15,19 +18,12 @@ class Word < String
     str = str.gsub(/[^1a-zA-Z]/,'')
     raise(InvalidArgument) if str.size == 0
     super(str)
-#    @G = FreeGroup.new(str)
   end
 #-------------------------------
-#  attr_reader :G
 
   def show
     {:value => self, :obj_id => self.object_id}
-    #"[#{self}, alphabet = #{@alphabet}, obj_id = #{self.object_id}]"
   end
-
-  # def rebuildGroup
-  #   @G.build_gens(self)
-  # end
 
  #--- mathematical operations ---
   def ===(word)
@@ -39,8 +35,6 @@ class Word < String
   end
 
   def product_with(other_word)  # other_word can be a String object.
-    #self.class.new("#{self + other_word}").contract
-    
     if self == '1' then 
       mystr = other_word
     else 
@@ -78,12 +72,21 @@ class Word < String
    end
 
 #--- destructive methods ------  
+   def replace(other)
+     begin
+       other = other.gsub(/[^1a-zA-Z]/,'') 
+     rescue 
+       raise(InvalidArgument)
+     end
+     super(other)
+     return self
+   end
+
    def contract(*accelerate)
      #-- proccess with Generator class
      marr = []
      self.each_char do |c|
        (c == c.downcase)? k=0 : k=1 
-#         marr << @G.generators[c.downcase.to_sym].dup.inverse(k)
        marr << Generator.new(c.downcase).inverse(k)
      end
 
@@ -106,17 +109,6 @@ class Word < String
      marr.each{|g| my_str << g.to_c}
 
      return self.replace(my_str)
-   end
-
-   def replace(other)
-     other = other.gsub(/[^1a-zA-Z]/,'')
-     if other.size == 0 then
-       raise(ArgumentError)
-     else
-       super(other)
-#       self.rebuildGroup
-       return self
-     end
    end
 
    undef_method :upcase!, :downcase!, :sub!, :gsub!, :concat, :[]=
