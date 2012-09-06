@@ -1,7 +1,7 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-07 01:35:01 (ryosuke)>
+# Time-stamp: <2012-09-07 01:44:16 (ryosuke)>
 #
 
 require('rubygems')
@@ -15,8 +15,8 @@ class Word < String
 
 #--- initialize ----------------
   def initialize(str)
-    str = str.gsub(/[^1a-zA-Z]/,'')
-    raise(InvalidArgument) if str.size == 0
+    str = str.gsub(/[^1a-zA-Z]/,'') rescue raise(InvalidArgument) 
+    raise(InvalidArgument, "could not generate a word") if str.size == 0
     super(str)
   end
 #-------------------------------

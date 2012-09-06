@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-07 01:33:01 (ryosuke)>
+# Time-stamp: <2012-09-07 01:58:14 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -30,9 +30,17 @@ describe Word, "when initializing" do
   end
 #
   context "with a string consisting of non-alphabet letters" do
-    it "should raise error" do
+    it "should raise Word::InvalidArgument error" do
       ['0', '2', '00', '28302370', '&;/:;*+][', '*3]0:[2+8;'].each do |str|
         expect{ Word.new(str) }.to raise_error(Word::InvalidArgument)
+      end
+    end
+  end
+#
+  context "with a non-String argument" do
+    it "should raise Word::InvalidArgument error" do
+      [1, 0.238, [1,1,1], 5..10].each do |non_str|
+        expect{ Word.new(non_str) }.to raise_error(Word::InvalidArgument)
       end
     end
   end
@@ -136,24 +144,26 @@ end
 
 #------------------------
 describe Word, "#product" do
-   before :all do
-     @mwd = Word.new('aBc')
-   end
+  before :all do
+    @mwd = Word.new('aBc')
+  end
  #
-   context "with another normal Word" do
-     subject { @mwd*Word.new('xYz')}
-     it { should eq 'aBcxYz'}
-   end
+  context "with the identity" do
+    it "should be the original Word 'aBc'" do
+      (@mwd*Word.new('1')).should eq @mwd 
+      (Word.new('1')*@mwd).should eq @mwd 
+    end
+  end
  #
-   context "with the inverse" do
-     subject { @mwd*@mwd.invert}
-     it { should eq 'aBcCbA'}
-   end
+  context "with another normal Word 'xYz'" do
+    subject { @mwd*Word.new('xYz')}
+    it { should eq 'aBcxYz'}
+  end
  #
-   context "with the identity" do
-     it { (@mwd*Word.new('1')).should eq @mwd }
-     it { (Word.new('1')*@mwd).should eq @mwd }
-   end
+  context "with the inverse" do
+    subject { @mwd*@mwd.invert}
+    it { should eq 'aBcCbA'}
+  end
  #
 end
 #------------------------
