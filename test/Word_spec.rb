@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-07 01:58:14 (ryosuke)>
+# Time-stamp: <2012-09-07 02:02:00 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -18,9 +18,7 @@ describe Word, "when initializing" do
   end
 #
   context "without arguments" do
-    it "should raise error" do
-      expect{ Word.new }.to raise_error
-    end
+    it { expect{ Word.new }.to raise_error }
   end
 #
   context "with a string including non-alphabet letters" do
