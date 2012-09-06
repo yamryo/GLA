@@ -1,10 +1,9 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-04-16 23:28:13 (ryosuke)>
+# Time-stamp: <2012-09-06 20:47:19 (ryosuke)>
 #
 
-#require('FreeGroup')
 require('Generator')
 
 class Word < String

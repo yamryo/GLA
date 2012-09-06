@@ -1,44 +1,47 @@
 #
 # test_Word.rb
 #
-# Time-stamp: <2012-09-03 20:55:10 (ryosuke)>
+# Time-stamp: <2012-09-06 20:44:29 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
 require('Word.rb')
 
+#------------------------    
 describe Word, "when initializing" do
   before(:all) do
     @mstr = 'xaybzc'
     @word = Word.new(@mstr)
   end
 #
-  it "should be right" do
-    @word.should == @mstr
-    %w[a A x 1 aA].each{ |c| Word.new(c).should == c}
-    # assert_equal %w[a b c x y z], @word.G.alphabet
-   end
-#
-  it "should raise error if no arguments" do
-    expect{ Word.new }.to raise_error
+  context "with a string of alphabet and '1'" do
+    it { Word.new('xaybzc').should == 'xaybzc' }
+    it { %w[a A x aA].each{ |c| Word.new(c).should == c} }
+    it { Word.new('1').should == '1' } 
   end
 #
-  it "should consist of alphabet only" do
-    Word.new('This&is(a]Test$8String0/').should == 'ThisisaTestString'
-   end
-#
-  it "should ignore letters which are not alphabet" do
-    Word.new('aBA3$#e0-c:').should == 'aBAec'
+  context "without arguments" do
+    it "should raise error" do
+      expect{ Word.new }.to raise_error(Word::InvalidArgument)
+    end
   end
 #
-  it "should raise error when a string without alphabet given" do
-    ['0', '2', '00', '28302370', '&;/:;*+]['].each do |str| 
-      expect{ Word.new(str) }.to raise_error(Word::InvalidArgument)
+  context "with a string including non-alphabet letters" do
+    it "should exclude non-alphabets" do
+      Word.new('Al&p(hab]e$tO8nl0y/').should == 'AlphabetOnly'
+    end
+  end
+#
+  context "with a string consisting of non-alphabet letters" do
+    it "should raise error" do
+      ['0', '2', '00', '28302370', '&;/:;*+]['].each do |str| 
+        expect{ Word.new(str) }.to raise_error(Word::InvalidArgument)
+      end
     end
   end
 #
 end 
-
+#------------------------    
 describe Word, "#show" do
   it "should show information in hash table style" do
     info = Word.new('aioStwfmXb').show
@@ -47,7 +50,7 @@ describe Word, "#show" do
   end
 #
 end
-
+#------------------------    
 describe Word, "#==" do
   it "should compare words without contraction" do
     mwrd = Word.new('aBAa')
@@ -68,7 +71,7 @@ describe Word, "#replace" do
    end
 #
 end    
-
+#------------------------    
 describe Word, "#contract" do
   before(:all) do
     @myw = Word.new('a')
@@ -84,21 +87,36 @@ describe Word, "#contract" do
   end
 #    
 end
-#
+#------------------------    
 describe Word, "#===" do
   it "should compare words by using contraction" do
     (Word.new('aBc') === Word.new('aBsSc')).should be_true
   end
 end
-#    
-#   must "product words right" do
-#     @word.replace('aBc')
-#     assert_equal 'aBcxYz', @word*Word.new('xYz')
-#     assert_equal 'aBc', @word*Word.new('1')
-#     assert_equal 'aBc', Word.new('1')*@word
-#     assert_equal 'aBcCbA', @word*@word.invert
+#------------------------    
+# describe Word, "#product" do
+#   before :all do
+#     @mwd = Word.new('aBc')
+#   end
+# #
+#   context "with another normal Word" do
+#     subject { @mwd*Word.new('xYz')}
+#     it { should eq 'aBcxYz'}
 #   end
 # #    
+#   context "with the inverse" do
+#     subject { @mwd*@mwd.invert} 
+#     it { should eq 'aBcCbA'}
+#   end
+# #
+#   context "with the identity" do
+#     it { @mwd*Word.new('1').should eq @mwd }
+#     it { Word.new('1')*@mwd.should eq @mwd }
+#   end
+# #
+# end
+#------------------------    
+#    
 #   must "allow to take product with string" do
 #     @word.replace('aBc')
 #     assert_equal 'aBcxYz', @word*'xYz'
