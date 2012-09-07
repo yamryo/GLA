@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-09-07 17:23:33 (ryosuke)>
+# Time-stamp: <2012-09-07 18:49:59 (ryosuke)>
 #
 
 require('Word')
@@ -31,10 +31,10 @@ class Term
   attr_reader :word, :coeff
 #-------------------------------
 
-  def setup(*arg)
-    self.initialize(*arg)
-    return self
-  end
+  # def setup(*arg)
+  #   self.initialize(*arg)
+  #   return self
+  # end
 
   def coeff=(num)
     num.kind_of?(Fixnum) ? @coeff = num : raise(InvalidArgument)
