@@ -1,7 +1,7 @@
 #
 # test_Generator.rb
 #
-# Time-stamp: <2012-09-07 13:26:24 (ryosuke)>
+# Time-stamp: <2012-09-07 13:29:47 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -19,9 +19,9 @@ describe Generator, "when initialized" do
   end
 #
   context "with bad letters '&','2' and ' '(space)" do
-    it { expect{ Generator.new('&') }.to raise_error(Generator::InvalidLetter) }
-    it { expect{ Generator.new('2') }.to raise_error(Generator::InvalidLetter) }
-    it { expect{ Generator.new(' ') }.to raise_error(Generator::InvalidLetter) }
+    ['&','2',' '].each do |c|
+      it { expect{ Generator.new(c) }.to raise_error(Generator::InvalidLetter) }
+    end
   end
 #
   context "with no argument" do
