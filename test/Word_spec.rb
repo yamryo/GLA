@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-07 17:49:24 (ryosuke)>
+# Time-stamp: <2012-09-07 17:51:19 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -246,8 +246,8 @@ describe Word, "generated in a random manner" do
       @mstr = ''
       20.times{ |k| @mstr += @alph[rand(@alph.size)] }
       random_word = Word.new(@mstr)
-      p random_word
-      expect do
+#      p random_word
+      (expect do
         random_word.to_s
         random_word.invert
         random_word.replace('qoeEoKlrjfij')
@@ -256,7 +256,7 @@ describe Word, "generated in a random manner" do
         random_word*random_word
         random_word*(Word.new('abcde'))
         (random_word*random_word.invert).contract
-      end.not_to raise_error
+      end).not_to raise_error
     end
   end
 end
