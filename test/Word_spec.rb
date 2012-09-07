@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-07 09:35:38 (ryosuke)>
+# Time-stamp: <2012-09-07 17:49:24 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -260,15 +260,6 @@ describe Word, "generated in a random manner" do
     end
   end
 end
-# # #
-# #   must "act rightly with random words" do
-# #     
-#
-# #     assert_nothing_raised do
-# #     end
-# #   end
-# # #
-# #----------
 #--------------------------------------------------
 # End of File
 #--------------------------------------------------
