@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-04-22 16:30:33 (ryosuke)>
+# Time-stamp: <2012-09-07 17:23:33 (ryosuke)>
 #
 
 require('Word')
@@ -9,55 +9,61 @@ require('Word')
 #---------------------------
 class Term
   
-  def initialize(word, *arg)
+  InvalidArgument = Class.new(StandardError)
+
+#--- initialize ----------------
+  def initialize(*arg)
+    raise(InvalidArgument, "no arguments!!") unless arg.size > 0
+    word = arg[0]
     case word.class.name
     when 'Word' then @word = word
     when 'String' then @word = Word.new(word)
-    else raise ArgumentError, "The argument is not of Word or String class." 
+    else raise InvalidArgument, "The argument is not a Word or a String." 
     end
-
-    if arg.size > 0 then 
-      unless arg[0].to_i == arg[0] then
-        raise ArgumentError, "The second argument must be an integer." 
-      end
-      @coeff = arg[0]
-    else
+    
+    if arg.size == 1 then 
       @coeff = 1
+    else
+      raise InvalidArgument, "The second argument must be an integer." unless arg[1].kind_of?(Fixnum)
+      @coeff = arg[1]
     end
   end
   attr_reader :word, :coeff
+#-------------------------------
 
-  def setup
+  def setup(*arg)
+    self.initialize(*arg)
     return self
   end
 
   def coeff=(num)
-    @coeff = num
-    @word = '1' if num == 0
+    num.kind_of?(Fixnum) ? @coeff = num : raise(InvalidArgument)
+    return self
   end
 
   def ==(other_term)
-    (@word == other_term.word) and (@coeff == other_term.coeff)
+    raise(InvalidArgument) unless other_term.kind_of?(Term)
+    return ((@word == other_term.word) and (@coeff == other_term.coeff))
   end
   def =~(other_term)
-    @word == other_term.word
+    raise(InvalidArgument) unless other_term.kind_of?(Term)
+    return (@word == other_term.word)
   end
 
+  def *(other)
+    if other.kind_of?(Term) then
+      self.product_with(other)
+    elsif other.kind_of?(Fixnum) then
+      self.multiplied_by(other)
+    else
+      raise InvalidArgment, "the argment should be of Term or of Fixnum"
+    end
+  end
   def product_with(other_term)
     self.class.new(@word*other_term.word, @coeff * other_term.coeff)
   end
   def multiplied_by(k)
-    @coeff *= k.to_i
-    return self
-  end
-  def *(other)
-    if other.class == Term then
-      self.product_with(other)
-    elsif other.class == Fixnum then
-      self.multiplied_by(other)
-    else
-      raise ArgmentError, "the argment should be an object of Term class or Fixnum class"
-    end
+    self.class.new(@word, @coeff * k.to_i) 
   end
   
   def contract
