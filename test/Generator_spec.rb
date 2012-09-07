@@ -1,7 +1,7 @@
 #
-# test_Generator.rb
+# Generator_spec.rb
 #
-# Time-stamp: <2012-09-07 13:29:47 (ryosuke)>
+# Time-stamp: <2012-09-07 15:45:05 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -65,15 +65,15 @@ describe Generator, "comparisons" do
     it "should return true iff the letters coinside" do
       (@gen_1 =~ @gen_2).should be_true
       (@gen_1 =~ @gen_3).should be_true
-      (@gen_1 =~ @gen_4).should be_false
+      (@gen_1 =~ @gen_4).should_not be_true
     end
   end
 #
   context "==, the normal comparing," do
     it "should return true iff the letters and inverseness coinside" do
       (@gen_1 == @gen_2).should be_true
-      (@gen_1 == @gen_3).should be_false
-      (@gen_1 == @gen_4).should be_false
+      (@gen_1 == @gen_3).should_not be_true
+      (@gen_1 == @gen_4).should_not be_true
     end
   end
 #
