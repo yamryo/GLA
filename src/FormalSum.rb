@@ -1,11 +1,10 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-05-07 17:51:57 (ryosuke)>
+# Time-stamp: <2012-09-07 20:30:38 (ryosuke)>
 #
 
 require('Term')
-require('ruby-debug')  #require('pry')
 
 #-------------------------------
 class FormalSum

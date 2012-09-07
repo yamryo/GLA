@@ -1,7 +1,7 @@
 #
 # Term_spec.rb
 #
-# Time-stamp: <2012-09-07 18:29:31 (ryosuke)>
+# Time-stamp: <2012-09-07 20:35:26 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
