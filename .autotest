@@ -1,5 +1,4 @@
 Autotest.add_hook :initialize do |at|
-  at.add_mapping(/src\/(.*)\.rb$/, true) do |f, _|
-    Dir.glob 'test/**/$1_spec.rb'
-  end
+  at.add_mapping(%r%^src\/(.*)\.rb$%) {|_, match| ["test/#{match[1]}_spec.rb"] }
+  at.add_mapping(%r%^test\/.*_spec.rb$%) { |filename, _| filename }
 end

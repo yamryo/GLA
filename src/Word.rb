@@ -1,7 +1,7 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-07 08:31:03 (ryosuke)>
+# Time-stamp: <2012-09-07 19:23:11 (ryosuke)>
 #
 
 require('rubygems')

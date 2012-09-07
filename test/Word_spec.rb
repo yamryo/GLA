@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-07 17:51:19 (ryosuke)>
+# Time-stamp: <2012-09-07 19:37:27 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -55,23 +55,33 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#==" do
+describe Word, "comparisons" do
   before { @mwrd = Word.new('aBAa') }
-  context "comparing a Word with itself" do
-    subject { @mwrd == @mwrd}
-    it { should be_true}
+#
+  context "==, comparing as Strings," do
+#    
+    context "comparing a Word to itself" do
+      subject { @mwrd == @mwrd}
+      it { should be_true }
+    end
+#
+    context "comparing a Word to itself contracted" do
+      subject { @mwrd == @mwrd.dup.contract }
+      it { should be_false}
+    end
+#    
+    context "comparing a Word with a String" do
+      subject { @mwrd == 'aBAa' }
+      it { should be_true }
+    end
+#
   end
 #
-  context "comparing a Word with itself contracted" do
-    subject { @mwrd == Word.new('aB') }
-    it { should be_false}
-  end
-#    
-  context "comparing a Word with a String" do
-    subject { @mwrd == 'aBAa' }
+  context "===, comparing with contraction," do
+    subject { @mwrd === @mwrd.dup.contract }
     it { should be_true }
   end
-#    
+#
 end
 #------------------------
 
@@ -130,13 +140,6 @@ describe Word, "#contract" do
     it { should == '1' }
   end
 #
-end
-#------------------------
-
-#------------------------ 
-describe Word, "#===" do
-  subject { Word.new('aBc') === Word.new('aBsSc') }
-  it { should be_true }
 end
 #------------------------
 
