@@ -1,7 +1,7 @@
 #
 # Term_spec.rb
 #
-# Time-stamp: <2012-09-07 17:37:13 (ryosuke)>
+# Time-stamp: <2012-09-07 18:29:31 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -280,8 +280,8 @@ describe Term, "#degree" do
     it { should == 3 }
   end
 #
-  context "of '-4AbcCB'" do
-    subject { Term.new('AbcCB', -4).degree }
+  context "of '10AbcCB'" do
+    subject { Term.new('AbcCB', 10).degree }
     it { should == 1 }
   end
 #
