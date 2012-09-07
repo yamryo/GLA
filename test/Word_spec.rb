@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-07 02:02:00 (ryosuke)>
+# Time-stamp: <2012-09-07 09:35:38 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -158,6 +158,13 @@ describe Word, "#product" do
     it { should eq 'aBcxYz'}
   end
  #
+  context "with a String 'UvW'" do
+    it { (@mwd*'UvW').should eq 'aBcUvW'}
+    it "should be an instance of Word class" do
+      (@mwd*'UvW').kind_of?(Word).should be_true
+    end
+  end
+ #
   context "with the inverse" do
     subject { @mwd*@mwd.invert}
     it { should eq 'aBcCbA'}
@@ -167,56 +174,97 @@ end
 #------------------------
 
 #------------------------
-# #
-# #   must "allow to take product with string" do
-# #     @word.replace('aBc')
-# #     assert_equal 'aBcxYz', @word*'xYz'
-# #     assert_kind_of Word, @word*'xYz'
-# # #    assert_equal 'z', (@word*'xYz').G.generators[:z].to_c
-# #   end
-# #end
-# #--------------------------------------------------
-# # #
-# #   must "inverse a word right" do
-# #     @word.replace('abCd')
-# #     assert_equal 'DcBA', @word.invert
-# #   end
-# # #
-# #   must "get nth power of a word" do
-# #     @word.replace('abC')
-# #     assert_equal 'abCabCabC', @word^3
-# #   end
-# # #
-# #   must "get 1 when word is powered by zero" do
-# #     ['a', 'A', '1', 'ab', 'abC'].each do |str|
-# #       assert_equal '1', @word.replace(str)^0
-# #     end
-# #   end
-# # #
-# #  must "take a conjugate of word" do
-# #     @word.replace('a')
-# #     other = Word.new('b')
-# #     assert_equal 'Bab', @word.conj(other)
+describe Word, "#invert" do  
+  context "of a normal Word 'abCd'" do
+    subject { Word.new('abCd').invert }
+    it { should ==  'DcBA' }
+  end
 #
-# #     @word.replace('aBcde')
-# #     other = Word.new('dgKy')
-# #     assert_equal 'YkGDaBcdedgKy', @word.conj(other)
-# #     assert_equal (other.invert)*@word*other, @word.conj(other)
-# #   end
+  context "of a Word of a single letter 'a'" do
+    subject { Word.new('a').invert }
+    it { should ==  'A' }
+  end
+#
+  context "of the identity" do
+    subject { Word.new('1').invert }
+    it { should ==  '1' }
+  end
+#
+end
+#------------------------
+
+#------------------------
+describe Word, "#^ (power)" do
+  before { @mwd = Word.new('bWd') }
+  context "with a natural number" do
+    subject { @mwd^3 }
+    it { should == 'bWdbWdbWd' }
+  end
+#
+  context "with zero" do
+    it "should be '1'" do
+     ['a', 'A', '1', 'ab', 'abC'].each do |str|
+        (@mwd.replace(str)^0).should == '1'
+      end
+    end
+#
+  end
+end
+#------------------------
+
+#------------------------
+describe Word, "#conjugate" do
+  before :all do
+    @word = Word.new('a')
+    @another = Word.new('b')
+  end
+#
+  context "of 'a' with 'b'" do
+    subject { @word.conj(@another) }
+    it { should == 'Bab' }
+  end
+#
+  context "of @word='aBcde' with @another='dgKy'" do
+    subject { (@word.replace('aBcde')).conj(@another.replace('dgKy')) }
+    it { should == 'YkGDaBcdedgKy' }
+    it "should be equal to (@another.invert)*@word*@another" do
+      should ==  (@another.invert)*@word*@another 
+    end
+  end
+#
+end
+#------------------------
+
+#------------------------
+describe Word, "generated in a random manner" do
+  before do
+    @alph = ('a'..'z').to_a + ('A'..'Z').to_a + ['1']
+  end
+#
+  it "should raise no error in any method" do
+    10.times do |i|
+      @mstr = ''
+      20.times{ |k| @mstr += @alph[rand(@alph.size)] }
+      random_word = Word.new(@mstr)
+      p random_word
+      expect do
+        random_word.to_s
+        random_word.invert
+        random_word.replace('qoeEoKlrjfij')
+        random_word^5
+        random_word.contract
+        random_word*random_word
+        random_word*(Word.new('abcde'))
+        (random_word*random_word.invert).contract
+      end.not_to raise_error
+    end
+  end
+end
 # # #
 # #   must "act rightly with random words" do
-# #     mstr = ''
-# #     alph = ('a'..'z').to_a.concat(('A'..'Z').to_a)
-# #     20.times{ |k| mstr += alph[rand(alph.size)] }
+# #     
 #
 # #     assert_nothing_raised do
-# #       @word.replace(mstr)
-# #       @word.to_s
-# #       @word.invert
-# #       @word.contract
-# #       @word*@word
-# #       @word*Word.new('abcde')
-# #       (@word*@word.invert).contract
 # #     end
 # #   end
 # # #

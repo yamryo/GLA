@@ -1,7 +1,7 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-07 01:44:16 (ryosuke)>
+# Time-stamp: <2012-09-07 08:31:03 (ryosuke)>
 #
 
 require('rubygems')
@@ -64,7 +64,7 @@ class Word < String
    end
 
    def conjugated_with(other)  # The argument 'other' can be a String object.
-     other = self.class.new(other) if other.class == String
+     other = self.class.new(other) if other.kind_of?(String)
      (other.invert)*self*other
    end
    def conj(other_word)
