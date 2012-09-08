@@ -1,7 +1,7 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-09-07 20:57:27 (ryosuke)>
+# Time-stamp: <2012-09-08 22:28:01 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -10,35 +10,46 @@ require('pry')
 
 require('FormalSum.rb')
 
-   Zero = FormalSum::Zero
-   One = FormalSum::One
+Zero = FormalSum::Zero
+One = FormalSum::One
 
 #------------------------------------
 describe FormalSum, "when initialized" do
   before(:all){ @fs = FormalSum.new(Zero) }
 #
-  context "with the zero Term" do
-    it "should include Terms in Array" do
-      @fs.terms.kind_of?(Array).should be true
-    end 
+  context "with a String" do
+    before do
+      @str = '2+a-B-4s'
+      @arr= %w[2 a -B -4s]
+      @fs = FormalSum.new(@str)
+      @tarr = @fs.terms
+    end
 #
-    it { (@fs.terms).should == [Zero]}
+    it "should equip an Array of Terms" do
+       (@tarr.size).times do |k|
+        @tarr[k].kind_of?(Term).should be_true
+        (@tarr[k].to_s).should == @arr[k]
+      end
+    end
+#
+    it "should initialize with String including zero terms" do
+      FormalSum.new("0+2+00-3ab+0aG-8Cd").to_s.should == "2-3ab-8Cd"
+    end
+#
+    it "initialize with more complicated strings" do
+      FormalSum.new('a+30').terms.join(',').should == "a,30"
+      FormalSum.new('100+b').terms.join(',').should == "100,b"
+    end
 #
   end
-# #   must "initialize with String" do
-# #     %w[1+a-Bc a+B-4s 1+A-6 a+30 3+a 1].each do 
-# #       |str| assert_equal str, FormalSum.new(str).to_s
-# #     end
-# #   end
-# # #    
-# #   must "initialize with String including zero terms" do
-# #     assert_equal "2-3ab-8Cd", FormalSum.new("0+2+00-3ab+0aG-8Cd").to_s
-# #   end
-# # #    
-# #   must "initialize with more complicated strings" do
-# #     assert_equal "a,30", FormalSum.new('a+30').terms.join(',')
-# #     assert_equal "100,b", FormalSum.new('100+b').terms.join(',')
-# #   end
+#
+  context "with the zero Term" do
+    it "should equip an Array of Terms" do
+      @fs.terms.kind_of?(Array).should be true
+      (@fs.terms)[0].should == Zero
+    end 
+  end
+# 
 end
 #------------------------------------
 
