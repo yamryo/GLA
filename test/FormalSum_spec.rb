@@ -1,7 +1,7 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-09-08 22:28:01 (ryosuke)>
+# Time-stamp: <2012-09-08 23:42:35 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -43,25 +43,31 @@ describe FormalSum, "when initialized" do
 #
   end
 #
-  context "with the zero Term" do
+  context "with a Term" do
     it "should equip an Array of Terms" do
       @fs.terms.kind_of?(Array).should be true
       (@fs.terms)[0].should == Zero
     end 
   end
 # 
+  context "with Terms" do
+  end
+#
+  context "with an Array of Term" do
+  end
+#
 end
 #------------------------------------
 
 #------------------------------------
 describe FormalSum, "#to_s" do
-  context "" do
-    it { FormalSum.new(One).to_s.should == '1' }
-    it { FormalSum.new(Zero, One).to_s.should == '1' }
-    it { FormalSum.new([One, Zero]).to_s.should == '1' }
-    it { FormalSum.new([One, Zero, Term.new('a')]).to_s.should == '1+a' }
-    it { FormalSum.new(One, Zero, Term.new('aAB', -2)).to_s.should == '1-2aAB'}
-    it { FormalSum.new([One, Term.new('2xe', -4)]).to_s.should == '1-4xe'}
+  it "should yield the String expressing the given FormalSum" do
+    FormalSum.new(One).to_s.should == '1'
+    FormalSum.new(Zero, One).to_s.should == '1'
+    FormalSum.new([One, Zero]).to_s.should == '1'
+    FormalSum.new([One, Zero, Term.new('a')]).to_s.should == '1+a'
+    FormalSum.new(One, Zero, Term.new('aAB', -2)).to_s.should == '1-2aAB'
+    FormalSum.new([One, Term.new('2xe', -4)]).to_s.should == '1-4xe'
   end
 end
 #------------------------------------
@@ -74,7 +80,6 @@ end
 # end
 # #------------------------------------
 #
-# # #    
 # #   must "perform addition of formal sums as simply connecting them with '+'" do
 # #     fs_1 = FormalSum.new(Term.new('a'),Term.new('b', -1))
 # #     fs_2 = FormalSum.new(Term.new('c'), Term.new('de', -3))
