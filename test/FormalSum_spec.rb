@@ -1,12 +1,12 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-09-08 23:42:35 (ryosuke)>
+# Time-stamp: <2012-09-11 20:46:05 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
-require('rubygems')
 require('pry')
+require('pry-nav')
 
 require('FormalSum.rb')
 
@@ -15,45 +15,80 @@ One = FormalSum::One
 
 #------------------------------------
 describe FormalSum, "when initialized" do
-  before(:all){ @fs = FormalSum.new(Zero) }
+  #
+  context "with a Term" do
+    before do
+      @trm = Term.new('-5wojCSisA')
+      @fs = FormalSum.new(@trm)
+    end
+    #
+    it "should equip an Array of a single Term" do
+      @fs.terms.kind_of?(Array).should be_true
+      @fs.terms.should == [@trm]
+    end
+    #
+    context "with the Zero" do
+      it "should equip an Array of a single Zero" do
+        zerofs = FormalSum.new(Zero)
+        zerofs.terms.kind_of?(Array).should be_true
+        zerofs.terms.should == [Zero]
+      end 
+    end
+    #
+  end
+  # 
+  context "without arguments" do
+    subject { @fs = FormalSum.new.terms }
+    it { should == [Zero] }
+  end
+  #
+  context "with Terms" do
+    before { @t = Term.new('aAB', -2)}
+    #
+    it "should not ignore the Zero term" do
+      FormalSum.new(One, Zero, @t).terms[0].should == One
+      FormalSum.new(One, Zero, @t).terms[1].should == Zero
+      FormalSum.new(One, Zero, @t).terms[2].should == @t
+      FormalSum.new(One, Zero, @t).terms.size.should == 3
+    end
+  end
+#
+  context "with an Array of Terms" do
+    before :all do
+      @t = Term.new('2xe', -4)
+      @zero = Term.new('Wiejr',0)
+    end
+#
+    it "should be a FormalSum of the given Terms" do
+      FormalSum.new([One, @t]).terms.should == [One, @t]
+    end
+#
+    it "should not ignore the Zero" do
+      FormalSum.new([One, Zero]).terms.should == [One, Zero]
+      FormalSum.new([@zero, One, @t]).terms.should == [@zero, One, @t]
+    end
+  end
 #
   context "with a String" do
     before do
-      @str = '2+a-B-4s'
-      @arr= %w[2 a -B -4s]
+      @str = '2+c-B-4s'
+      @arr= %w[(2)1 (1)c (-1)B (-4)s]
       @fs = FormalSum.new(@str)
       @tarr = @fs.terms
     end
 #
     it "should equip an Array of Terms" do
-       (@tarr.size).times do |k|
+      (@tarr.size).times do |k|
         @tarr[k].kind_of?(Term).should be_true
-        (@tarr[k].to_s).should == @arr[k]
+        (@tarr[k].show).should == @arr[k]
       end
     end
 #
-    it "should initialize with String including zero terms" do
-      FormalSum.new("0+2+00-3ab+0aG-8Cd").to_s.should == "2-3ab-8Cd"
+    it "should not ignore zero terms" do
+      t = FormalSum.new('-3+6acB-a+0bKde-00+0-50')
+      t.terms.join(',').should == '-3,6acB,-a,0,0,0,-50'
+      (t.terms[3]) == { word: 'bKde', coeff: 0 }
     end
-#
-    it "initialize with more complicated strings" do
-      FormalSum.new('a+30').terms.join(',').should == "a,30"
-      FormalSum.new('100+b').terms.join(',').should == "100,b"
-    end
-#
-  end
-#
-  context "with a Term" do
-    it "should equip an Array of Terms" do
-      @fs.terms.kind_of?(Array).should be true
-      (@fs.terms)[0].should == Zero
-    end 
-  end
-# 
-  context "with Terms" do
-  end
-#
-  context "with an Array of Term" do
   end
 #
 end
@@ -61,14 +96,132 @@ end
 
 #------------------------------------
 describe FormalSum, "#to_s" do
-  it "should yield the String expressing the given FormalSum" do
-    FormalSum.new(One).to_s.should == '1'
-    FormalSum.new(Zero, One).to_s.should == '1'
-    FormalSum.new([One, Zero]).to_s.should == '1'
-    FormalSum.new([One, Zero, Term.new('a')]).to_s.should == '1+a'
-    FormalSum.new(One, Zero, Term.new('aAB', -2)).to_s.should == '1-2aAB'
-    FormalSum.new([One, Term.new('2xe', -4)]).to_s.should == '1-4xe'
+  context "for a FormalSum without zero terms" do
+    subject { FormalSum.new('-3+6acB-a-50').to_s}
+    it { should == '-3+6acB-a-50'} 
   end
+#
+  context "for a FormalSum with zero terms" do
+    subject { FormalSum.new('-3+6acB-a+0bKde-0+0-50').to_s}
+    it { should == '-3+6acB-a-50'} 
+  end
+#
+  context "for a FormalSum with zero terms only" do
+    subject { FormalSum.new('-0+0acB-0a+0bKde-0+0+0').to_s}
+    it { should == '0'} 
+  end
+#
+  context "for Zero" do
+    subject { FormalSum.new.to_s}
+    it { should == '0'} 
+  end
+#
+  context "for One" do
+    subject { FormalSum.new(One).to_s}
+    it { should == '1'} 
+  end
+#
+end
+#------------------------------------
+
+#------------------------------------
+describe FormalSum, "#show" do
+  context "for a FormalSum without zero terms" do
+    subject { FormalSum.new('-3+6acB-a-50').show}
+    it { should == '(-3)1+(6)acB+(-1)a+(-50)1'} 
+  end
+#
+  context "for a FormalSum with zero terms" do
+    subject { FormalSum.new('-3+6acB-a+0bKde-0+0-50').show}
+    it { should == '(-3)1+(6)acB+(-1)a+(0)bKde+(0)1+(0)1+(-50)1'} 
+  end
+#
+  context "for a FormalSum with zero terms only" do
+    subject { FormalSum.new('-0+0acB-0a+0bKde+0').show}
+    it { should == '(0)1+(0)acB+(0)a+(0)bKde+(0)1'} 
+  end
+#
+  context "for Zero" do
+    subject { FormalSum.new.show}
+    it { should == '(0)1'} 
+  end
+#
+  context "for One" do
+    subject { FormalSum.new(One).show}
+    it { should == '(1)1'} 
+  end
+#
+end
+#------------------------------------
+
+#------------------------------------
+describe FormalSum, "addition" do
+  before :all do
+    @fs_1 = FormalSum.new('a-b')
+    @fs_2 = FormalSum.new('c-3de')
+    @zfs = FormalSum.new('0a-0b')
+  end
+#
+  context "for 'a-b' and 'c-3de'" do
+    it { (@fs_1+@fs_2).to_s.should == 'a-b+c-3de' }
+  end
+# 
+  context "for a FormalSum and Zero" do
+    it "should simply connect two Array of Terms" do
+      (@fs_1+@zfs).show.should == '(1)a+(-1)b+(0)a+(0)b'
+    end
+  end
+#
+end
+#------------------------------------
+
+#------------------------------------
+describe FormalSum, "#opposite" do
+  context "for a FormalSum with zero terms" do
+    before { @zfs = FormalSum.new('0-0aBCD+00') }
+    #
+    it "should cause to no change" do
+      expect { @zfs.opposite }.not_to change{ @zfs } 
+    end
+  end
+#
+  context "for a normal FormalSum" do
+    before { @fs = FormalSum.new('a-b+c-3de') }
+    #
+    it "should change the sign of each Term" do
+      (@fs.opposite.terms.map{ |t| t.sign }).should == ['-','+','-','+'] 
+    end
+  end
+#
+end
+#------------------------------------
+
+#------------------------------------
+describe FormalSum, "#sort" do
+  before(:all){ @fs = FormalSum.new('a-1+bA') }
+  #
+  context "for a FormalSum 'a+1+bA'" do
+    subject { @fs.sort.to_s }
+    it { should == '-1+a+bA' }
+  end
+  #
+  context "for a FormalSum 'a-1+bA+0a-0k'" do
+    subject { (@fs+'0a-0k').sort.show }
+    it { should == '(-1)1+(0)a+(1)a+(0)k+(1)bA' }
+  end
+  #
+  context "of non-destructive type" do
+    it { expect { @fs.sort }.not_to change{ @fs.terms } }
+  end
+  #
+  context "of destructive type" do
+    it { expect { @fs.sort! }.to change{ @fs.terms } }
+  end
+  #
+  context "about uppercases and lowercases" do
+    it { FormalSum.new('a+bs-bS+M+1-A-0b+bsX').sort.to_s.should == '1+a-A+M+bs-bS+bsX' }
+  end
+  #
 end
 #------------------------------------
 
@@ -80,37 +233,8 @@ end
 # end
 # #------------------------------------
 #
-# #   must "perform addition of formal sums as simply connecting them with '+'" do
-# #     fs_1 = FormalSum.new(Term.new('a'),Term.new('b', -1))
-# #     fs_2 = FormalSum.new(Term.new('c'), Term.new('de', -3))
-# #     fs_3 = FormalSum.new(Term.new('a'),Term.new('b'))
-
-# #     assert_equal "a-b+c-3de", (fs_1 + fs_2).to_s
-# #     assert_equal "a-b", fs_1.to_s
-# #     assert_equal "a-b+a+b", (fs_1+fs_3).to_s
-# #   end
-# # #    
-# #   must "not be changed by addition with zero" do
-# #     mstr = "ac-5Ab"
-# #     assert_equal mstr, (@fs + FormalSum.new(mstr)).to_s
-# #   end
-# # #    
 # #   must "sort terms by degree, then by word, last by coefficient" do
-# #     @fs += FormalSum.new('a+1+bA')
-# # # non-destructive sort 
-# #     assert_equal ["1","a","bA"], @fs.sort.terms.map{ |t| t.to_s }
-# #     assert_equal ["a","1","bA"], @fs.terms.map{ |t| t.to_s }
-
-# # # destructive sort 
-# #     assert_equal ["1","a","bA"], @fs.sort!.terms.map{ |t| t.to_s }
-# #     assert_equal ["1","a","bA"], @fs.terms.map{ |t| t.to_s }
-
-# #     @fs += FormalSum.new('+2a+3cVe-6+10oLfP-2bc-v-4cVe') 
-# #     assert_equal ["-6","1","a","2a","-v","bA","-2bc","-4cVe","3cVe","10oLfP"], 
-# #     @fs.sort.terms.map{ |t| t.to_s }
-
-# #     assert_equal ["M","a"], FormalSum.new('a+M').sort.terms.map{ |t| t.to_s }
-# #     assert_equal ["M","-a"], FormalSum.new('-a+M').sort.terms.map{ |t| t.to_s }
+# #     
 # #   end
 # # #    
 # #   must "extract a homogeneous part" do

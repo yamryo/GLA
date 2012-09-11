@@ -1,11 +1,8 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-07 19:23:11 (ryosuke)>
+# Time-stamp: <2012-09-11 18:04:47 (ryosuke)>
 #
-
-require('rubygems')
-require('pry')
 
 require('Generator')
 
@@ -21,8 +18,8 @@ class Word < String
   end
 #-------------------------------
 
-  def show
-    {:value => self, :obj_id => self.object_id}
+  def show 
+    {:value => self, :obj_id => self.object_id} 
   end
 
  #--- mathematical operations ---
@@ -30,8 +27,8 @@ class Word < String
     (word*self.invert).dup.contract == '1'
   end
 
-  def invert
-    self.dup.reverse.swapcase
+  def invert 
+    self.dup.reverse.swapcase 
   end
 
   def product_with(other_word)  # other_word can be a String object.
@@ -59,9 +56,7 @@ class Word < String
        return nil
      end
    end
-   def ^(int)
-     self.powered_by(int)
-   end
+   def ^(int) self.powered_by(int) end
 
    def conjugated_with(other)  # The argument 'other' can be a String object.
      other = self.class.new(other) if other.kind_of?(String)

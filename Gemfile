@@ -4,6 +4,7 @@ source :rubygems
 
 group :development do
   gem 'pry'
+  gem 'pry-nav'
 #  gem 'guard-ronn'
 #  gem 'yard'
 #  gem 'redcarpet'
