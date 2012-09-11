@@ -1,53 +1,95 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-09-07 18:49:59 (ryosuke)>
+# Time-stamp: <2012-09-11 20:48:06 (ryosuke)>
 #
 
 require('Word')
 
 #---------------------------
-class Term
+class Term < Hash
   
   InvalidArgument = Class.new(StandardError)
+  RgxScaler = %r{(^[+-]\d*|^\d+)}  #This matchs the scalers
 
 #--- initialize ----------------
   def initialize(*arg)
-    raise(InvalidArgument, "no arguments!!") unless arg.size > 0
-    word = arg[0]
-    case word.class.name
-    when 'Word' then @word = word
-    when 'String' then @word = Word.new(word)
-    else raise InvalidArgument, "The argument is not a Word or a String." 
+      self[:word] = Word.new('1')
+      self[:coeff] = 0
+
+    if arg.size > 0 then
+      case arg[0].class.name
+      when 'Word' then 
+        self[:word] = arg[0]
+        self[:coeff] = 1
+      when 'String' then
+        pair = arg[0].split(RgxScaler).delete_if{ |x| x.empty? }
+        #
+        if pair.size == 1 then
+          pair.push('1')
+          pair.reverse! if pair[0].match(RgxScaler).nil? 
+        end
+        #
+        pair[0] += '1' if pair[0].match( %r{^[+-]$} )
+        self[:coeff] = pair[0].to_i
+        self[:word] = Word.new(pair[1])
+      when 'Integer', 'Fixnum' then
+        self[:coeff] = arg[0]
+      else 
+        raise InvalidArgument, "The argument is not a Word or a String." 
+      end
     end
     
-    if arg.size == 1 then 
-      @coeff = 1
-    else
-      raise InvalidArgument, "The second argument must be an integer." unless arg[1].kind_of?(Fixnum)
-      @coeff = arg[1]
+    if arg.size > 1 then 
+      if arg[1].kind_of?(Integer) then
+        self[:coeff] = arg[1]
+      else
+        raise InvalidArgument, "The second argument must be an integer." 
+      end
     end
   end
-  attr_reader :word, :coeff
 #-------------------------------
 
-  # def setup(*arg)
-  #   self.initialize(*arg)
-  #   return self
-  # end
-
-  def coeff=(num)
-    num.kind_of?(Fixnum) ? @coeff = num : raise(InvalidArgument)
+  def word=(wrd)
+    if wrd.kind_of?(Word) then
+      self[:word] = wrd 
+    elsif wrd.kind_of?(String) then
+      self[:word] = Word.new(wrd)
+    else
+      raise(InvalidArgument)
+    end
     return self
   end
 
-  def ==(other_term)
-    raise(InvalidArgument) unless other_term.kind_of?(Term)
-    return ((@word == other_term.word) and (@coeff == other_term.coeff))
+  def coeff=(num)
+    num.kind_of?(Fixnum) ? self[:coeff] = num : raise(InvalidArgument)
+    return self
   end
+
   def =~(other_term)
     raise(InvalidArgument) unless other_term.kind_of?(Term)
-    return (@word == other_term.word)
+    return (self[:word] == other_term[:word])
+  end
+
+  def <=>(other_term)
+    rtn = self[:word].casecmp(other_term[:word])
+#    binding.pry if self[:word] == 'aK'
+    #
+    if rtn == 0 then
+      k=0
+      while k < self[:word].size do
+        rtn = (self[:word][k] <=> other_term[:word][k])*(-1)
+        if rtn == 0 then
+          k += 1
+        else
+          k = self[:word].size
+        end
+      end
+    end
+    #
+    rtn = (self[:coeff] <=> other_term[:coeff]) if rtn == 0
+    #
+    return rtn
   end
 
   def *(other)
@@ -60,43 +102,58 @@ class Term
     end
   end
   def product_with(other_term)
-    self.class.new(@word*other_term.word, @coeff * other_term.coeff)
+    self.class.new( self[:word]*other_term[:word], self[:coeff] * other_term[:coeff])
   end
   def multiplied_by(k)
-    self.class.new(@word, @coeff * k.to_i) 
+    self.class.new( self[:word], self[:coeff] * k.to_i) 
   end
   
   def contract
-    @word.contract
+    self[:word].contract
     return self
   end
 
   def degree
-    tmp = @word.dup.contract 
+    tmp = self[:word].dup.contract 
     tmp == '1' ? 0 : tmp.size
   end
+
   def sign
-    @coeff > 0 ? '+' : '-'
+    if self[:coeff] == 0 then 
+      return nil
+    else
+      self[:coeff] > 0 ? '+' : '-'
+    end
   end
   def positive?
-    return (@coeff > 0)
+    return (self[:coeff] > 0)
   end
   def negative?
-    return (@coeff < 0)
+    return (self[:coeff] < 0)
+  end
+  def opposite
+    self.coeff = self[:coeff]*(-1)
+    return self
   end
 
   def to_s
-    case @coeff
-    when 0
-      return '0'
-    when 1
-      return @word
-    when -1
-      return '-' + @word
+    case self[:coeff]
+    when 0 then return '0'
+    when 1 then return self[:word]
+    when -1 then return '-' + self[:word]
     else
-      @word == '1' ? @coeff.to_s : @coeff.to_s + @word
+      self[:word] == '1' ? self[:coeff].to_s : self[:coeff].to_s + self[:word]
     end
   end
+  def show
+    return '('+self[:coeff].to_s+')'+self[:word]
+  end
+  
+  private
+  def []=(*arg)
+    super
+  end
+
 end
 #---------------------------
 
