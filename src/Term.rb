@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-09-11 20:48:06 (ryosuke)>
+# Time-stamp: <2012-09-12 19:03:50 (ryosuke)>
 #
 
 require('Word')
@@ -72,24 +72,27 @@ class Term < Hash
   end
 
   def <=>(other_term)
-    rtn = self[:word].casecmp(other_term[:word])
-#    binding.pry if self[:word] == 'aK'
+    unless (self.degree == other_term.degree) then
+      (self.degree < other_term.degree) ? rtn = -1 : rtm = 1
+    else
+      rtn = self[:word].casecmp(other_term[:word])
     #
-    if rtn == 0 then
-      k=0
-      while k < self[:word].size do
-        rtn = (self[:word][k] <=> other_term[:word][k])*(-1)
-        if rtn == 0 then
-          k += 1
-        else
-          k = self[:word].size
+      if rtn == 0 then
+        k=0
+        while k < self[:word].size do
+          rtn = (self[:word][k] <=> other_term[:word][k])*(-1)
+          if rtn == 0 then
+            k += 1
+          else
+            k = self[:word].size
+          end
         end
       end
+      #
+      rtn = (self[:coeff] <=> other_term[:coeff]) if rtn == 0
+      #
+      return rtn
     end
-    #
-    rtn = (self[:coeff] <=> other_term[:coeff]) if rtn == 0
-    #
-    return rtn
   end
 
   def *(other)
@@ -114,8 +117,16 @@ class Term < Hash
   end
 
   def degree
-    tmp = self[:word].dup.contract 
-    tmp == '1' ? 0 : tmp.size
+    rtn = 0
+    #
+    if self[:coeff] == 0 then 
+      rtn = -1.0/0.0 
+    else
+      cont_word = self[:word].dup.contract
+      rtn = cont_word.size unless cont_word == '1'
+    end
+    #
+    return rtn
   end
 
   def sign

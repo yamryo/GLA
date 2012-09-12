@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-11 19:31:14 (ryosuke)>
+# Time-stamp: <2012-09-12 19:01:21 (ryosuke)>
 #
 
 require('Term')
@@ -12,6 +12,8 @@ class FormalSum
   Zero = Term.new('1', 0)
   One = Term.new('1', 1)
 
+  InvalidArgument = Class.new(StandardError)
+
   def initialize(*arr)
     @terms = [Zero]
 
@@ -21,7 +23,7 @@ class FormalSum
       elsif trm.kind_of?(String) then
         str2terms(trm).each{ |t| self.terms << t}
       else
-        raise ArgumentError, "the argument is a #{t.class.name} class object."
+        raise InvalidArgument, "the argument is a #{t.class.name} class object."
       end
     end
     @terms.delete_at(0) unless @terms.size == 1
@@ -38,7 +40,7 @@ class FormalSum
     when 'Term', 'String'
       other_fs = self.class.new(other_fs)
     else
-      raise ArgumentError
+      raise InvalidArgument
     end
 
     myfs = self.class.new(self.terms)
@@ -53,42 +55,68 @@ class FormalSum
     elsif term.kind_of?(String) then
       @terms << Term.new(term) 
     else
-      raise ArgumentError
+      raise InvalidArgument
     end
     #
     return self
   end
 
+  def reverse
+    self.class.new(@terms).reverse!
+  end
+  def reverse!
+    @terms.reverse!
+    return self
+  end
+
+  def sort
+    self.class.new(@terms).sort!
+  end
   def sort!
     @terms.sort_by!{ |t| [t.degree, t] }
 #    @terms.sort!{ |a,b| a <=> b }
     return self
   end
-  def sort
-    self.class.new(@terms).sort!
-  end
 
   def homo_part(int)
-    int = int.to_i
-    raise ArgumentError unless int.class.name == "Fixnum"
-
-    myfs = self.class.new
-    self.sort.terms.each{ |t| myfs << t if t.degree == int}
-    myfs.terms.delete_at 0 if myfs.terms.size > 1 and myfs.terms[0] == Zero
-    return myfs
+    raise InvalidArgument unless ( int.kind_of?(Integer) and int >=0 )
+    myterms = self.terms.dup
+    myterms.keep_if{ |t| t.degree == int }
+    myterms << Zero if myterms.empty? 
+    return self.class.new(myterms)
   end
 
-  def simplify!
-    myhp = self.class.new
-    k = 0 
-    while myhp.size > 0 do
-      myhp = self.homo_part(k)
-      #-- TODO --#
-    end
-    return self
+  def degree
+    self.terms.max.degree
   end
+
   def simplify
-    self.class.new(@terms).simplify!
+    self.dup.simplify!
+  end
+  def simplify!
+    hp_arr = []
+    #
+    (self.degree+1).times{ |d| hp_arr[d] = self.homo_part(d).sort!.reverse! }
+    #
+    hp_arr.map! do |hp|
+      tmp = self.class.new
+      #
+      until hp.terms.empty?
+        tmp << hp.terms.pop
+        #
+        until (hp.terms.empty? or (hp.terms.last[:word] != tmp.terms.last[:word]))
+          (tmp.terms.last).coeff = (tmp.terms.last)[:coeff] + (hp.terms.pop)[:coeff]
+        end
+        #
+      end
+      #
+      tmp.terms.delete_at(0) unless tmp.terms == [Zero]
+      tmp  # the return value of this block called by map!
+    end
+    #
+    simplified_str = hp_arr.map!{ |hp| hp.to_s}.join('+').gsub('+-','-')
+    #
+    self.class.new( simplified_str )
   end
 
   def to_s
