@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-12 19:01:21 (ryosuke)>
+# Time-stamp: <2012-09-12 19:09:40 (ryosuke)>
 #
 
 require('Term')
@@ -73,8 +73,8 @@ class FormalSum
     self.class.new(@terms).sort!
   end
   def sort!
-    @terms.sort_by!{ |t| [t.degree, t] }
-#    @terms.sort!{ |a,b| a <=> b }
+#    @terms.sort_by!{ |t| [t.degree, t] }
+    @terms.sort!{ |a,b| a <=> b }
     return self
   end
 
