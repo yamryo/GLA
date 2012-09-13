@@ -1,7 +1,7 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-09-12 19:03:17 (ryosuke)>
+# Time-stamp: <2012-09-13 19:48:43 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -169,6 +169,27 @@ describe FormalSum, "addition" do
   context "for a FormalSum and Zero" do
     it "should simply connect two Array of Terms" do
       (@fs_1+@zfs).show.should == '(1)a+(-1)b+(0)a+(0)b'
+    end
+  end
+#
+end
+#------------------------------------
+
+#------------------------------------
+describe FormalSum, "product" do
+  before :all do
+    @fs_1 = FormalSum.new('a-b')
+    @fs_2 = FormalSum.new('c-3de')
+    @zfs = FormalSum.new('0a-0b')
+  end
+#
+  context "for 'a-b' and 'c-3de'" do
+    it { (@fs_1*@fs_2).to_s.should == 'ac-3ade-bc+3bde' }
+  end
+# 
+  context "for a FormalSum and Zero" do
+    it "should simply connect two Array of Terms" do
+      (@fs_1*@zfs).show.should == '(0)aa+(0)ab+(0)ba+(0)bb'
     end
   end
 #

@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-12 19:35:20 (ryosuke)>
+# Time-stamp: <2012-09-13 19:54:06 (ryosuke)>
 #
 
 require('Term')
@@ -34,18 +34,33 @@ class FormalSum
     @terms[int]
   end
 
-  def +(other_fs)
-    case other_fs.class.name
+  def +(another_fs)
+    case another_fs.class.name
     when self.class.name
     when 'Term', 'String'
-      other_fs = self.class.new(other_fs)
+      another_fs = self.class.new(another_fs)
     else
       raise InvalidArgument
     end
 
     myfs = self.class.new(self.terms)
-    other_fs.terms.each{ |t| myfs << t }
+    another_fs.terms.each{ |t| myfs << t }
     myfs.terms.delete_at(0) if myfs.terms.size > 1 and myfs.terms[0] == Zero
+    return myfs
+  end
+
+  def *(another_fs)
+    myfs = self.class.new
+    myterms = self.terms.dup.reverse
+    #
+    while myterms.size > 0 do
+      former = myterms.pop
+      another_fs.terms.each do |latter|
+        myfs << former*latter
+      end
+    end
+    #
+    myfs.terms.delete_at(0) unless myfs.terms.size == 0
     return myfs
   end
 
