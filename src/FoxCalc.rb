@@ -1,10 +1,8 @@
 #
 # FoxCalc.rb
 #
-# Time-stamp: <2011-03-30 16:59:39 (ryosuke)>
+# Time-stamp: <2012-09-13 18:37:36 (ryosuke)>
 #
-
-#require('Generator')
 require('Word')
 
 module FoxCalculator
