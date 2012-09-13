@@ -1,11 +1,10 @@
 #
 # FoxCalc.rb
 #
-# Time-stamp: <2011-03-30 16:59:39 (ryosuke)>
+# Time-stamp: <2012-09-12 19:54:57 (ryosuke)>
 #
 
-#require('Generator')
-require('Word')
+require('FormalSum')
 
 module FoxCalculator
   extend self
