@@ -1,7 +1,7 @@
 #
 # FoxCalc.rb
 #
-# Time-stamp: <2012-09-12 19:54:57 (ryosuke)>
+# Time-stamp: <2012-09-13 18:47:44 (ryosuke)>
 #
 
 require('FormalSum')
