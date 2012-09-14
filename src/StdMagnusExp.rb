@@ -1,7 +1,7 @@
 #
 # StdMagnusExp.rb
 #
-# Time-stamp: <2012-09-14 13:37:36 (ryosuke)>
+# Time-stamp: <2012-09-14 20:06:37 (ryosuke)>
 #
 
 require('FormalSum')
@@ -11,6 +11,8 @@ module StdMagnusExp
 
   Zero = FormalSum::Zero
   One = FormalSum::One
+
+  Modulo = 4
 
   def expand(word)
     marr = []
@@ -25,7 +27,10 @@ module StdMagnusExp
     end
     #
     marr.reverse!
-    marr << (marr.pop)*(marr.pop) until marr.size == 1
+    until marr.size == 1  
+      marr << (marr.pop)*(marr.pop) 
+      marr.last.terms.delete_if { |t| t.degree >= Modulo }
+    end
     #
 #    binding.pry if word == 'bAcaBACBa'
     return marr[0].simplify

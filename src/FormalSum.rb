@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-14 14:44:25 (ryosuke)>
+# Time-stamp: <2012-09-14 20:41:50 (ryosuke)>
 #
 
 require('Term')
@@ -34,6 +34,13 @@ class FormalSum
     @terms[int]
   end
 
+  def opposite
+    @terms.map! { |t| t.opposite }
+  end
+
+  def -(another_fs) 
+    self + another_fs.opposite
+  end
   def +(another_fs)
     case another_fs.class.name
     when self.class.name
@@ -48,7 +55,7 @@ class FormalSum
     myfs.terms.delete_at(0) if myfs.terms.size > 1 and myfs.terms[0] == Zero
     return myfs
   end
-
+    
   def *(another_fs)
     myfs = self.class.new
     myterms = self.terms.dup.reverse
