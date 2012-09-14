@@ -1,7 +1,7 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-09-13 19:48:43 (ryosuke)>
+# Time-stamp: <2012-09-14 10:46:39 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -304,23 +304,43 @@ describe FormalSum, "#homo_part" do
       @marr = ["29+1", "-a+M", "0", "3DVe-2bAc", "-10oLfP"]
     end
     #
-    5.times do |k|
-      context "degree-#{k} part" do
-        subject { @mfs.homo_part(k).to_s }
-        it { should == @marr[k] }
+    context "for a single argument" do
+      5.times do |k|
+        context "degree-#{k} part" do
+          subject { @mfs.homo_part(k).to_s }
+          it { should == @marr[k] }
+        end
       end
+      #
+      context "too big degree part" do
+        subject { @mfs.homo_part(5).terms }
+        it { should == [Zero] }
+      end
+      #
+      context "negative degree parts" do
+        subject { @mfs.homo_part(-1).terms }
+        it { should == [Zero] }
+      end
+      #
     end
     #
-    context "too big degree part" do
-      subject { @mfs.homo_part(5).terms }
-      it { should == [Zero] }
+    context "for more than one argument" do
+      context "degree-(0..2) part" do
+        subject { @mfs.homo_part(0..2).to_s }
+        it { should == '29-a+M+1' }
+      end
+      #
+      context "(degree-0,2, and 5) part" do
+        subject { @mfs.homo_part(1,2,4).to_s }
+        it { should == '-a-10oLfP+M'  }
+      end
+      #
+      context "(degree-0 and higher than 3) part" do
+        subject { @mfs.homo_part(0,3..@mfs.degree).to_s }
+        it { should == '29+3DVe-10oLfP-2bAc+1' }
+      end
+      #
     end
-    #
-    context "negative degree parts" do
-      subject { @mfs.homo_part(-1).to_s }
-      it { expect{ should }.to raise_error(FormalSum::InvalidArgument) }
-    end
-    #
   end
 end
 #------------------------------------

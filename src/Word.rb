@@ -1,7 +1,7 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-13 19:43:26 (ryosuke)>
+# Time-stamp: <2012-09-13 20:36:20 (ryosuke)>
 #
 
 require('Generator')

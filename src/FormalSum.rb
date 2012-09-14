@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-13 19:54:06 (ryosuke)>
+# Time-stamp: <2012-09-14 10:46:56 (ryosuke)>
 #
 
 require('Term')
@@ -92,11 +92,25 @@ class FormalSum
     return self
   end
 
-  def homo_part(int)
-    raise InvalidArgument unless ( int.kind_of?(Integer) and int >=0 )
+  def homo_part(*arg)
+    ints = []
+    arg.each do |a|
+      case a.class.name
+      when 'Fixnum'
+        ints << a
+      when 'Array', 'Range'
+        ints << a.to_a.flatten.keep_if { |i| i.kind_of?(Integer) }
+        ints.flatten!
+      else 
+        raise InvalidArgument
+      end
+    end
+    ints.uniq.keep_if{ |i| i>=0 }
+    #
     myterms = self.terms.dup
-    myterms.keep_if{ |t| t.degree == int }
+    myterms.keep_if{ |t| ints.include?(t.degree) }
     myterms << Zero if myterms.empty? 
+    #
     return self.class.new(myterms)
   end
 

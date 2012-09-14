@@ -1,7 +1,7 @@
 #
 # Generator.rb
 #
-# Time-stamp: <2012-09-07 13:24:39 (ryosuke)>
+# Time-stamp: <2012-09-13 21:12:18 (ryosuke)>
 #
 
 class Generator
@@ -10,7 +10,7 @@ class Generator
 #
   def initialize(*arg)
     @letter = "1"
-    @inverse = false
+    @inverse = nil
     
     self.set(arg[0][0,1]) if arg.length > 0
   end
@@ -20,7 +20,11 @@ class Generator
     raise(InvalidLetter) unless char =~ /[1a-zA-Z]/
     
     @letter = char.downcase
-    @inverse = (@letter != char) # true or false
+    if @letter == '1' then
+      @inverse = nil
+    else
+      @inverse = (@letter != char) # true or false
+    end
 
     return self
   end
@@ -35,7 +39,9 @@ class Generator
     rescue 
       raise(ArgumentError)
     end
-    @inverse = !@inverse if k.odd?
+    unless @letter == '1' then
+      @inverse = !@inverse if k.odd?
+    end
     return self
   end
 #
@@ -67,7 +73,8 @@ class Generator
     else
       product_word = (self.to_c + gen.to_c).sub('1','')
       if product_word.length == 1 then # if one of two is '1' 
-        return self.set(product_word) # then retrun the self replaced its letter to #{product_word}
+        return self.set(product_word) 
+        # then retrun the self replaced its letter to #{product_word}
       else 
         #  in general, retrun an array with two generators
         return Array[self, gen]
