@@ -1,7 +1,7 @@
 #
 # StdMagnusExp.rb
 #
-# Time-stamp: <2012-09-14 09:20:33 (ryosuke)>
+# Time-stamp: <2012-09-14 13:37:36 (ryosuke)>
 #
 
 require('FormalSum')
@@ -27,6 +27,7 @@ module StdMagnusExp
     marr.reverse!
     marr << (marr.pop)*(marr.pop) until marr.size == 1
     #
+#    binding.pry if word == 'bAcaBACBa'
     return marr[0].simplify
   end
   

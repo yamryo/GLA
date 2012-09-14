@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-14 10:46:56 (ryosuke)>
+# Time-stamp: <2012-09-14 14:44:25 (ryosuke)>
 #
 
 require('Term')
@@ -122,11 +122,16 @@ class FormalSum
     self.dup.simplify!
   end
   def simplify!
-    hp_arr = []
+    hp_hash = Hash.new
+    self.terms.each do |t|
+      deg = t.degree
+      hp_hash[deg] = FormalSum.new unless hp_hash.has_key?(deg)
+      hp_hash[deg] << t
+    end
     #
-    (self.degree+1).times{ |d| hp_arr[d] = self.homo_part(d).sort!.reverse! }
-    #
-    hp_arr.map! do |hp|
+    simp_fs = self.class.new
+    hp_hash.each_value do |hp|
+      hp.sort!
       tmp = self.class.new
       #
       until hp.terms.empty?
@@ -139,12 +144,10 @@ class FormalSum
       end
       #
       tmp.terms.delete_at(0) unless tmp.terms == [Zero]
-      tmp  # the return value of this block called by map!
+      simp_fs = simp_fs + tmp
     end
     #
-    simplified_str = hp_arr.map!{ |hp| hp.to_s}.join('+').gsub('+-','-')
-    #
-    self.class.new( simplified_str )
+    return simp_fs.sort
   end
 
   def to_s
