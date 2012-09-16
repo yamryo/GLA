@@ -1,7 +1,5 @@
 source :rubygems
 
-#gem 'listen', :github => 'guard/listen'
-
 group :development do
   gem 'pry'
   gem 'pry-nav'

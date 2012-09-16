@@ -1,11 +1,10 @@
 #
 # FoxCalc.rb
 #
-# Time-stamp: <2011-03-30 16:59:39 (ryosuke)>
+# Time-stamp: <2012-09-13 19:17:55 (ryosuke)>
 #
 
-#require('Generator')
-require('Word')
+require('FormalSum')
 
 module FoxCalculator
   extend self
@@ -35,8 +34,8 @@ module FoxCalculator
   end
 
   def calc(gen) 
-    # del(gen)/del(@generator) returns Zero, One or Term '-#{gen.to_c}' 
-    gen = Generator.new(gen[0]) if gen.class == String  # can accept a string
+    # (del/del(@generator))(gen) returns Zero, One or Term '-#{gen.to_c}' 
+    gen = Generator.new(gen[0]) if gen.kind_of?(String)  # can accept a string
     raise ArgumentError, "The argument is not a word." unless gen.class == Generator
 
     if @generator.letter == gen.letter then
@@ -47,7 +46,7 @@ module FoxCalculator
   end
 
   def send(word)
-    raise ArgumentError, "The argument is not a word." unless word.class == Word
+    raise ArgumentError, "The argument is not a word." unless word.kind_of?(Word)
 
     word.contract
     myarr = [Zero, One]

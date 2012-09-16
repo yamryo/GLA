@@ -1,7 +1,7 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-11 18:04:47 (ryosuke)>
+# Time-stamp: <2012-09-13 20:36:20 (ryosuke)>
 #
 
 require('Generator')
@@ -18,8 +18,8 @@ class Word < String
   end
 #-------------------------------
 
-  def show 
-    {:value => self, :obj_id => self.object_id} 
+  def show
+    {:value => self, :obj_id => self.object_id}
   end
 
  #--- mathematical operations ---
@@ -27,24 +27,24 @@ class Word < String
     (word*self.invert).dup.contract == '1'
   end
 
-  def invert 
-    self.dup.reverse.swapcase 
+  def invert
+    self.dup.reverse.swapcase
   end
 
-  def product_with(other_word)  # other_word can be a String object.
+  def product_with(another_word)  # another_word can be a String object.
     if self == '1' then 
-      mystr = other_word
+      mystr = another_word
     else 
-      if other_word == '1' then
+      if another_word == '1' then
         mystr = self
       else
-        mystr = self+other_word
+        mystr = self+another_word
       end
     end
     self.class.new(mystr)
   end
-  def *(other_word)
-    self.product_with(other_word)
+  def *(another_word)
+    self.product_with(another_word)
   end
 
    def powered_by(int)
@@ -62,8 +62,8 @@ class Word < String
      other = self.class.new(other) if other.kind_of?(String)
      (other.invert)*self*other
    end
-   def conj(other_word)
-     self.conjugated_with(other_word)
+   def conj(another_word)
+     self.conjugated_with(another_word)
    end
 
 #--- destructive methods ------  
