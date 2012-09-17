@@ -1,31 +1,24 @@
 #
 # Generator.rb
 #
-# Time-stamp: <2012-09-13 21:12:18 (ryosuke)>
+# Time-stamp: <2012-09-18 02:27:08 (ryosuke)>
 #
 
 class Generator
 #
   InvalidLetter = Class.new(StandardError)
 #
-  def initialize(*arg)
-    @letter = "1"
-    @inverse = nil
-    
-    self.set(arg[0][0,1]) if arg.length > 0
+  def initialize(arg='1')
+    self.set(arg)
   end
   attr_reader :letter
 #
   def set(char)
     raise(InvalidLetter) unless char =~ /[1a-zA-Z]/
-    
+    #
     @letter = char.downcase
-    if @letter == '1' then
-      @inverse = nil
-    else
-      @inverse = (@letter != char) # true or false
-    end
-
+    @letter == '1' ? @inverse = nil : @inverse = (@letter != char) # true or false
+    #
     return self
   end
 #
@@ -50,18 +43,23 @@ class Generator
   end
 #
   def =~(another)
-    raise(ArgumentError) unless another.kind_of?(Generator)
+    raise(ArgumentError) unless another.is_a?(Generator)
     (self.letter == another.letter)
   end
 #
   def ==(another)
-    raise(ArgumentError) unless another.kind_of?(Generator)
+    raise(ArgumentError) unless another.is_a?(Generator)
     return ( (self =~ another) and (self.inverse? == another.inverse?) )
   end
 #
   def ===(another)
-    raise(ArgumentError) unless another.kind_of?(Generator)
+    raise(ArgumentError) unless another.is_a?(Generator)
     return ( (self == another) and (self.object_id == another.object_id) )
+  end
+#
+  def <=>(another)
+    raise(ArgumentError) unless another.is_a?(Generator)
+    return ( self.to_c <=> another.to_c )
   end
 #
   def *(gen)

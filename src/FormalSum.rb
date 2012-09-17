@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-14 20:41:50 (ryosuke)>
+# Time-stamp: <2012-09-18 00:12:17 (ryosuke)>
 #
 
 require('Term')
@@ -18,9 +18,9 @@ class FormalSum
     @terms = [Zero]
 
     arr.flatten.each do |trm| 
-      if trm.kind_of?(Term) then
+      if trm.is_a?(Term) then
         self << trm
-      elsif trm.kind_of?(String) then
+      elsif trm.is_a?(String) then
         str2terms(trm).each{ |t| self.terms << t}
       else
         raise InvalidArgument, "the argument is a #{t.class.name} class object."
@@ -52,7 +52,7 @@ class FormalSum
 
     myfs = self.class.new(self.terms)
     another_fs.terms.each{ |t| myfs << t }
-    myfs.terms.delete_at(0) if myfs.terms.size > 1 and myfs.terms[0] == Zero
+    myfs.terms.delete_at(0) if (myfs.terms.size > 1 and myfs.terms[0] == Zero)
     return myfs
   end
     
@@ -72,14 +72,19 @@ class FormalSum
   end
 
   def <<(term)
-    if term.kind_of?(Term) then
+    if term.is_a?(Term) then
       @terms << term
-    elsif term.kind_of?(String) then
+    elsif term.is_a?(String) then
       @terms << Term.new(term) 
     else
       raise InvalidArgument
     end
     #
+    return self
+  end
+
+  def opposite
+    @terms.map!{ |t| t.opposite }
     return self
   end
 
@@ -106,7 +111,7 @@ class FormalSum
       when 'Fixnum'
         ints << a
       when 'Array', 'Range'
-        ints << a.to_a.flatten.keep_if { |i| i.kind_of?(Integer) }
+        ints << a.to_a.flatten.keep_if { |i| i.is_a?(Integer) }
         ints.flatten!
       else 
         raise InvalidArgument
@@ -165,11 +170,6 @@ class FormalSum
 
   def show
     @terms.map{ |t| t.show }.join('+')
-  end
-
-  def opposite
-    @terms.map!{ |t| t.opposite }
-    return self
   end
 
   private

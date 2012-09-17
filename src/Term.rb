@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-09-12 19:03:50 (ryosuke)>
+# Time-stamp: <2012-09-18 02:26:20 (ryosuke)>
 #
 
 require('Word')
@@ -41,7 +41,7 @@ class Term < Hash
     end
     
     if arg.size > 1 then 
-      if arg[1].kind_of?(Integer) then
+      if arg[1].is_a?(Integer) then
         self[:coeff] = arg[1]
       else
         raise InvalidArgument, "The second argument must be an integer." 
@@ -51,9 +51,9 @@ class Term < Hash
 #-------------------------------
 
   def word=(wrd)
-    if wrd.kind_of?(Word) then
+    if wrd.is_a?(Word) then
       self[:word] = wrd 
-    elsif wrd.kind_of?(String) then
+    elsif wrd.is_a?(String) then
       self[:word] = Word.new(wrd)
     else
       raise(InvalidArgument)
@@ -62,18 +62,18 @@ class Term < Hash
   end
 
   def coeff=(num)
-    num.kind_of?(Fixnum) ? self[:coeff] = num : raise(InvalidArgument)
+    num.is_a?(Fixnum) ? self[:coeff] = num : raise(InvalidArgument)
     return self
   end
 
   def =~(other_term)
-    raise(InvalidArgument) unless other_term.kind_of?(Term)
+    raise(InvalidArgument) unless other_term.is_a?(self.class)
     return (self[:word] == other_term[:word])
   end
 
   def <=>(other_term)
     unless (self.degree == other_term.degree) then
-      (self.degree < other_term.degree) ? rtn = -1 : rtm = 1
+      (self.degree < other_term.degree) ? rtn = -1 : rtn = 1
     else
       rtn = self[:word].casecmp(other_term[:word])
     #
@@ -81,11 +81,7 @@ class Term < Hash
         k=0
         while k < self[:word].size do
           rtn = (self[:word][k] <=> other_term[:word][k])*(-1)
-          if rtn == 0 then
-            k += 1
-          else
-            k = self[:word].size
-          end
+          (rtn == 0) ? k += 1 : k = self[:word].size
         end
       end
       #
@@ -96,9 +92,9 @@ class Term < Hash
   end
 
   def *(other)
-    if other.kind_of?(Term) then
+    if other.is_a?(self.class) then
       self.product_with(other)
-    elsif other.kind_of?(Fixnum) then
+    elsif other.is_a?(Fixnum) then
       self.multiplied_by(other)
     else
       raise InvalidArgment, "the argment should be of Term or of Fixnum"
