@@ -1,7 +1,7 @@
 #
 # scratch.rb
 #
-# Time-stamp: <2012-09-18 14:39:49 (ryosuke)>
+# Time-stamp: <2012-09-18 19:39:29 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
