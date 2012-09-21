@@ -1,7 +1,7 @@
 #
 # StdMagnusExp.rb
 #
-# Time-stamp: <2012-09-14 20:06:37 (ryosuke)>
+# Time-stamp: <2012-09-18 00:07:09 (ryosuke)>
 #
 
 require('FormalSum')
@@ -17,9 +17,9 @@ module StdMagnusExp
   def expand(word)
     marr = []
     #
-    if word.kind_of?(Generator) then
+    if word.is_a?(Generator) then
       marr << self.map(word)
-    elsif word.kind_of?(Word) 
+    elsif word.is_a?(Word) 
       word.contract
       word.each_char{ |chr| marr << self.map(Generator.new(chr)) }
     else
@@ -40,8 +40,8 @@ module StdMagnusExp
     # The standerd Magnus expansion theta_std(gen) maps 
     # a Generator gen of downcase letter to a FormalSum '1+#{gen.to_c}'.
     #
-    gen = Generator.new(gen[0]) if gen.kind_of?(String)  # a String is acceptable
-    raise ArgumentError, "The argument is not a Generator" unless gen.kind_of?(Generator)
+    gen = Generator.new(gen[0]) if gen.is_a?(String)  # a String is acceptable
+    raise ArgumentError, "The argument is not a Generator" unless gen.is_a?(Generator)
     #
     if gen.letter == '1' then
       mstr = "1" 

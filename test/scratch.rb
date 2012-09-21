@@ -1,7 +1,7 @@
 #
 # scratch.rb
 #
-# Time-stamp: <2012-09-20 20:59:12 (ryosuke)>
+# Time-stamp: <2012-09-14 20:48:45 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -10,7 +10,10 @@ require('LieBracket')
 
 theta = StdMagnusExp
 
-#length = 2
+#str_1 = (('a'..'z').to_a+('A'..'Z').to_a).sample(3).join
+#str_2 = (('a'..'z').to_a+('A'..'Z').to_a).sample(3).join
+
+length = 2
 #str_1 = ('a'..'z').to_a.sample(length).join
 #str_2 = ('a'..'z').to_a.sample(length).join
 str_1, str_2 = 'ab', 'cd'

@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-07 19:37:27 (ryosuke)>
+# Time-stamp: <2012-09-18 00:53:40 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -51,6 +51,21 @@ describe Word, "#show" do
   before { @mwd = Word.new('aioStwfmXb')}
   subject { @mwd.show }
   it { should == {:value => @mwd, :obj_id => @mwd.object_id} }
+end
+#------------------------
+
+#------------------------
+describe Word, "#[]" do
+  before { @mwd = Word.new('aioStwfmXb')}
+  #
+  context "with a given integer k" do
+    it "should be a k-th Generator" do
+      @mwd[3].is_a?(Generator).should be_true
+      @mwd[3].to_c.should == 'S'
+      @mwd[3].inverse?.should be_true
+    end
+  end
+  #
 end
 #------------------------
 

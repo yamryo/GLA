@@ -80,7 +80,6 @@ class FormalSum
     when FormalSum
       self.product_with(another)
     else
-      binding.pry
       raise(InvalidArgument)
     end
   end
@@ -105,9 +104,9 @@ class FormalSum
   end
   
   def <<(term)
-    if term.kind_of?(Term) then
+    if term.is_a?(Term) then
       @terms << term
-    elsif term.kind_of?(String) then
+    elsif term.is_a?(String) then
       @terms << Term.new(term) 
     else
       raise InvalidArgument
