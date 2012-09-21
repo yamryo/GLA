@@ -1,7 +1,7 @@
 #
 # Generator.rb
 #
-# Time-stamp: <2012-09-13 21:12:18 (ryosuke)>
+# Time-stamp: <2012-09-20 08:12:36 (ryosuke)>
 #
 
 class Generator
@@ -35,7 +35,7 @@ class Generator
 #
   def inverse(*times)
     begin
-      (times == []) ? k=1 : k=times[0].to_i 
+      k = (times == []) ? 1 : times[0].to_i 
     rescue 
       raise(ArgumentError)
     end

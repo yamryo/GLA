@@ -1,7 +1,7 @@
 #
 # StdMagnusExp_spec.rb
 #
-# Time-stamp: <2012-09-14 20:08:52 (ryosuke)>
+# Time-stamp: <2012-09-20 21:07:44 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -20,7 +20,7 @@ end
 #---------------------------------
 
 #---------------------------------
-describe StdMagnusExp, "#send" do
+describe StdMagnusExp, "#expand" do
   before :all do
     @gen_a = Generator.new('a')
     @gen_1 = Generator.new('1')
@@ -82,23 +82,28 @@ describe StdMagnusExp, "#send" do
   end
   #
   context "theta_std('bAcaBC')" do
-    subject { Theta_std.expand(Word.new('bAcaBC')).homo_part(1).to_s }
-    it { should == '0'}
+    subject { Theta_std.expand(Word.new('bAcaBC')).homo_part(1).show }
+    it { should == '(0)1'}
   end
   #
   context "theta_std('bAcaB')" do
-    subject { Theta_std.expand(Word.new('bAcaB')).homo_part(2).to_s }
-    it { should == '-ac+bc+ca-cb'}
+    subject { Theta_std.expand(Word.new('bAcaB')).homo_part(2).show }
+    it { should == '(-1)ac+(1)bc+(1)ca+(-1)cb'}
+  end
+  #
+  context "theta_std('bAcaB')-FromalSum('ca-ac')" do
+    subject { (Theta_std.expand(Word.new('bAcaB'))-FormalSum.new('ca-ac')).homo_part(2).simplify.show }
+    it { should == '(0)ac+(0)ca+(1)bc+(-1)cb'}
   end
   #
   context "theta_std('cBDdaA')" do
-    subject { Theta_std.expand(Word.new('cBDdaA')).homo_part(3).to_s }
-    it { should == '-bbb+cbb'}
+    subject { Theta_std.expand(Word.new('cBDdaA')).homo_part(3).show }
+    it { should == '(-1)bbb+(1)cbb'}
   end
   #
   context "theta_std(a word contractible into '1')" do
     ['aA', 'ZaAz', 'cBDdaAbC'].each do |str|
-      it { Theta_std.expand(Word.new(str)).to_s.should == '1' }
+      it { Theta_std.expand(Word.new(str)).show.should == '(1)1' }
     end
   end
   #

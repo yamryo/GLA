@@ -1,7 +1,7 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-13 20:36:20 (ryosuke)>
+# Time-stamp: <2012-09-20 08:16:58 (ryosuke)>
 #
 
 require('Generator')
@@ -50,7 +50,7 @@ class Word < String
    def powered_by(int)
      k = int.to_i
      if k then
-       k == 0 ? str = '1' : str = "#{self}"*k
+       str = ( k == 0 ? '1' : "#{self}"*k )
        return self.class.new(str)
      else
        return nil

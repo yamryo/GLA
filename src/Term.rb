@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-09-12 19:03:50 (ryosuke)>
+# Time-stamp: <2012-09-20 09:09:06 (ryosuke)>
 #
 
 require('Word')
@@ -18,11 +18,11 @@ class Term < Hash
       self[:coeff] = 0
 
     if arg.size > 0 then
-      case arg[0].class.name
-      when 'Word' then 
+      case arg[0]
+      when Word
         self[:word] = arg[0]
         self[:coeff] = 1
-      when 'String' then
+      when String
         pair = arg[0].split(RgxScaler).delete_if{ |x| x.empty? }
         #
         if pair.size == 1 then
@@ -33,7 +33,7 @@ class Term < Hash
         pair[0] += '1' if pair[0].match( %r{^[+-]$} )
         self[:coeff] = pair[0].to_i
         self[:word] = Word.new(pair[1])
-      when 'Integer', 'Fixnum' then
+      when Integer, Fixnum
         self[:coeff] = arg[0]
       else 
         raise InvalidArgument, "The argument is not a Word or a String." 
@@ -62,7 +62,8 @@ class Term < Hash
   end
 
   def coeff=(num)
-    num.kind_of?(Fixnum) ? self[:coeff] = num : raise(InvalidArgument)
+    raise(InvalidArgument) unless num.kind_of?(Fixnum)
+    self[:coeff] = num
     return self
   end
 
@@ -73,7 +74,7 @@ class Term < Hash
 
   def <=>(other_term)
     unless (self.degree == other_term.degree) then
-      (self.degree < other_term.degree) ? rtn = -1 : rtm = 1
+      rtn = ( (self.degree < other_term.degree) ? -1 : 1 )
     else
       rtn = self[:word].casecmp(other_term[:word])
     #

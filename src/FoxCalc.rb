@@ -1,7 +1,7 @@
 #
 # FoxCalc.rb
 #
-# Time-stamp: <2012-09-13 19:17:55 (ryosuke)>
+# Time-stamp: <2012-09-20 09:06:45 (ryosuke)>
 #
 
 require('FormalSum')
@@ -13,7 +13,7 @@ module FoxCalculator
   One = FormalSum::One
 
   def initialize(*arg)
-    if arg.size >0 and arg[0].class == Generator then
+    if ( arg.size >0 and Generator === arg[0] ) then
       @generator = arg[0]
     else
       @generator = Generator.new('1')
@@ -23,13 +23,11 @@ module FoxCalculator
   attr_reader :generator
 
   def [](gen)
-    if gen.class == Generator then
-      @generator = gen 
-    elsif gen.class == String then
-      @generator = Generator.new(gen[0])
-    else
-      @generator = Generator.new('1')
-    end
+    @generator = case gen
+                 when Generator then gen      
+                 when String then Generator.new(gen[0])
+                 else Generator.new('1')
+                 end
     return self
   end
 
@@ -56,9 +54,6 @@ module FoxCalculator
       myarr.concat [last*t, last*Term.new(chr)]
     end
     myarr.pop
-#    myarr.delete_at 0
-#    myarr.delete(Zero) if myarr.size > 1
-#    myarr.delete_if{ |x| x.coeff == 0}
 
     return FormalSum.new(myarr).to_s
 #    

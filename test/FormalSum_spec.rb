@@ -1,7 +1,7 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-09-14 10:46:39 (ryosuke)>
+# Time-stamp: <2012-09-21 09:55:32 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -176,6 +176,85 @@ end
 #------------------------------------
 
 #------------------------------------
+describe FormalSum, "#opposite, #opposite!" do
+  before :each do
+    @fs = FormalSum.new('a-b+c-3de')
+    @zfs = FormalSum.new('0-0aBCD+00')
+  end
+  #
+  context "#opposite" do
+    context "for a normal FormalSum" do
+      #
+      it "should return a FormalSum of terms with opposite signs to the original" do
+        (@fs.opposite.terms.map{ |t| t.sign }).should == ['-','+','-','+'] 
+      end
+      #
+      it "should cause no change to the original" do
+        expect { @fs.opposite }.not_to change{ @fs.terms } 
+        expect { @fs.opposite }.not_to change{ @fs.terms.map{ |t| t.sign } } 
+        expect { @fs.opposite }.not_to change{ @fs.terms.map{ |t| t[:coeff] } } 
+      end
+    end
+    #
+    context "for a FormalSum with zero terms" do
+      it "should cause no change" do
+        expect { @fs.opposite }.not_to change{ @fs.terms } 
+        expect { @zfs.opposite }.not_to change{ @zfs.terms.map{ |t| t.sign } } 
+        expect { @zfs.opposite }.not_to change{ @zfs.terms.map{ |t| t[:coeff] } } 
+      end
+    end
+    #
+  end
+  #
+  context "#opposite!" do
+    context "for a normal FormalSum" do
+      it "should cause change to the original" do
+        expect { @fs.opposite! }.not_to change{ @fs.terms } 
+        expect { @fs.opposite! }.to change{ @fs.terms.map{ |t| t.sign } } 
+        expect { @fs.opposite! }.to change{ @fs.terms.map{ |t| t[:coeff] } } 
+      end
+    end
+    #
+    context "for a FormalSum with zero terms" do
+      it "should cause no change" do
+        expect { @fs.opposite! }.not_to change{ @fs.terms } 
+        expect { @zfs.opposite! }.not_to change{ @zfs.terms.map{ |t| t.sign } } 
+        expect { @zfs.opposite! }.not_to change{ @zfs.terms.map{ |t| t[:coeff] } } 
+      end
+    end
+    #
+  end
+  #
+end
+#------------------------------------
+
+#------------------------------------
+describe FormalSum, "subtraction" do
+  before :all do
+    @fs_1 = FormalSum.new('a-b')
+    @fs_2 = FormalSum.new('c-3de')
+    @zfs = FormalSum.new('0a-0b')
+  end
+#
+  context "of 'c-3de' from 'a-b'" do
+    it { (@fs_1-@fs_2).to_s.should == 'a-b-c+3de' }
+  end
+# 
+  context "of a FormalSum 'a-b' from itself" do
+    it "should simply connect two Array of Terms '(1)a+(-1)b+(-1)a+(1)b'" do
+      (@fs_1-@fs_1).show.should == '(1)a+(-1)b+(-1)a+(1)b'
+    end
+    #
+    context "follwed by simplification" do
+      it { (@fs_1-@fs_1).simplify.show.should == '(0)a+(0)b' }
+    end
+  end
+    #
+#
+end
+#------------------------------------
+
+#------------------------------------
 describe FormalSum, "product" do
   before :all do
     @fs_1 = FormalSum.new('a-b')
@@ -193,24 +272,9 @@ describe FormalSum, "product" do
     end
   end
 #
-end
-#------------------------------------
-
-#------------------------------------
-describe FormalSum, "#opposite" do
-  context "for a FormalSum with zero terms" do
-    before { @zfs = FormalSum.new('0-0aBCD+00') }
-    #
-    it "should cause to no change" do
-      expect { @zfs.opposite }.not_to change{ @zfs } 
-    end
-  end
-#
-  context "for a normal FormalSum" do
-    before { @fs = FormalSum.new('a-b+c-3de') }
-    #
-    it "should change the sign of each Term" do
-      (@fs.opposite.terms.map{ |t| t.sign }).should == ['-','+','-','+'] 
+  context "with a Integer" do
+    it "should be scaler multiplication" do
+      (@fs_1*(-2)).show.should == '(-2)a+(2)b'
     end
   end
 #
@@ -346,10 +410,17 @@ end
 #------------------------------------
 
 #------------------------------------
-describe FormalSum, "#simplify" do
+describe FormalSum, "#simplify, #simplify!" do
+  context "#simplify for a FormalSum" do
+    before { @fs = FormalSum.new('a-b+a') }
+    it "should not change the original" do
+      expect { @fs.simplify }.not_to change{@fs.terms }
+    end
+  end
+#
   context "for a FormalSum 'a-b+a'" do
-    subject { FormalSum.new('a-b+a').simplify.to_s }
-    it { should == '2a-b' }
+    subject { FormalSum.new('a-b+a').simplify.show }
+    it { should == '(2)a+(-1)b' }
   end
 #
   context "for a FormalSum '3b+2Bc+1+a-2Bc+a+3aCb-6b-9-5aCb+5b'" do
@@ -357,6 +428,12 @@ describe FormalSum, "#simplify" do
     it { should == '-8+2a+2b-2aCb' }
   end
 #
+  context "#simplify! for a FormalSum" do
+    before { @fs = FormalSum.new('a-b+a') }
+    it "should change the original" do
+      expect { @fs.simplify! }.to change{ @fs.terms }
+    end
+  end
 end
 #------------------------------------
 
