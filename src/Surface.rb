@@ -1,7 +1,7 @@
 #
-# surface.rb
+# Surface.rb
 #
-# Time-stamp: <2010-05-20 14:07:15>
+# Time-stamp: <2012-09-13 20:06:01 (ryosuke)>
 #
 
 class OneHandle

@@ -1,7 +1,7 @@
 #
 # Generator_spec.rb
 #
-# Time-stamp: <2012-09-07 20:03:46 (ryosuke)>
+# Time-stamp: <2012-09-13 21:04:20 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -100,8 +100,8 @@ describe Generator, "#inverse?" do
     (Generator.new(@letter.upcase).inverse?).should be_true
   end
 #
-  it "should be false for the generator '1'" do
-    (Generator.new.inverse?).should be_false
+  it "should be nil for the generator '1'" do
+    (Generator.new.inverse?).should be_nil
   end
 #
 end  
@@ -112,11 +112,16 @@ describe Generator, "#inverse" do
   before(:all){ @gen = Generator.new('g') }
 #
   context "with no arguments" do
-    it "should change inverseness of itself" do 
+    it "should change inverseness of a normal Generator" do 
       expect { @gen.inverse }.to change{@gen.inverse?}.from(false).to(true)
     end
 #
     it { (@gen.to_c =~ /[A-Z]/).should be_true }
+#
+    it "should change inverseness of '1'" do 
+      @gen.set('1')
+      expect { @gen.inverse }.not_to change{@gen.inverse?}
+    end
 #
   end
 # 

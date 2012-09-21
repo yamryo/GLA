@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-09-11 20:48:06 (ryosuke)>
+# Time-stamp: <2012-09-20 09:09:06 (ryosuke)>
 #
 
 require('Word')
@@ -18,11 +18,11 @@ class Term < Hash
       self[:coeff] = 0
 
     if arg.size > 0 then
-      case arg[0].class.name
-      when 'Word' then 
+      case arg[0]
+      when Word
         self[:word] = arg[0]
         self[:coeff] = 1
-      when 'String' then
+      when String
         pair = arg[0].split(RgxScaler).delete_if{ |x| x.empty? }
         #
         if pair.size == 1 then
@@ -33,7 +33,7 @@ class Term < Hash
         pair[0] += '1' if pair[0].match( %r{^[+-]$} )
         self[:coeff] = pair[0].to_i
         self[:word] = Word.new(pair[1])
-      when 'Integer', 'Fixnum' then
+      when Integer, Fixnum
         self[:coeff] = arg[0]
       else 
         raise InvalidArgument, "The argument is not a Word or a String." 
@@ -41,7 +41,7 @@ class Term < Hash
     end
     
     if arg.size > 1 then 
-      if arg[1].kind_of?(Integer) then
+      if arg[1].is_a?(Integer) then
         self[:coeff] = arg[1]
       else
         raise InvalidArgument, "The second argument must be an integer." 
@@ -51,9 +51,9 @@ class Term < Hash
 #-------------------------------
 
   def word=(wrd)
-    if wrd.kind_of?(Word) then
+    if wrd.is_a?(Word) then
       self[:word] = wrd 
-    elsif wrd.kind_of?(String) then
+    elsif wrd.is_a?(String) then
       self[:word] = Word.new(wrd)
     else
       raise(InvalidArgument)
@@ -62,40 +62,40 @@ class Term < Hash
   end
 
   def coeff=(num)
-    num.kind_of?(Fixnum) ? self[:coeff] = num : raise(InvalidArgument)
+    raise(InvalidArgument) unless num.kind_of?(Fixnum)
+    self[:coeff] = num
     return self
   end
 
   def =~(other_term)
-    raise(InvalidArgument) unless other_term.kind_of?(Term)
+    raise(InvalidArgument) unless other_term.is_a?(self.class)
     return (self[:word] == other_term[:word])
   end
 
   def <=>(other_term)
-    rtn = self[:word].casecmp(other_term[:word])
-#    binding.pry if self[:word] == 'aK'
+    unless (self.degree == other_term.degree) then
+      rtn = ( (self.degree < other_term.degree) ? -1 : 1 )
+    else
+      rtn = self[:word].casecmp(other_term[:word])
     #
-    if rtn == 0 then
-      k=0
-      while k < self[:word].size do
-        rtn = (self[:word][k] <=> other_term[:word][k])*(-1)
-        if rtn == 0 then
-          k += 1
-        else
-          k = self[:word].size
+      if rtn == 0 then
+        k=0
+        while k < self[:word].size do
+          rtn = (self[:word][k] <=> other_term[:word][k])*(-1)
+          k = ( (rtn == 0) ? k + 1 : self[:word].size )
         end
       end
+      #
+      rtn = (self[:coeff] <=> other_term[:coeff]) if rtn == 0
+      #
+      return rtn
     end
-    #
-    rtn = (self[:coeff] <=> other_term[:coeff]) if rtn == 0
-    #
-    return rtn
   end
 
   def *(other)
-    if other.kind_of?(Term) then
+    if other.is_a?(self.class) then
       self.product_with(other)
-    elsif other.kind_of?(Fixnum) then
+    elsif other.is_a?(Fixnum) then
       self.multiplied_by(other)
     else
       raise InvalidArgment, "the argment should be of Term or of Fixnum"
@@ -114,8 +114,16 @@ class Term < Hash
   end
 
   def degree
-    tmp = self[:word].dup.contract 
-    tmp == '1' ? 0 : tmp.size
+    rtn = 0
+    #
+    if self[:coeff] == 0 then 
+      rtn = -1.0/0.0 
+    else
+      cont_word = self[:word].dup.contract
+      rtn = cont_word.size unless cont_word == '1'
+    end
+    #
+    return rtn
   end
 
   def sign

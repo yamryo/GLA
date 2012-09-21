@@ -1,11 +1,10 @@
 #
 # FoxCalc.rb
 #
-# Time-stamp: <2011-03-30 16:59:39 (ryosuke)>
+# Time-stamp: <2012-09-20 09:06:45 (ryosuke)>
 #
 
-#require('Generator')
-require('Word')
+require('FormalSum')
 
 module FoxCalculator
   extend self
@@ -14,7 +13,7 @@ module FoxCalculator
   One = FormalSum::One
 
   def initialize(*arg)
-    if arg.size >0 and arg[0].class == Generator then
+    if ( arg.size >0 and Generator === arg[0] ) then
       @generator = arg[0]
     else
       @generator = Generator.new('1')
@@ -24,19 +23,17 @@ module FoxCalculator
   attr_reader :generator
 
   def [](gen)
-    if gen.class == Generator then
-      @generator = gen 
-    elsif gen.class == String then
-      @generator = Generator.new(gen[0])
-    else
-      @generator = Generator.new('1')
-    end
+    @generator = case gen
+                 when Generator then gen      
+                 when String then Generator.new(gen[0])
+                 else Generator.new('1')
+                 end
     return self
   end
 
   def calc(gen) 
-    # del(gen)/del(@generator) returns Zero, One or Term '-#{gen.to_c}' 
-    gen = Generator.new(gen[0]) if gen.class == String  # can accept a string
+    # (del/del(@generator))(gen) returns Zero, One or Term '-#{gen.to_c}' 
+    gen = Generator.new(gen[0]) if gen.kind_of?(String)  # can accept a string
     raise ArgumentError, "The argument is not a word." unless gen.class == Generator
 
     if @generator.letter == gen.letter then
@@ -47,7 +44,7 @@ module FoxCalculator
   end
 
   def send(word)
-    raise ArgumentError, "The argument is not a word." unless word.class == Word
+    raise ArgumentError, "The argument is not a word." unless word.kind_of?(Word)
 
     word.contract
     myarr = [Zero, One]
@@ -57,9 +54,6 @@ module FoxCalculator
       myarr.concat [last*t, last*Term.new(chr)]
     end
     myarr.pop
-#    myarr.delete_at 0
-#    myarr.delete(Zero) if myarr.size > 1
-#    myarr.delete_if{ |x| x.coeff == 0}
 
     return FormalSum.new(myarr).to_s
 #    
