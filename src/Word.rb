@@ -1,7 +1,7 @@
 #
 # Word.rb
 #
-# Time-stamp: <2012-09-20 08:16:58 (ryosuke)>
+# Time-stamp: <2012-09-21 11:08:58 (ryosuke)>
 #
 
 require('Generator')
@@ -63,8 +63,7 @@ class Word < String
 
 #--- destructive methods ------  
    def replace(other)
-     other.gsub!(/[^1a-zA-Z]/,'') rescue raise(InvalidArgument)
-     super(other)
+     super(other.gsub(/[^1a-zA-Z]/,'')) rescue raise(InvalidArgument)
      return self
    end
 
