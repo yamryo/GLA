@@ -1,7 +1,7 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-09-21 09:55:32 (ryosuke)>
+# Time-stamp: <2012-10-01 10:17:32 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -23,14 +23,14 @@ describe FormalSum, "when initialized" do
     end
     #
     it "should equip an Array of a single Term" do
-      @fs.terms.kind_of?(Array).should be_true
+      @fs.terms.should be_kind_of(Array)
       @fs.terms.should == [@trm]
     end
     #
     context "with the Zero" do
       it "should equip an Array of a single Zero" do
         zerofs = FormalSum.new(Zero)
-        zerofs.terms.kind_of?(Array).should be_true
+        zerofs.terms.should be_kind_of(Array)
         zerofs.terms.should == [Zero]
       end 
     end
@@ -79,7 +79,7 @@ describe FormalSum, "when initialized" do
 #
     it "should equip an Array of Terms" do
       (@tarr.size).times do |k|
-        @tarr[k].kind_of?(Term).should be_true
+        @tarr[k].should be_kind_of(Term)
         (@tarr[k].show).should == @arr[k]
       end
     end

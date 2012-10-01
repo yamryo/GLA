@@ -1,7 +1,7 @@
 #
 # StdMagnusExp_spec.rb
 #
-# Time-stamp: <2012-09-20 21:07:44 (ryosuke)>
+# Time-stamp: <2012-10-01 10:21:55 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -27,8 +27,8 @@ describe StdMagnusExp, "#expand" do
   end
   #  
   context "return a FormalSum" do
-    subject { Theta_std.expand(@gen_a).kind_of?(FormalSum) }
-    it { should be_true }
+    subject { Theta_std.expand(@gen_a) }
+    it { should be_kind_of(FormalSum) }
   end
   #
   context "for generators" do
@@ -110,13 +110,13 @@ describe StdMagnusExp, "#expand" do
 end
 #---------------------------------
 
-#---------------------------------
-describe StdMagnusExp, "when initialized" do
-  context "" do
-    it { }
-  end
-end
-#---------------------------------
+# #---------------------------------
+# describe StdMagnusExp, "when initialized" do
+#   context "" do
+#     it { }
+#   end
+# end
+# #---------------------------------
 
 # #---------------------------------
 # describe StdMagnusExp, "" do

@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-18 00:53:40 (ryosuke)>
+# Time-stamp: <2012-10-01 10:31:09 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -60,9 +60,9 @@ describe Word, "#[]" do
   #
   context "with a given integer k" do
     it "should be a k-th Generator" do
-      @mwd[3].is_a?(Generator).should be_true
+      @mwd[3].should be_is_a(Generator)
       @mwd[3].to_c.should == 'S'
-      @mwd[3].inverse?.should be_true
+      @mwd[3].should be_inverse
     end
   end
   #
@@ -179,7 +179,7 @@ describe Word, "#product" do
   context "with a String 'UvW'" do
     it { (@mwd*'UvW').should eq 'aBcUvW'}
     it "should be an instance of Word class" do
-      (@mwd*'UvW').kind_of?(Word).should be_true
+      (@mwd*'UvW').should be_is_a(Word)
     end
   end
  #
@@ -264,7 +264,6 @@ describe Word, "generated in a random manner" do
       @mstr = ''
       20.times{ |k| @mstr += @alph[rand(@alph.size)] }
       random_word = Word.new(@mstr)
-#      p random_word
       (expect do
         random_word.to_s
         random_word.invert
@@ -278,6 +277,7 @@ describe Word, "generated in a random manner" do
     end
   end
 end
+
 #--------------------------------------------------
 # End of File
 #--------------------------------------------------

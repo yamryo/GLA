@@ -1,7 +1,7 @@
 #
 # Term_spec.rb
 #
-# Time-stamp: <2012-09-18 02:16:02 (ryosuke)>
+# Time-stamp: <2012-10-01 10:26:06 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -26,11 +26,11 @@ describe Term, "when initialized in the right manner" do
     end
     #
     it "should have a value of Word class for the key :word" do
-      @mt[:word].kind_of?(Word).should be_true
+      @mt[:word].should be_kind_of(Word)
     end
     #
     it "should have a value of Integer class for the key :coeff" do
-      @mt[:coeff].kind_of?(Integer).should be_true
+      @mt[:coeff].should be_kind_of(Integer)
     end
   end
   #
@@ -378,24 +378,20 @@ describe Term, "#sign and related methods" do
     it { should == '+'}
   end
 #
-  context "The sign of Zero" do
-    subject { Term.new.sign }
-    it { should be_nil }
-  end
-#
-  context "#positive?" do
-    subject { @t.positive? }
-    it { should be_true }
-  end
-#
-  context "#negative?" do
-    subject { @t.negative? }
-    it { should be_false }
+  context "#positive? or #negative?" do
+    subject { @t }
+    it { should be_positive }
+    it { should_not be_negative }
   end
 #
   context "#opposite" do
     it { expect { @t.opposite }.to change{ @t.sign } }
     it { expect { @t.opposite }.to change{ @t[:coeff] }.from(7).to(-7) }
+  end
+#
+  context "The sign of Zero" do
+    subject { Term.new.sign }
+    it { should be_nil }
   end
 #
 end

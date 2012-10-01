@@ -1,7 +1,7 @@
 #
 # SympMagnusExp_spec.rb
 #
-# Time-stamp: <2012-09-19 19:38:16 (ryosuke)>
+# Time-stamp: <2012-10-01 10:22:21 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -27,8 +27,8 @@ describe SympMagnusExp, "#send" do
   end
   #  
   context "return a FormalSum" do
-    subject { Theta_symp.expand(@gen_a).kind_of?(FormalSum) }
-    it { should be_true }
+    subject { Theta_symp.expand(@gen_a) }
+    it { should be_kind_of(FormalSum) }
   end
   #
   context "for generators" do

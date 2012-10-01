@@ -1,7 +1,7 @@
 #
 # Generator_spec.rb
 #
-# Time-stamp: <2012-09-13 21:04:20 (ryosuke)>
+# Time-stamp: <2012-10-01 10:19:50 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -93,11 +93,11 @@ describe Generator, "#inverse?" do
   before(:all){ @letter = 'g'}
 #
   it "should be false for a downcase letter" do
-    (Generator.new(@letter).inverse?).should be_false
+    Generator.new(@letter).should_not be_inverse
   end
 #
   it "should be true for an uppercase letter" do
-    (Generator.new(@letter.upcase).inverse?).should be_true
+    Generator.new(@letter.upcase).should be_inverse
   end
 #
   it "should be nil for the generator '1'" do
