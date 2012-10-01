@@ -1,7 +1,7 @@
 #
 # StdMagnusExp_spec.rb
 #
-# Time-stamp: <2012-10-01 10:21:55 (ryosuke)>
+# Time-stamp: <2012-10-01 11:15:55 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -19,8 +19,10 @@ describe StdMagnusExp, "when initialized" do
 end
 #---------------------------------
 
+describe StdMagnusExp do
+
 #---------------------------------
-describe StdMagnusExp, "#expand" do
+describe "#expand" do
   before :all do
     @gen_a = Generator.new('a')
     @gen_1 = Generator.new('1')
@@ -126,4 +128,5 @@ end
 # end
 # #---------------------------------
 
+end
 #End of File

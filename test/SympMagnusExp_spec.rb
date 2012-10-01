@@ -1,7 +1,7 @@
 #
 # SympMagnusExp_spec.rb
 #
-# Time-stamp: <2012-10-01 10:22:21 (ryosuke)>
+# Time-stamp: <2012-10-01 11:16:34 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -12,15 +12,17 @@ require('SympMagnusExp')
 
  Theta_symp = SympMagnusExp
 
+describe SympMagnusExp do
+
 #---------------------------------
-describe SympMagnusExp, "when initialized" do
+describe "when initialized" do
   it { Theta_symp.class.name.should == 'Module'}
   it { Theta_symp::Modulo.should == 4}
 end
 #---------------------------------
 
 #---------------------------------
-describe SympMagnusExp, "#send" do
+describe "#send" do
   before :all do
     @gen_a = Generator.new('a')
     @gen_1 = Generator.new('1')
@@ -113,4 +115,5 @@ end
 # end
 # #---------------------------------
 
+end
 #End of File

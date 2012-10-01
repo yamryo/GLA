@@ -1,7 +1,7 @@
 #
 # FoxCalc_spec.rb
 #
-# Time-stamp: <2012-09-13 19:35:05 (ryosuke)>
+# Time-stamp: <2012-10-01 11:14:50 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -17,8 +17,10 @@ describe FoxCalculator, "when initializing" do
 end
 #---------------------------------
 
+describe FoxCalculator do
+
 #---------------------------------
-describe FoxCalculator, "#calc" do
+describe "#calc" do
   before :all do
     @fc = FoxCalculator
     @gen_a = Generator.new('a')
@@ -45,7 +47,7 @@ end
 #---------------------------------
 
 #---------------------------------
-describe FoxCalculator, "#send" do
+describe "#send" do
   before :all do
     @fc = FoxCalculator
     @gen_a = Generator.new('a')
@@ -106,4 +108,5 @@ end
 # end
 # #---------------------------------
 
+end
 #End of File

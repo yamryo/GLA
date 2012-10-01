@@ -1,7 +1,7 @@
 #
 # Generator_spec.rb
 #
-# Time-stamp: <2012-10-01 10:19:50 (ryosuke)>
+# Time-stamp: <2012-10-01 11:14:35 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -10,8 +10,10 @@ require('pry')
 
 require('Generator')
 
+describe Generator do
+
 #---------------------------------------
-describe Generator, "when initialized" do
+describe "when initialized" do
   context "with a single letter 'g'" do
     it "should be a Generator 'g'" do
       (Generator.new('g').to_c).should == 'g'
@@ -32,7 +34,7 @@ end
 #---------------------------------------
 
 #---------------------------------------
-describe Generator, "#set" do
+describe "#set" do
   before { @gen = Generator.new('g') }
 #
   context "with another letter" do
@@ -46,14 +48,15 @@ describe Generator, "#set" do
   end
 #
   context "with bad letter" do
-    it { expect{ @gen.set('@') }.to raise_error(Generator::InvalidLetter) }
+    subject{ expect{ @gen.set('@') }.to }
+    it { raise_error(Generator::InvalidLetter) }
   end
 #
 end  
 #---------------------------------------
 
 #---------------------------------------
-describe Generator, "comparisons" do
+describe "comparisons" do
   before :all do
     @gen_1 = Generator.new('g') 
     @gen_2 = @gen_1.dup
@@ -89,7 +92,7 @@ end
 #---------------------------------------
 
 #---------------------------------------
-describe Generator, "#inverse?" do
+describe "#inverse?" do
   before(:all){ @letter = 'g'}
 #
   it "should be false for a downcase letter" do
@@ -108,7 +111,7 @@ end
 #---------------------------------------
 
 #---------------------------------------
-describe Generator, "#inverse" do
+describe "#inverse" do
   before(:all){ @gen = Generator.new('g') }
 #
   context "with no arguments" do
@@ -137,7 +140,7 @@ end
 #---------------------------------------
 
 #---------------------------------------
-describe Generator, "#* (multiplication)" do
+describe "#* (multiplication)" do
   before do
     @gen = Generator.new('g')
     @another = Generator.new('S')
@@ -167,4 +170,5 @@ describe Generator, "#* (multiplication)" do
 end  
 #---------------------------------------
 
+end
 #End of File
