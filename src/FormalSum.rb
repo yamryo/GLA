@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-10-01 19:57:46 (ryosuke)>
+# Time-stamp: <2012-10-02 10:14:54 (ryosuke)>
 #
 require('Term')
 
@@ -45,9 +45,6 @@ class FormalSum
     return self
   end
 
-  def -(another_fs) 
-    self + another_fs.opposite
-  end
   def +(another_fs)
     former = self.deepcopy
     latter = case another_fs
@@ -58,6 +55,9 @@ class FormalSum
     (former.terms).concat(latter.terms)
     former.terms.delete_at(0) if (former.terms[0] == Zero and former.terms.size > 1 )
     return former
+  end
+  def -(another_fs) 
+    self + another_fs.opposite
   end
     
   def *(another)
@@ -186,6 +186,8 @@ class FormalSum
   def <<(arg)
     case arg
     when Term then @terms << arg
+    when Word then @terms << Term.new(arg)
+    when Generator then @terms << Term.new(arg)
     when String then str2terms(arg).each{ |t| @terms << t }
     else
       raise InvalidArgument, "Your argument is a #{arg.class.name} class object."

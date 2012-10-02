@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-09-20 09:09:06 (ryosuke)>
+# Time-stamp: <2012-10-02 10:13:11 (ryosuke)>
 #
 
 require('Word')
@@ -19,6 +19,9 @@ class Term < Hash
 
     if arg.size > 0 then
       case arg[0]
+      when Generator
+        self[:word] = Word.new(arg[0])
+        self[:coeff] = 1
       when Word
         self[:word] = arg[0]
         self[:coeff] = 1
@@ -36,7 +39,7 @@ class Term < Hash
       when Integer, Fixnum
         self[:coeff] = arg[0]
       else 
-        raise InvalidArgument, "The argument is not a Word or a String." 
+        raise InvalidArgument, "The argument is not a Word or a Generator or a String." 
       end
     end
     
