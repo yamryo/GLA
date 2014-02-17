@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-09-21 09:45:35 (ryosuke)>
+# Time-stamp: <2012-10-02 10:14:54 (ryosuke)>
 #
 require('Term')
 
@@ -16,17 +16,7 @@ class FormalSum
   #-----------------------------------------
   def initialize(*arr)
     @terms = [Zero]
-
-    arr.flatten.each do |trm| 
-      case trm
-      when Term
-        self << trm
-      when String
-        str2terms(trm).each{ |t| self.terms << t }
-      else
-        raise InvalidArgument, "Your argument is a #{trm.class.name} class object."
-      end
-    end
+    arr.flatten.each{ |trm| self << trm }
     @terms.delete_at(0) unless @terms.size == 1
   end
   #-----------------------------------------
@@ -37,17 +27,16 @@ class FormalSum
   end
 
   def deepcopy
-    # [ self.dup ] and even [ self.class.new(self.terms) ] is shallow for later use.
-
+    # For the following arithmetic operations, 
+    # we need a deep copy method of an instance of this class.
+    # self.dup and even self.class.new(@terms) are too shallow. 
     terms_copy = []
-    self.terms.each do |t|
+    @terms.each do |t|
       terms_copy << Term.new(t[:word], t[:coeff])
-      #terms_copy << t
     end
     return self.class.new(terms_copy)
-    # return Marshal.load(Marshal.dump(self))
   end
-
+  
   def opposite
     (self.deepcopy).opposite!
   end
@@ -56,9 +45,6 @@ class FormalSum
     return self
   end
 
-  def -(another_fs) 
-    self + another_fs.opposite
-  end
   def +(another_fs)
     former = self.deepcopy
     latter = case another_fs
@@ -69,6 +55,9 @@ class FormalSum
     (former.terms).concat(latter.terms)
     former.terms.delete_at(0) if (former.terms[0] == Zero and former.terms.size > 1 )
     return former
+  end
+  def -(another_fs) 
+    self + another_fs.opposite
   end
     
   def *(another)
@@ -85,7 +74,7 @@ class FormalSum
   end
   def product_with(another_fs)
     myfs = self.class.new
-    myterms = self.terms.dup.reverse
+    myterms = @terms.dup.reverse
     #
     while myterms.size > 0 do
       former = myterms.pop
@@ -103,18 +92,6 @@ class FormalSum
     return myfs
   end
   
-  def <<(term)
-    if term.is_a?(Term) then
-      @terms << term
-    elsif term.is_a?(String) then
-      @terms << Term.new(term) 
-    else
-      raise InvalidArgument
-    end
-    #
-    return self
-  end
-
   def reverse
     self.class.new(@terms).reverse!
   end
@@ -146,7 +123,7 @@ class FormalSum
     end
     ints.uniq.keep_if{ |i| i>=0 }
     #
-    myterms = self.terms.dup
+    myterms = @terms.dup
     myterms.keep_if{ |t| ints.include?(t.degree) }
     myterms << Zero if myterms.empty? 
     #
@@ -154,7 +131,7 @@ class FormalSum
   end
 
   def degree
-    self.terms.max.degree
+    @terms.max.degree
   end
 
   def simplify
@@ -165,7 +142,7 @@ class FormalSum
 
     hp_hash = Hash.new
     #
-    self.terms.each do |t|
+    @terms.each do |t|
       deg = t.degree
       unless hp_hash.has_key?(deg) 
         hp_hash[deg] = FormalSum.new(t) 
@@ -189,7 +166,7 @@ class FormalSum
       end
       #
       tmp.terms.delete_at(0) unless tmp.terms == [Zero]
-      (self.terms << tmp.terms).flatten!
+      (@terms << tmp.terms).flatten!
     end
     #
     return self.sort!
@@ -205,7 +182,21 @@ class FormalSum
     @terms.map{ |t| t.show }.join('+')
   end
 
-  private
+  #--- protected and private methods ---
+  def <<(arg)
+    case arg
+    when Term then @terms << arg
+    when Word then @terms << Term.new(arg)
+    when Generator then @terms << Term.new(arg)
+    when String then str2terms(arg).each{ |t| @terms << t }
+    else
+      raise InvalidArgument, "Your argument is a #{arg.class.name} class object."
+    end
+    #
+    return self
+  end
+  protected :<<
+
   def str2terms (str)
     myterms = []
     #
@@ -224,6 +215,7 @@ class FormalSum
     #
     return myterms
   end
+  private :str2terms
 #
 end
 #---------------------------------

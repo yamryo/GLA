@@ -1,8 +1,11 @@
 #
 # LieBracket.rb
 #
-# Time-stamp: <2012-09-20 12:06:34 (ryosuke)>
+# Time-stamp: <2012-10-02 13:57:17 (ryosuke)>
 #
+
+require('pry')
+require('pry-nav')
 
 require('FormalSum')
 
@@ -26,7 +29,7 @@ class LieBracket < FormalSum
       when Fixnum
         FormalSum.new(Term.new(elm))
       else
-        raise(InvalidArgument)
+        raise InvalidArgument, "Your argument is of #{elm.class} object."
       end
     end
     #

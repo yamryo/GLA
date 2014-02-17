@@ -1,7 +1,7 @@
 #
 # Word_spec.rb
 #
-# Time-stamp: <2012-09-18 00:53:40 (ryosuke)>
+# Time-stamp: <2012-10-01 11:17:35 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -9,8 +9,10 @@ require('rubygems')
 require('pry')
 
 require('Word.rb')
+describe Word do
+
 #--------------------------------------------------
-describe Word, "when initializing" do
+describe "when initializing" do
   context "with a string of alphabet and '1'" do
     it { Word.new('xaybzc').should == 'xaybzc' }
     it { %w[a A x aA].each{ |c| Word.new(c).should == c} }
@@ -47,7 +49,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#show" do
+describe "#show" do
   before { @mwd = Word.new('aioStwfmXb')}
   subject { @mwd.show }
   it { should == {:value => @mwd, :obj_id => @mwd.object_id} }
@@ -55,14 +57,14 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#[]" do
+describe "#[]" do
   before { @mwd = Word.new('aioStwfmXb')}
   #
   context "with a given integer k" do
     it "should be a k-th Generator" do
-      @mwd[3].is_a?(Generator).should be_true
+      @mwd[3].should be_is_a(Generator)
       @mwd[3].to_c.should == 'S'
-      @mwd[3].inverse?.should be_true
+      @mwd[3].should be_inverse
     end
   end
   #
@@ -70,7 +72,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "comparisons" do
+describe "comparisons" do
   before { @mwrd = Word.new('aBAa') }
 #
   context "==, comparing as Strings," do
@@ -101,7 +103,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#replace" do
+describe "#replace" do
   before :all do
     @mwrd = Word.new('abC') 
     @id = @mwrd.show[:obj_id]
@@ -140,7 +142,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#contract" do
+describe "#contract" do
   before(:all){ }
 #
   context "in a normal action" do
@@ -159,7 +161,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#product" do
+describe "#product" do
   before :all do
     @mwd = Word.new('aBc')
   end
@@ -179,7 +181,7 @@ describe Word, "#product" do
   context "with a String 'UvW'" do
     it { (@mwd*'UvW').should eq 'aBcUvW'}
     it "should be an instance of Word class" do
-      (@mwd*'UvW').kind_of?(Word).should be_true
+      (@mwd*'UvW').should be_is_a(Word)
     end
   end
  #
@@ -192,7 +194,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#invert" do  
+describe "#invert" do  
   context "of a normal Word 'abCd'" do
     subject { Word.new('abCd').invert }
     it { should ==  'DcBA' }
@@ -212,7 +214,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#^ (power)" do
+describe "#^ (power)" do
   before { @mwd = Word.new('bWd') }
   context "with a natural number" do
     subject { @mwd^3 }
@@ -231,7 +233,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "#conjugate" do
+describe "#conjugate" do
   before :all do
     @word = Word.new('a')
     @another = Word.new('b')
@@ -254,7 +256,7 @@ end
 #------------------------
 
 #------------------------
-describe Word, "generated in a random manner" do
+describe "generated in a random manner" do
   before do
     @alph = ('a'..'z').to_a + ('A'..'Z').to_a + ['1']
   end
@@ -264,7 +266,6 @@ describe Word, "generated in a random manner" do
       @mstr = ''
       20.times{ |k| @mstr += @alph[rand(@alph.size)] }
       random_word = Word.new(@mstr)
-#      p random_word
       (expect do
         random_word.to_s
         random_word.invert
@@ -277,6 +278,8 @@ describe Word, "generated in a random manner" do
       end).not_to raise_error
     end
   end
+end
+
 end
 #--------------------------------------------------
 # End of File
