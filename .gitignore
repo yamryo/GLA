@@ -1,6 +1,6 @@
 *~
-*.orig
 #*#
 .#*
 *.orig
 /vendor/bundle
+/test/OLD

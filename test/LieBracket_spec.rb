@@ -1,7 +1,7 @@
 #
 # LieBracket_spec.rb
 #
-# Time-stamp: <2012-09-20 12:22:02 (ryosuke)>
+# Time-stamp: <2012-10-01 11:15:20 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -10,8 +10,10 @@ require('pry-nav')
 
 require('LieBracket')
 
+describe LieBracket do
+
 #---------------------------------
-describe LieBracket, "#to_s" do
+describe "#to_s" do
   before :all do
     @a, @b = FormalSum.new('a'), FormalSum.new('b')
     @lb = LieBracket.new(@a,@b)
@@ -28,7 +30,7 @@ end
 #---------------------------------
 
 #---------------------------------
-describe LieBracket, "#expand" do
+describe "#expand" do
   before :all do
     a, b = FormalSum.new('a'), FormalSum.new('b')
     @a_b = LieBracket.new(a,b)
@@ -56,4 +58,5 @@ end
 # end
 # #---------------------------------
 
+end
 #End of File
