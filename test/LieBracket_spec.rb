@@ -1,7 +1,7 @@
 #
 # LieBracket_spec.rb
 #
-# Time-stamp: <2014-03-11 18:04:17 (ryosuke)>
+# Time-stamp: <2014-03-11 20:24:49 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -30,9 +30,10 @@ describe "#to_s" do
       it { LieBracket.new(@a, @b_ab).to_s.should == '[a,[b,[a,b]]]'}
       it { LieBracket.new(@ab_a, @b).to_s.should == '[[[a,b],a],b]'}
     end
-    context "Liebracket with integers" do
+    context "Liebracket with Numeric" do
       it { LieBracket.new(@a,5).to_s.should == '[a,5]'}
       it { LieBracket.new(-2,@a_b).to_s.should == '[-2,[a,b]]'}
+      it { LieBracket.new(-2/3r,@a_b).to_s.should == '[-2/3,[a,b]]'}
     end
 end
 #---------------------------------
@@ -51,18 +52,24 @@ describe "#expand" do
     end
     context "some more liebrackets" do
       context "[a,[a,b]]" do
-      it { @a_ab.expand.to_s.should == 'aab-aba-aba+baa'}
+        it { @a_ab.expand.to_s.should == 'aab-aba-aba+baa'}
       end 
       context "[[a,b],a]" do
-      it { @ab_a.expand.to_s.should == 'aba-baa-aab+aba'}
+        it { @ab_a.expand.to_s.should == 'aba-baa-aab+aba'}
       end 
       context "[[a,b], 8]" do
-      it { LieBracket.new(@a_b, 8).expand.to_s.should == '8ab-8ba-8ab+8ba'}
-      it { LieBracket.new(@a_b, 8).expand.simplify.to_s.should == '0'}
+        it { LieBracket.new(@a_b, 8).expand.to_s.should == '8ab-8ba-8ab+8ba'}
+        it { LieBracket.new(@a_b, 8).expand.simplify.to_s.should == '0'}
       end 
-      context "[-2, [a,b]]" do
-      it { LieBracket.new(-2,@a_b).expand.to_s.should == '-2ab+2ba+2ab-2ba'}
-      it { LieBracket.new(-2,@a_b).expand.simplify.to_s.should == '0'}
+      context "[2/3r, [a,b]]" do
+        it { LieBracket.new(2/3r, @a_b).expand.to_s.should == '2/3ab-2/3ba-2/3ab+2/3ba'}
+        it { LieBracket.new(2/3r, @a_b).expand.simplify.to_s.should == '0'}
+      end 
+      context "expansion of [lb, num] and [num, lb]" do
+        [89, -2, 3/8r, -8/121r].each do |num|
+          it { LieBracket.new(num, @a_b).expand.simplify.to_s.should == '0'}
+          it { LieBracket.new(@a_ab, num).expand.simplify.to_s.should == '0'}
+        end
       end
     end
 end

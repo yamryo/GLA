@@ -1,7 +1,7 @@
 #
 # Term_spec.rb
 #
-# Time-stamp: <2014-03-11 17:24:30 (ryosuke)>
+# Time-stamp: <2014-03-11 20:15:15 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -13,68 +13,71 @@ require('Term.rb')
 describe Term do 
 
   #--------------------------------------------
-  describe "when initialized in the right manner" do
+  #-- Initialize ------------------------------
+  #--------------------------------------------
+  describe "initialized in the right manner" do
+    before :all do
+      @mt_pi = Term.new('aBcdE', 3)
+      @mt_ni = Term.new('aBcdE', -201)
+      @mt_pr = Term.new('aBcdE', 2/5r)
+      @mt_nr = Term.new('aBcdE', -8/13r)
+    end
     #
     context "with no arguments" do
       it { Term.new.should == {word: '1', coeff: 0} }
     end
     #
-    context "with a pair of a String and an Integer" do
-      before(:all) { @mt = Term.new('aBcdE',3) }
-      #
-      it "should have be a Hash with keys, :word and :coeff" do
-        @mt.keys.should == [:word, :coeff]
-        @mt.should == { :word => 'aBcdE', :coeff => 3 }
+    context "should be a Hash with keys, :word and :coeff" do
+      it "" do
+        [@mt_pi, @mt_ni, @mt_pr, @mt_nr].each do |mt|
+          mt.keys.should == [:word, :coeff]
+          mt[:word].should be_kind_of(Word)
+          mt[:coeff].should be_kind_of(Numeric)
+        end
       end
+    end
       #
-      it "should have a value of Word class for the key :word" do
-        @mt[:word].should be_kind_of(Word)
-      end
+    context "in the case of a String and an Integer" do
+      it { @mt_pi.should == { :word => 'aBcdE', :coeff => 3 } }
+      it { @mt_ni.should == { :word => 'aBcdE', :coeff => -201 } }
+    end
       #
-      it "should have a value of Integer class for the key :coeff" do
-        @mt[:coeff].should be_kind_of(Integer)
-      end
+    context "in the case of a String and a Rational" do
+      it { @mt_pr.should == { :word => 'aBcdE', :coeff => 2/5r } }
+      it { @mt_nr.should == { :word => 'aBcdE', :coeff => -8/13r } }
     end
     #
     context "with a String only" do
-      subject { Term.new('aBcdE')}
-      it { should == {word: 'aBcdE', coeff: 1} }
+      it { Term.new('aBcdE').should == {word: 'aBcdE', coeff: 1} }
     end
     #
     context "with the String '1'" do
-      context "('1',1)" do
-        subject { Term.new('1') }
-        it { should == {word: '1', coeff: 1} }
-      end
+      it { Term.new('1').should == {word: '1', coeff: 1} }
+    end
       #
-      context "('1',1)" do
-        subject { Term.new('1',8) }
-        it { should == {word: '1', coeff: 8} }
-      end
-      #
+    context "with ('1', 8)" do
+      it { Term.new('1',8).should == {word: '1', coeff: 8} }
     end
     #
     context "with an Integer -6 only" do
-      subject { Term.new(-6) }
-      it { should == {word: '1', coeff: -6} }
+      it { Term.new(-6).should == {word: '1', coeff: -6} }
     end
     #
-    context "with a String of an integer" do
+    context "with a String of a Numeric" do
       it { Term.new('3').should == {word: '1', coeff: 3} }
       it { Term.new('-7').should == {word: '1', coeff: -7} }
+      it { Term.new('20/51').should == {word: '1', coeff: 20/51r} }
+      it { Term.new('-2/5').should == {word: '1', coeff: -2/5r} }
     end
     #
-    context "with a String of an integer followed by a word" do
+    context "with a String of a Numeric followed by a word" do
       it { Term.new('3a').should == {word: 'a', coeff: 3} }
       it { Term.new('-7KstUL').should == {word: 'KstUL', coeff: -7} }
+      it { Term.new('-27/3KstUL').should == {word: 'KstUL', coeff: -27/3r} }
     end
     #
-    context "with the Integer 0" do
-      context "('aBE',0)" do
-        subject { Term.new('aBE',0) }
-        it { should == {word: 'aBE', coeff: 0} }
-      end
-      #
+    context "with the coeff 0" do
+      it { Term.new('aBE',0).should == {word: 'aBE', coeff: 0} }
     end
     #    
     context "with the contractible String 'aAB1c'" do
@@ -82,7 +85,7 @@ describe Term do
       it { should == {word: 'aAB1c', coeff: 1} }
     end
     #    
-    context "with leading two valid arguments and the rest, which will be omitted" do
+    context "with leading two valid arguments and the rest, which will be ignored" do
       it { expect{ Term.new('kLSt', 10, 'wouocei',  7, nil) }.not_to raise_error}
     end
     #
@@ -97,7 +100,7 @@ describe Term do
 
   #--------------------------------------------
   describe "when initialized in the wrong manner" do
-    context "with bad String arguments, '&','0' and ' '(space)," do
+    context "with bad Strings, '&','0' and ' '(space)," do
       ['&',' '].each do |c| 
         it { expect{ Term.new(c) }.to raise_error{Term::InvalidArgument} }
       end
@@ -160,7 +163,7 @@ describe Term do
     #
     context "with wrong arguments" do
       it "should raise IvalidArgument Error" do
-        ['a', [1,2,3], 1..6, 0.58].each do |badarg|
+        ['a', [1,2,3], 1..6].each do |badarg|
           expect{ @t.coeff = badarg }.to raise_error{Term::InvalidArgument}
         end
       end

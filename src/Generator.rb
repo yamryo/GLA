@@ -1,7 +1,7 @@
 #
 # Generator.rb
 #
-# Time-stamp: <2012-09-20 08:12:36 (ryosuke)>
+# Time-stamp: <2014-03-11 18:43:54 (ryosuke)>
 #
 
 class Generator
@@ -69,14 +69,11 @@ class Generator
     if (@letter == gen.letter and @inverse != gen.inverse?) then
       return Generator.new
     else
+      # In the case where one of self and gen is '1',
+      # retrun self which is replaced its letter to #{product_word}.
+      # In general, retrun an Array of two generators.
       product_word = (self.to_c + gen.to_c).sub('1','')
-      if product_word.length == 1 then # if one of two is '1' 
-        return self.set(product_word) 
-        # then retrun the self replaced its letter to #{product_word}
-      else 
-        #  in general, retrun an array with two generators
-        return Array[self, gen]
-      end
+      return (product_word.length == 1) ? self.set(product_word) : Array[self, gen]
     end
   end
 #

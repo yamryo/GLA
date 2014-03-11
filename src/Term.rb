@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2014-03-11 17:29:08 (ryosuke)>
+# Time-stamp: <2014-03-11 19:44:14 (ryosuke)>
 #
 
 require('Word')
@@ -10,12 +10,12 @@ require('Word')
 class Term < Hash
   
   InvalidArgument = Class.new(StandardError)
-  RgxScaler = %r{(^[+-]\d*|^\d+)}  #This matchs the scalers
+  RgxScaler = %r{(^[+-]*\d+/*\d*)}  #This matchs the Strings expressing scalers (Integers and Rationals)
 
 #--- initialize ----------------
   def initialize(*arg)
-      self[:word] = Word.new('1')
-      self[:coeff] = 0
+    self[:word] = Word.new('1')
+    self[:coeff] = 0
 
     if arg.size > 0 then
       case arg[0]
@@ -34,9 +34,9 @@ class Term < Hash
         end
         #
         pair[0] += '1' if pair[0].match( %r{^[+-]$} )
-        self[:coeff] = pair[0].to_i
+        self[:coeff] = pair[0].match('/') ? pair[0].to_r : pair[0].to_i
         self[:word] = Word.new(pair[1])
-      when Integer, Fixnum
+      when Numeric
         self[:coeff] = arg[0]
       else 
         raise InvalidArgument, "The argument is not a Word or a Generator or a String." 
@@ -44,10 +44,10 @@ class Term < Hash
     end
     
     if arg.size > 1 then 
-      if arg[1].is_a?(Integer) then
+      if arg[1].is_a?(Numeric) then
         self[:coeff] = arg[1]
       else
-        raise InvalidArgument, "The second argument must be an integer." 
+        raise InvalidArgument, "The second argument must be a Numeric." 
       end
     end
   end
@@ -65,7 +65,7 @@ class Term < Hash
   end
 
   def coeff=(num)
-    raise(InvalidArgument) unless num.kind_of?(Fixnum)
+    raise(InvalidArgument) unless num.kind_of?(Numeric)
     self[:coeff] = num
     return self
   end
@@ -98,10 +98,10 @@ class Term < Hash
   def *(other)
     if other.is_a?(self.class) then
       self.product_with(other)
-    elsif other.is_a?(Fixnum) then
+    elsif other.is_a?(Numeric) then
       self.multiplied_by(other)
     else
-      raise InvalidArgment, "the argment should be of Term or of Fixnum"
+      raise InvalidArgment, "the argment should be of Term or of Numeric"
     end
   end
   def product_with(other_term)
@@ -111,7 +111,7 @@ class Term < Hash
     self.class.new( self[:word], self[:coeff] * k.to_i) 
   end
   def multiplied_by!(k)
-    self.coeff = self[:coeff] * (k.is_a?(Fixnum) ? k : 1)
+    self.coeff = self[:coeff] * (k.is_a?(Numeric) ? k : 1)
     return self
   end
   

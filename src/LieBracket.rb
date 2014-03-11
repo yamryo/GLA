@@ -1,7 +1,7 @@
 #
 # LieBracket.rb
 #
-# Time-stamp: <2014-03-11 17:53:49 (ryosuke)>
+# Time-stamp: <2014-03-11 20:16:20 (ryosuke)>
 #
 
 require('pry')
@@ -26,7 +26,7 @@ class LieBracket < FormalSum
         elm
       when Term, Word, String
         FormalSum.new(elm)
-      when Fixnum
+      when Numeric
         FormalSum.new(Term.new(elm))
       else
         raise InvalidArgument, "Your argument is of #{elm.class} object."
