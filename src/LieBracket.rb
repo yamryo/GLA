@@ -1,7 +1,7 @@
 #
 # LieBracket.rb
 #
-# Time-stamp: <2014-03-11 12:22:18 (ryosuke)>
+# Time-stamp: <2014-03-11 17:53:49 (ryosuke)>
 #
 
 require('pry')
@@ -38,11 +38,38 @@ class LieBracket < FormalSum
     #
   end
   #-----------------
+  attr_accessor :couple
+
+  def deepcopy
+    # Override FormalSum.deepcopy
+    couple_copy = []
+    @couple.each do |elm|
+      couple_copy << elm.deepcopy
+    end
+    return self.class.new(couple_copy[0],couple_copy[1])
+  end
 
   def *(another)
-    @couple[0]=@couple[0]*another if anoter.kind_of?(Fixnum)
-    #
-    super(another)
+    case another
+    when Integer, Fixnum
+      self.multiply_by(another)
+    # when Term, Word, String
+    #   self.product_with(self.class.new(another))
+    # when FormalSum
+    #   self.product_with(another)
+    else
+      raise(InvalidArgument)
+    end
+  end
+  def multiply_by(scaler)
+    if scaler.kind_of?(Fixnum)
+      mylb = super(scaler)
+      mylb.couple[0] = mylb.couple[0]*scaler
+    else
+      mylb = self
+    end
+    return mylb
+    #return scaler.kind_of?(Fixnum) ? super(scaler).couple[0]*scaler : self
   end
 
   def to_s
@@ -51,7 +78,6 @@ class LieBracket < FormalSum
   #
   def expand
     return FormalSum.new(self.terms)
-    
   end
   #
 end

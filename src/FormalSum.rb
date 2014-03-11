@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2012-10-02 10:14:54 (ryosuke)>
+# Time-stamp: <2014-03-11 17:34:06 (ryosuke)>
 #
 require('Term')
 
@@ -87,9 +87,13 @@ class FormalSum
     return myfs
   end
   def multiply_by(int)
-    myfs = self.dup
-    myfs.terms.each{ |t| t.coeff = t[:coeff]*int }
+    myfs = self.deepcopy
+    myfs.terms.map! { |t| t.multiplied_by!(int) }
     return myfs
+  end
+  def multiply_by!(int)
+    self.terms.map! { |t| t.multiplied_by!(int) }
+    return self
   end
   
   def reverse

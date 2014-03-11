@@ -1,7 +1,7 @@
 #
 # Term_spec.rb
 #
-# Time-stamp: <2012-10-01 11:06:41 (ryosuke)>
+# Time-stamp: <2014-03-11 17:24:30 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -317,36 +317,36 @@ describe Term do
   end
 
   #--------------------------------------------
-  describe "product of '5yAM'" do
+  describe "#*(product) of '5yAM'" do
     before(:all){ @term = Term.new('yAM', 5) }
     #
-    context "and another Term" do
+    context "with another Term" do
       it "should yield a new Term and keep the original clean" do
         expect{ (@term*Term.new('RyO',3))}.not_to change{@term}
       end
     end
     #
-    context "and '-2RyO'" do
+    context "with '-2RyO'" do
       subject { (@term*Term.new('RyO',-2)).to_s }
       it { should == "-10yAMRyO" }
     end
     #
-    context "and '-maY'" do
+    context "with '-maY'" do
       subject { (@term*Term.new('maY',-1)).to_s }
       it { should == "-5yAMmaY" }
     end
     #
-    context "and '1'" do
+    context "with '1'" do
       subject { (@term*Term.new('1')).to_s }
       it { should == "5yAM" }
     end
     #
-    context "and '100'" do
+    context "with '100'" do
       subject { (@term*Term.new('1',100)).to_s }
       it { should == "500yAM" }
     end
     #
-    context "and a Term with coeff '0'" do
+    context "with a Term with coeff '0'" do
       before { @zero_term = @term*Term.new('RyO',0)}
       #
       it { @zero_term.to_s.should == "0" }
@@ -355,16 +355,35 @@ describe Term do
         @zero_term[:word].should == "yAMRyO"
       end
     end
+  end
     #
-    context "and an Integer (i.e. the scaler multiplication)" do
+  describe "#*(multiplied_by)" do
+    before(:all){ @term = Term.new('Yam', -2) }
+    #
+    context "'-2Yam' by an Integer (i.e. the scaler multiplication)" do
       it "should yield a new Term and keep the original clean" do
         expect{ @term*2 }.not_to change{@term[:coeff]}
+        expect{ @term*(-34) }.not_to change{@term}
+      end
+      #
+      it "should multiply @coeff" do
+        [0, 1, 2, -3, 10, 203].each do |int|
+          (@term*int)[:coeff].should == (@term[:coeff])*int
+        end
+      end
+    end
+    #
+  end
+  describe "#multiplied_by!" do
+    before(:all){ @tm = Term.new('Yam', -2) }
+    #
+    context "'-2Yam' by an Integer" do
+      it "should change self.coeff (destractive method)" do
+        expect{ @tm.multiplied_by!(2) }.to change{@tm[:coeff]}
       end
       #
       it "should multiply @coeff by the Integer" do
-        [0, 1, 2, -3, 10].each do |int|
-          (@term*int)[:coeff].should == (@term[:coeff])*int
-        end
+        @tm.multiplied_by!(5)[:coeff].should == @tm[:coeff]
       end
     end
     #

@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2012-10-02 10:13:11 (ryosuke)>
+# Time-stamp: <2014-03-11 17:29:08 (ryosuke)>
 #
 
 require('Word')
@@ -109,6 +109,10 @@ class Term < Hash
   end
   def multiplied_by(k)
     self.class.new( self[:word], self[:coeff] * k.to_i) 
+  end
+  def multiplied_by!(k)
+    self.coeff = self[:coeff] * (k.is_a?(Fixnum) ? k : 1)
+    return self
   end
   
   def contract

@@ -1,7 +1,7 @@
 #
 # FormalSum_spec.rb
 #
-# Time-stamp: <2012-10-01 19:57:15 (ryosuke)>
+# Time-stamp: <2014-03-11 17:52:21 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -261,27 +261,52 @@ describe FormalSum do
   #------------------------------------
 
   #------------------------------------
-  describe "product" do
+  describe "#*" do
     before :all do
       @fs_1 = FormalSum.new('a-b')
       @fs_2 = FormalSum.new('c-3de')
       @zfs = FormalSum.new('0a-0b')
     end
     #
-    context "for 'a-b' and 'c-3de'" do
-      it { (@fs_1*@fs_2).to_s.should == 'ac-3ade-bc+3bde' }
-    end
-    # 
-    context "for a FormalSum and Zero" do
-      it "should simply connect two Array of Terms" do
-        (@fs_1*@zfs).show.should == '(0)aa+(0)ab+(0)ba+(0)bb'
+    describe "#product" do
+      context "to be non-destructive" do
+        it { expect { @fs_1*@fs_2 }.not_to change{ @fs_1 } }
+      end
+      #
+      context "for 'a-b' and 'c-3de'" do
+        it { (@fs_1*@fs_2).to_s.should == 'ac-3ade-bc+3bde' }
+      end
+      # 
+      context "for a FormalSum and Zero" do
+        it "should simply connect two Array of Terms" do
+          (@fs_1*@zfs).show.should == '(0)aa+(0)ab+(0)ba+(0)bb'
+        end
       end
     end
     #
-    context "with a Integer" do
-      it "should be scaler multiplication" do
-        (@fs_1*(-2)).show.should == '(-2)a+(2)b'
+    describe "#multiply_by" do
+      #
+      context "to be non-destructive" do
+        it { expect { @fs_1*10 }.not_to change{ @fs_1 } }
       end
+      #
+      context "to be scaler multiplication by an Integer" do
+        it { (@fs_1*(-2)).show.should == '(-2)a+(2)b'}
+      end
+      #
+    end
+  end
+  #
+  describe "#multiply_by!" do
+    before(:all){ @fs = FormalSum.new('a-1+bA-34+7cAkK') }
+    #
+    context "to be destructive" do
+      it { expect { @fs.multiply_by!(10) }.to change{ @fs.terms[1][:coeff] }.from(-1).to(-10) }
+    end
+    #
+    context "to be scaler multiplication by an Integer" do
+      it { (@fs*(-5)).show.should == '(-50)a+(50)1+(-50)bA+(1700)1+(-350)cAkK'}
+      it { (@fs*(-5)).to_s.should == '-50a+50-50bA+1700-350cAkK'}
     end
     #
   end
