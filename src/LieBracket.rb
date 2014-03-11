@@ -1,7 +1,7 @@
 #
 # LieBracket.rb
 #
-# Time-stamp: <2012-10-02 13:57:17 (ryosuke)>
+# Time-stamp: <2014-03-11 12:22:18 (ryosuke)>
 #
 
 require('pry')
@@ -51,6 +51,7 @@ class LieBracket < FormalSum
   #
   def expand
     return FormalSum.new(self.terms)
+    
   end
   #
 end
