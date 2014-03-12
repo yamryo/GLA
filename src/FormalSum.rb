@@ -1,7 +1,7 @@
 #
 # FormalSum.rb
 #
-# Time-stamp: <2014-03-11 17:34:06 (ryosuke)>
+# Time-stamp: <2014-03-11 23:59:34 (ryosuke)>
 #
 require('Term')
 
@@ -181,7 +181,7 @@ class FormalSum
     mstr = '0' if mstr.size == 0
     return mstr
   end
-
+  
   def show
     @terms.map{ |t| t.show }.join('+')
   end
@@ -192,7 +192,7 @@ class FormalSum
     when Term then @terms << arg
     when Word then @terms << Term.new(arg)
     when Generator then @terms << Term.new(arg)
-    when String then str2terms(arg).each{ |t| @terms << t }
+    when String then splitter(arg).each{ |t| @terms << Term.new(t) }
     else
       raise InvalidArgument, "Your argument is a #{arg.class.name} class object."
     end
@@ -201,11 +201,10 @@ class FormalSum
   end
   protected :<<
 
-  def str2terms (str)
+  def splitter(str)
     myterms = []
-    #
-    myarr = str.split( %r{([+-])} ).delete_if{ |x| x.empty?}
-    myarr.reverse!
+    # binding.pry
+    myarr = str.split( %r{([+-])} ).delete_if{ |x| x.empty?}.reverse
     while (myarr.size > 0) do
       mystr = myarr.pop
       #
@@ -214,12 +213,12 @@ class FormalSum
         mystr = (mystr + myarr.pop)
       end
       #
-      myterms << Term.new(mystr)
+      myterms << mystr
     end
     #
     return myterms
   end
-  private :str2terms
+  private :splitter
 #
 end
 #---------------------------------

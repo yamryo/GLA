@@ -1,7 +1,7 @@
 #
 # Term_spec.rb
 #
-# Time-stamp: <2014-03-11 20:15:15 (ryosuke)>
+# Time-stamp: <2014-03-12 00:44:54 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -10,10 +10,8 @@ require('pry')
 
 require('Term.rb')
 
-describe Term do 
-
-  #--------------------------------------------
-  #-- Initialize ------------------------------
+describe Term do
+  
   #--------------------------------------------
   describe "initialized in the right manner" do
     before :all do
@@ -74,6 +72,11 @@ describe Term do
       it { Term.new('3a').should == {word: 'a', coeff: 3} }
       it { Term.new('-7KstUL').should == {word: 'KstUL', coeff: -7} }
       it { Term.new('-27/3KstUL').should == {word: 'KstUL', coeff: -27/3r} }
+    end
+    #
+    context "with '+' or '-' followed by a word" do
+      it { Term.new('+B').should == {word: 'B', coeff: 1} }
+      it { Term.new('-a').should == {word: 'a', coeff: -1} }
     end
     #
     context "with the coeff 0" do

@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2014-03-11 19:44:14 (ryosuke)>
+# Time-stamp: <2014-03-12 09:55:51 (ryosuke)>
 #
 
 require('Word')
@@ -10,8 +10,9 @@ require('Word')
 class Term < Hash
   
   InvalidArgument = Class.new(StandardError)
-  RgxScaler = %r{(^[+-]*\d+/*\d*)}  #This matchs the Strings expressing scalers (Integers and Rationals)
-
+  # A Regexp which matchs the scalers (Integers and Rationals) part of Strings
+  RgxScaler = /([+-]\d*|\d+)(\/\d+)?/
+  
 #--- initialize ----------------
   def initialize(*arg)
     self[:word] = Word.new('1')

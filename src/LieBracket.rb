@@ -1,11 +1,11 @@
 #
 # LieBracket.rb
 #
-# Time-stamp: <2014-03-11 20:16:20 (ryosuke)>
+# Time-stamp: <2014-03-12 00:34:03 (ryosuke)>
 #
 
 require('pry')
-require('pry-nav')
+require('pry-byebug')
 
 require('FormalSum')
 
