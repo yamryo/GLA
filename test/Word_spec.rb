@@ -1,14 +1,15 @@
 #
-# Word_spec.rb
+# GLA/test/Word_spec.rb
 #
-# Time-stamp: <2012-10-01 11:17:35 (ryosuke)>
+# Time-stamp: <2014-03-12 16:54:27 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
-require('rubygems')
 require('pry')
+require('pry-byebug')
 
 require('Word.rb')
+
 describe Word do
 
 #--------------------------------------------------
@@ -23,13 +24,13 @@ describe "when initializing" do
     it { expect{ Word.new }.to raise_error }
   end
 #
-  context "with a string including non-alphabet letters" do
+  context "with a String including non-alphabet letters" do
     it "should exclude non-alphabets" do
       Word.new('Al&p(hab]e$tO8nl0y/').should == 'AlphabetOnly'
     end
   end
 #
-  context "with a string consisting of non-alphabet letters" do
+  context "with a String consisting of non-alphabet letters" do
     it "should raise Word::InvalidArgument error" do
       ['0', '2', '00', '28302370', '&;/:;*+][', '*3]0:[2+8;'].each do |str|
         expect{ Word.new(str) }.to raise_error(Word::InvalidArgument)

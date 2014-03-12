@@ -1,12 +1,12 @@
 #
-# Generator_spec.rb
+# GLA/test/Generator_spec.rb
 #
-# Time-stamp: <2012-10-01 11:14:35 (ryosuke)>
+# Time-stamp: <2014-03-12 16:54:01 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
-require('rubygems')
 require('pry')
+require('pry-byebug')
 
 require('Generator')
 

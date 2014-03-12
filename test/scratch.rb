@@ -1,7 +1,7 @@
 #
-# scratch.rb
+# GLA/test/scratch.rb
 #
-# Time-stamp: <2012-10-01 20:54:31 (ryosuke)>
+# Time-stamp: <2014-03-12 16:54:12 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 

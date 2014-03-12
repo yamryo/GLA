@@ -1,21 +1,21 @@
 #
-# Term.rb
+# GLA/src/Term.rb
 #
-# Time-stamp: <2012-10-02 10:13:11 (ryosuke)>
+# Time-stamp: <2014-03-12 16:49:53 (ryosuke)>
 #
-
 require('Word')
 
 #---------------------------
 class Term < Hash
   
   InvalidArgument = Class.new(StandardError)
-  RgxScaler = %r{(^[+-]\d*|^\d+)}  #This matchs the scalers
-
+  # A Regexp which matchs the scalers (Integers and Rationals) part of Strings
+  RgxScaler = /(^[+-]\d*|^\d+)(\/\d+)?/
+  
 #--- initialize ----------------
   def initialize(*arg)
-      self[:word] = Word.new('1')
-      self[:coeff] = 0
+    self[:word] = Word.new('1')
+    self[:coeff] = 0
 
     if arg.size > 0 then
       case arg[0]
@@ -26,28 +26,43 @@ class Term < Hash
         self[:word] = arg[0]
         self[:coeff] = 1
       when String
-        pair = arg[0].split(RgxScaler).delete_if{ |x| x.empty? }
-        #
-        if pair.size == 1 then
-          pair.push('1')
-          pair.reverse! if pair[0].match(RgxScaler).nil? 
+        # First, seperate arg[0] to the scaler part and the other.
+        sparr = arg[0].split(RgxScaler).delete_if{ |x| x.empty?}
+        # Second, fix Array sparr up to have just two entries, the scaler and the another.
+        #binding.pry if arg[0] == '+/50'
+        if (%r{[+-]/}.match(arg[0]).nil?) then
+          unless (%r{/\d+}.match(sparr[1]).nil?) then
+            # if you are here, the scaler is a Rational
+            tmp = sparr.shift
+            sparr[0] = tmp+sparr[0]
+          end
         end
-        #
-        pair[0] += '1' if pair[0].match( %r{^[+-]$} )
-        self[:coeff] = pair[0].to_i
-        self[:word] = Word.new(pair[1])
-      when Integer, Fixnum
+        case sparr.size
+        when 1 # The case where no scalers or no letters
+          sparr.push('1')
+          sparr.reverse! if sparr[0].match(RgxScaler).nil?
+        when 2 # The normal case
+          sparr[0] += '1' if sparr[0].match( %r{^[+-]$} )            
+        else
+          raise InvalidArgument,
+          "The argument must be a Word or a Generator or a String or a Numeric." 
+        end
+        #Finaly, set entries of sparr to :coeff and :word.
+        self[:coeff] = sparr[0].match('/') ? sparr[0].to_r : sparr[0].to_i
+        self[:word] = Word.new(sparr[1])
+      when Numeric
         self[:coeff] = arg[0]
       else 
-        raise InvalidArgument, "The argument is not a Word or a Generator or a String." 
+        raise InvalidArgument,
+        "The argument must be a Word or a Generator or a String or a Numeric." 
       end
     end
     
     if arg.size > 1 then 
-      if arg[1].is_a?(Integer) then
+      if arg[1].is_a?(Numeric) then
         self[:coeff] = arg[1]
       else
-        raise InvalidArgument, "The second argument must be an integer." 
+        raise InvalidArgument, "The second argument must be a Numeric." 
       end
     end
   end
@@ -65,7 +80,7 @@ class Term < Hash
   end
 
   def coeff=(num)
-    raise(InvalidArgument) unless num.kind_of?(Fixnum)
+    raise(InvalidArgument) unless num.kind_of?(Numeric)
     self[:coeff] = num
     return self
   end
@@ -98,10 +113,10 @@ class Term < Hash
   def *(other)
     if other.is_a?(self.class) then
       self.product_with(other)
-    elsif other.is_a?(Fixnum) then
+    elsif other.is_a?(Numeric) then
       self.multiplied_by(other)
     else
-      raise InvalidArgment, "the argment should be of Term or of Fixnum"
+      raise InvalidArgment, "the argment should be of Term or of Numeric"
     end
   end
   def product_with(other_term)
@@ -109,6 +124,10 @@ class Term < Hash
   end
   def multiplied_by(k)
     self.class.new( self[:word], self[:coeff] * k.to_i) 
+  end
+  def multiplied_by!(k)
+    self.coeff = self[:coeff] * (k.is_a?(Numeric) ? k : 1)
+    return self
   end
   
   def contract
