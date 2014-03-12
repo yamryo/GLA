@@ -1,7 +1,7 @@
 #
 # Term.rb
 #
-# Time-stamp: <2014-03-12 09:55:51 (ryosuke)>
+# Time-stamp: <2014-03-12 16:34:40 (ryosuke)>
 #
 
 require('Word')
@@ -11,7 +11,7 @@ class Term < Hash
   
   InvalidArgument = Class.new(StandardError)
   # A Regexp which matchs the scalers (Integers and Rationals) part of Strings
-  RgxScaler = /([+-]\d*|\d+)(\/\d+)?/
+  RgxScaler = /(^[+-]\d*|^\d+)(\/\d+)?/
   
 #--- initialize ----------------
   def initialize(*arg)
@@ -27,20 +27,35 @@ class Term < Hash
         self[:word] = arg[0]
         self[:coeff] = 1
       when String
-        pair = arg[0].split(RgxScaler).delete_if{ |x| x.empty? }
-        #
-        if pair.size == 1 then
-          pair.push('1')
-          pair.reverse! if pair[0].match(RgxScaler).nil? 
+        # First, seperate arg[0] to the scaler part and the other.
+        sparr = arg[0].split(RgxScaler).delete_if{ |x| x.empty?}
+        # Second, fix Array sparr up to have just two entries, the scaler and the another.
+        #binding.pry if arg[0] == '+/50'
+        if (%r{[+-]/}.match(arg[0]).nil?) then
+          unless (%r{/\d+}.match(sparr[1]).nil?) then
+            # if you are here, the scaler is a Rational
+            tmp = sparr.shift
+            sparr[0] = tmp+sparr[0]
+          end
         end
-        #
-        pair[0] += '1' if pair[0].match( %r{^[+-]$} )
-        self[:coeff] = pair[0].match('/') ? pair[0].to_r : pair[0].to_i
-        self[:word] = Word.new(pair[1])
+        case sparr.size
+        when 1 # The case where no scalers or no letters
+          sparr.push('1')
+          sparr.reverse! if sparr[0].match(RgxScaler).nil?
+        when 2 # The normal case
+          sparr[0] += '1' if sparr[0].match( %r{^[+-]$} )            
+        else
+          raise InvalidArgument,
+          "The argument must be a Word or a Generator or a String or a Numeric." 
+        end
+        #Finaly, set entries of sparr to :coeff and :word.
+        self[:coeff] = sparr[0].match('/') ? sparr[0].to_r : sparr[0].to_i
+        self[:word] = Word.new(sparr[1])
       when Numeric
         self[:coeff] = arg[0]
       else 
-        raise InvalidArgument, "The argument is not a Word or a Generator or a String." 
+        raise InvalidArgument,
+        "The argument must be a Word or a Generator or a String or a Numeric." 
       end
     end
     

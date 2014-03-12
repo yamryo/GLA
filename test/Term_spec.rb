@@ -1,7 +1,7 @@
 #
-# Term_spec.rb
+# GLA/src/Term_spec.rb
 #
-# Time-stamp: <2014-03-12 00:44:54 (ryosuke)>
+# Time-stamp: <2014-03-12 15:49:15 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -10,6 +10,7 @@ require('pry')
 
 require('Term.rb')
 
+#--------------------------------------------
 describe Term do
   
   #--------------------------------------------
@@ -57,13 +58,19 @@ describe Term do
       it { Term.new('1',8).should == {word: '1', coeff: 8} }
     end
     #
-    context "with an Integer -6 only" do
+    context "with a Numeric only" do
+      it { Term.new(0).should == {word: '1', coeff: 0} }
+      it { Term.new(102).should == {word: '1', coeff: 102} }
       it { Term.new(-6).should == {word: '1', coeff: -6} }
+      it { Term.new(6/97r).should == {word: '1', coeff: 6/97r} }
+      it { Term.new(-103/7r).should == {word: '1', coeff: -103/7r} }
     end
     #
     context "with a String of a Numeric" do
+      it { Term.new('0').should == {word: '1', coeff: 0} }
       it { Term.new('3').should == {word: '1', coeff: 3} }
       it { Term.new('-7').should == {word: '1', coeff: -7} }
+      
       it { Term.new('20/51').should == {word: '1', coeff: 20/51r} }
       it { Term.new('-2/5').should == {word: '1', coeff: -2/5r} }
     end
@@ -103,10 +110,15 @@ describe Term do
 
   #--------------------------------------------
   describe "when initialized in the wrong manner" do
-    context "with bad Strings, '&','0' and ' '(space)," do
-      ['&',' '].each do |c| 
-        it { expect{ Term.new(c) }.to raise_error{Term::InvalidArgument} }
-      end
+    context "with bad Strings, '&',' '(space), /[+-]?\/\d+/" do
+        it { expect{ Term.new('&') }.to raise_error{Term::InvalidArgument} }
+        it { expect{ Term.new('') }.to raise_error{Term::InvalidArgument} }
+        it { expect{ Term.new('/2') }.to raise_error{Term::InvalidArgument} }
+        it { expect{ Term.new('-9/') }.to raise_error{Term::InvalidArgument} }
+        it { expect{ Term.new('+100/') }.to raise_error{Term::InvalidArgument} }
+        it { expect{ Term.new('+/50') }.to raise_error{Term::InvalidArgument} }
+        it { expect{ Term.new('-/23098') }.to raise_error{Term::InvalidArgument} }
+        it { expect{ Term.new('+-3') }.to raise_error{Term::InvalidArgument} }
     end
     #
     context "with Array, Range and Term arguments" do
