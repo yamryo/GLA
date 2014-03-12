@@ -1,14 +1,15 @@
 #
-# Word_spec.rb
+# GLA/test/Word_spec.rb
 #
-# Time-stamp: <2014-03-12 13:02:00 (ryosuke)>
+# Time-stamp: <2014-03-12 16:54:27 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
-require('rubygems')
 require('pry')
+require('pry-byebug')
 
 require('Word.rb')
+
 describe Word do
 
 #--------------------------------------------------

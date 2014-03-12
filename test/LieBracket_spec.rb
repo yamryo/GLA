@@ -1,9 +1,12 @@
 #
-# LieBracket_spec.rb
+# GLA/test/LieBracket_spec.rb
 #
-# Time-stamp: <2014-03-11 20:24:49 (ryosuke)>
+# Time-stamp: <2014-03-12 16:54:07 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
+
+require('pry')
+require('pry-byebug')
 
 require('LieBracket')
 

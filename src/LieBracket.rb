@@ -1,7 +1,7 @@
 #
-# LieBracket.rb
+# GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-03-12 00:34:03 (ryosuke)>
+# Time-stamp: <2014-03-12 16:41:45 (ryosuke)>
 #
 
 require('pry')

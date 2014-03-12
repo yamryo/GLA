@@ -1,9 +1,8 @@
 #
-# Word.rb
+# GLA/src/Word.rb
 #
-# Time-stamp: <2012-09-21 11:08:58 (ryosuke)>
+# Time-stamp: <2014-03-12 16:50:11 (ryosuke)>
 #
-
 require('Generator')
 
 class Word < String

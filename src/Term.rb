@@ -1,9 +1,8 @@
 #
-# Term.rb
+# GLA/src/Term.rb
 #
-# Time-stamp: <2014-03-12 16:34:40 (ryosuke)>
+# Time-stamp: <2014-03-12 16:49:53 (ryosuke)>
 #
-
 require('Word')
 
 #---------------------------

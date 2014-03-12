@@ -1,13 +1,12 @@
 #
-# FormalSum_spec.rb
+# GLA/test/FormalSum_spec.rb
 #
-# Time-stamp: <2014-03-12 00:46:12 (ryosuke)>
+# Time-stamp: <2014-03-12 16:53:55 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
 require('pry')
 require('pry-byebug')
-#require('pry-nav')
 
 require('FormalSum.rb')
 

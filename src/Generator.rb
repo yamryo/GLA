@@ -1,7 +1,7 @@
 #
-# Generator.rb
+# GLA/src/Generator.rb
 #
-# Time-stamp: <2014-03-11 18:43:54 (ryosuke)>
+# Time-stamp: <2014-03-12 16:41:59 (ryosuke)>
 #
 
 class Generator

@@ -1,7 +1,7 @@
 #
-# FormalSum.rb
+# GLA/src/FormalSum.rb
 #
-# Time-stamp: <2014-03-11 23:59:34 (ryosuke)>
+# Time-stamp: <2014-03-12 16:42:12 (ryosuke)>
 #
 require('Term')
 

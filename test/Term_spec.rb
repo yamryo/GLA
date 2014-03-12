@@ -1,12 +1,12 @@
 #
-# GLA/src/Term_spec.rb
+# GLA/test/Term_spec.rb
 #
-# Time-stamp: <2014-03-12 15:49:15 (ryosuke)>
+# Time-stamp: <2014-03-12 16:54:19 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
-require('rubygems')
 require('pry')
+require('pry-byebug')
 
 require('Term.rb')
 
