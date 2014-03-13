@@ -1,7 +1,7 @@
 #
 # GLA/test/LieBracket_spec.rb
 #
-# Time-stamp: <2014-03-12 16:54:07 (ryosuke)>
+# Time-stamp: <2014-03-13 18:01:23 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -100,6 +100,22 @@ end
       it { (@ab_a*(23)).to_s.should == '[[23a,b],a]'}
       it { @ab_a.multiply_by(23).to_s.should == '[[23a,b],a]'}
       it { @ab_a.multiply_by(23).expand.to_s.should == '23aba-23baa-23aab+23aba'} #23(ab-ba)a-a23(ab-ba)
+    end
+    #
+    context "[[a,b],a]*(5/3r)" do
+      it { (@ab_a*(5/3r)).to_s.should == '[[5/3a,b],a]'}
+      it { @ab_a.multiply_by(5/3r).to_s.should == '[[5/3a,b],a]'}
+      it { @ab_a.multiply_by(5/3r).expand.to_s.should == '5/3aba-5/3baa-5/3aab+5/3aba'}
+    end
+    #
+    context "[[a,b],a]*(-4/8r)" do
+      it { (@ab_a*(-4/8r)).to_s.should == '[[-1/2a,b],a]'}
+      it { @ab_a.multiply_by(-4/8r).to_s.should == '[[-1/2a,b],a]'}
+      it { @ab_a.multiply_by(-4/8r).expand.to_s.should == '-1/2aba+1/2baa+1/2aab-1/2aba'}
+    end
+    #
+    context "[[a,b],a]*(5/1r)" do
+      it { (@ab_a*(5/1r)).to_s.should == '[[5/1a,b],a]'}
     end
   end
 #---------------------------------

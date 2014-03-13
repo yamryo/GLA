@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-03-12 16:41:45 (ryosuke)>
+# Time-stamp: <2014-03-13 17:45:05 (ryosuke)>
 #
 
 require('pry')
@@ -51,8 +51,8 @@ class LieBracket < FormalSum
 
   def *(another)
     case another
-    when Integer, Fixnum
-      self.multiply_by(another)
+    when Numeric
+      return self.multiply_by(another)
     # when Term, Word, String
     #   self.product_with(self.class.new(another))
     # when FormalSum
@@ -62,12 +62,8 @@ class LieBracket < FormalSum
     end
   end
   def multiply_by(scaler)
-    if scaler.kind_of?(Fixnum)
-      mylb = super(scaler)
-      mylb.couple[0] = mylb.couple[0]*scaler
-    else
-      mylb = self
-    end
+    mylb = super(scaler)
+    mylb.couple[0] = mylb.couple[0]*scaler
     return mylb
     #return scaler.kind_of?(Fixnum) ? super(scaler).couple[0]*scaler : self
   end

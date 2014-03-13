@@ -1,7 +1,7 @@
 #
 # GLA/src/Term.rb
 #
-# Time-stamp: <2014-03-12 16:49:53 (ryosuke)>
+# Time-stamp: <2014-03-13 17:56:09 (ryosuke)>
 #
 require('Word')
 
@@ -123,10 +123,10 @@ class Term < Hash
     self.class.new( self[:word]*other_term[:word], self[:coeff] * other_term[:coeff])
   end
   def multiplied_by(k)
-    self.class.new( self[:word], self[:coeff] * k.to_i) 
+    self.class.new( self[:word], self[:coeff] * ( k.is_a?(Numeric) ? k : 1 ))
   end
   def multiplied_by!(k)
-    self.coeff = self[:coeff] * (k.is_a?(Numeric) ? k : 1)
+    self.coeff = self[:coeff] * ( k.is_a?(Numeric) ? k : 1 )
     return self
   end
   

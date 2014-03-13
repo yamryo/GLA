@@ -1,7 +1,7 @@
 #
 # GLA/src/FormalSum.rb
 #
-# Time-stamp: <2014-03-12 16:42:12 (ryosuke)>
+# Time-stamp: <2014-03-13 18:03:46 (ryosuke)>
 #
 require('Term')
 
@@ -62,7 +62,7 @@ class FormalSum
     
   def *(another)
     case another
-    when Integer, Fixnum
+    when Numeric
       self.multiply_by(another)
     when Term, Word, String
       self.product_with(self.class.new(another))
@@ -86,14 +86,19 @@ class FormalSum
     myfs.terms.delete_at(0) unless myfs.terms.size == 0
     return myfs
   end
-  def multiply_by(int)
+  def multiply_by(num)
     myfs = self.deepcopy
-    myfs.terms.map! { |t| t.multiplied_by!(int) }
+    myfs.terms.map! { |t| t.multiplied_by!(num) }
     return myfs
   end
-  def multiply_by!(int)
-    self.terms.map! { |t| t.multiplied_by!(int) }
-    return self
+  def multiply_by!(num)
+    case num
+      when Numeric
+      self.terms.map! { |t| t.multiplied_by!(num) }
+      return self
+    else
+      raise(InvalidArgument)
+    end
   end
   
   def reverse
