@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-03-13 17:45:05 (ryosuke)>
+# Time-stamp: <2014-03-13 18:32:10 (ryosuke)>
 #
 
 require('pry')
@@ -42,11 +42,13 @@ class LieBracket < FormalSum
 
   def deepcopy
     # Override FormalSum.deepcopy
-    couple_copy = []
-    @couple.each do |elm|
-      couple_copy << elm.deepcopy
-    end
-    return self.class.new(couple_copy[0],couple_copy[1])
+    # couple_copy = []
+    # @couple.each do |elm|
+    #   couple_copy << elm.dup
+    # end
+    #return self.class.new(couple_copy[0],couple_copy[1])
+    cdup = couple.dup
+    return self.class.new(cdup[0],cdup[1])
   end
 
   def *(another)
