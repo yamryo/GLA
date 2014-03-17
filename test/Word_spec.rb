@@ -1,7 +1,7 @@
 #
 # GLA/test/Word_spec.rb
 #
-# Time-stamp: <2014-03-12 16:54:27 (ryosuke)>
+# Time-stamp: <2014-03-14 19:25:24 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -58,18 +58,18 @@ end
 #------------------------
 
 #------------------------
-describe "#[]" do
-  before { @mwd = Word.new('aioStwfmXb')}
-  #
-  context "with a given integer k" do
-    it "should be a k-th Generator" do
-      @mwd[3].should be_is_a(Generator)
-      @mwd[3].to_c.should == 'S'
-      @mwd[3].should be_inverse
-    end
+  describe "#gen_at" do
+    before { @mwd = Word.new('aioStwfmXb')}
+    #
+     context "with a given integer k" do
+       it "should be a k-th Generator" do
+        @mwd.gen_at(3).should be_kind_of(Generator)
+    #     @third_gen.to_c.should == 'S'
+    #     @third_gen.should be_inverse
+       end
+     end
+    #
   end
-  #
-end
 #------------------------
 
 #------------------------

@@ -1,7 +1,7 @@
 #
 # GLA/test/Generator_spec.rb
 #
-# Time-stamp: <2014-03-12 16:54:01 (ryosuke)>
+# Time-stamp: <2014-03-17 09:21:06 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -11,13 +11,16 @@ require('pry-byebug')
 require('Generator')
 
 describe Generator do
-
+  #
+  before :all do
+    @gen = Generator.new('g')
+    @identity = Generator.new
+  end
+  
 #---------------------------------------
-describe "when initialized" do
-  context "with a single letter 'g'" do
-    it "should be a Generator 'g'" do
-      (Generator.new('g').to_c).should == 'g'
-    end
+describe "#initialize" do
+    context "with a single letter 'g'" do
+      it { (@gen.to_char).should == 'g' }
   end
 #
   context "with bad letters '&','2' and ' '(space)" do
@@ -27,7 +30,7 @@ describe "when initialized" do
   end
 #
   context "with no argument" do
-    it { Generator.new.to_c.should == '1'}
+    it { @identity.to_char.should == '1'}
   end
 #
 end
@@ -35,11 +38,9 @@ end
 
 #---------------------------------------
 describe "#set" do
-  before { @gen = Generator.new('g') }
-#
   context "with another letter" do
     it "should change the original letter" do
-      expect{ @gen.set('x') }.to change{@gen.to_c}.from('g').to('x')
+      expect{ @gen.set('x') }.to change{@gen.to_char}.from('g').to('x')
     end
 #
     it "should not change the object id" do
@@ -58,9 +59,9 @@ end
 #---------------------------------------
 describe "comparisons" do
   before :all do
-    @gen_1 = Generator.new('g') 
+    @gen_1 = @gen
     @gen_2 = @gen_1.dup
-    @gen_3 = @gen_2.dup.inverse
+    @gen_3 = @gen_2.dup.invert!
     @gen_4 = Generator.new('s')
   end
 #
@@ -93,37 +94,32 @@ end
 
 #---------------------------------------
 describe "#inverse?" do
-  before(:all){ @letter = 'g'}
-#
   it "should be false for a downcase letter" do
-    Generator.new(@letter).should_not be_inverse
+    Generator.new('a').should_not be_inverse
   end
 #
   it "should be true for an uppercase letter" do
-    Generator.new(@letter.upcase).should be_inverse
+    Generator.new('A').should be_inverse
   end
 #
   it "should be nil for the generator '1'" do
-    (Generator.new.inverse?).should be_nil
+    (@identity.inverse?).should be_nil
   end
 #
 end  
 #---------------------------------------
 
 #---------------------------------------
-describe "#inverse" do
-  before(:all){ @gen = Generator.new('g') }
-#
+describe "#invert!" do
   context "with no arguments" do
     it "should change inverseness of a normal Generator" do 
-      expect { @gen.inverse }.to change{@gen.inverse?}.from(false).to(true)
+      expect { @gen.invert! }.to change{@gen.inverse?}.from(false).to(true)
     end
 #
-    it { (@gen.to_c =~ /[A-Z]/).should be_true }
+    it { (@gen.to_char =~ /[A-Z]/).should be_true }
 #
-    it "should change inverseness of '1'" do 
-      @gen.set('1')
-      expect { @gen.inverse }.not_to change{@gen.inverse?}
+    it "should not change inverseness of '1'" do
+      expect { @identity.invert! }.not_to change{ @identity.inverse? }
     end
 #
   end
@@ -131,20 +127,18 @@ describe "#inverse" do
   context "with an integer" do
     before(:all){ @gen.set('g') }
 #
-    it { expect { @gen.inverse(0) }.not_to change{@gen.inverse?} }
-    it { expect { @gen.inverse(3) }.to change{@gen.inverse?} }
-    it { expect { @gen.inverse(4) }.not_to change{@gen.inverse?} }
+    it { expect { @gen.invert!(0) }.not_to change{@gen.inverse?} }
+    it { expect { @gen.invert!(3) }.to change{@gen.inverse?} }
+    it { expect { @gen.invert!(4) }.not_to change{@gen.inverse?} }
   end
 #
 end
 #---------------------------------------
 
 #---------------------------------------
-describe "#* (multiplication)" do
+describe "#* (product!)" do
   before do
-    @gen = Generator.new('g')
     @another = Generator.new('S')
-    @one = Generator.new
   end
 #
   context "of two normal generators" do
@@ -155,16 +149,9 @@ describe "#* (multiplication)" do
     end
   end
 #
-  context "of a genarator with '1'" do
-    it { (@gen*@one).should == @gen }
-  end
-#
-  context "of '1' with a genarator" do
-    it "should be the same object to the former '1'" do
-      expect{ @one*@gen }.not_to change{@one.object_id} 
-    end
-#
-    it { (@one*@gen == @gen ).should be_true }
+  context "of a genarator 'g' and '1'" do
+      it { (@gen*@identity).should == @gen }
+      it { (@identity*@gen).should == @gen }
   end
 #
 end  

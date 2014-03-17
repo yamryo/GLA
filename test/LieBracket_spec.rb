@@ -1,7 +1,7 @@
 #
 # GLA/test/LieBracket_spec.rb
 #
-# Time-stamp: <2014-03-13 18:01:23 (ryosuke)>
+# Time-stamp: <2014-03-17 09:21:27 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 

@@ -1,7 +1,7 @@
 #
 # GLA/test/Term_spec.rb
 #
-# Time-stamp: <2014-03-12 16:54:19 (ryosuke)>
+# Time-stamp: <2014-03-17 09:21:49 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -475,7 +475,7 @@ describe Term do
     #
     context "of the Term '0'" do
       subject { Term.new('1', 0).degree }
-      it { should == -1.0/0.0 }
+      it { should == -1/0.0 }
     end
     #
   end

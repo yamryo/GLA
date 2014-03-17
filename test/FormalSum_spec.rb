@@ -1,7 +1,7 @@
 #
 # GLA/test/FormalSum_spec.rb
 #
-# Time-stamp: <2014-03-12 16:53:55 (ryosuke)>
+# Time-stamp: <2014-03-14 18:51:24 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -182,6 +182,32 @@ describe FormalSum do
   #------------------------------------
 
   #------------------------------------
+  describe "subtraction" do
+    before :all do
+      @fs_1 = FormalSum.new('a-b')
+      @fs_2 = FormalSum.new('c-3de')
+      @zfs = FormalSum.new('0a-0b')
+    end
+    #
+    context "of 'c-3de' from 'a-b'" do
+      it { (@fs_1-@fs_2).to_s.should == 'a-b-c+3de' }
+    end
+    # 
+    context "of a FormalSum 'a-b' from itself" do
+      it "should simply connect two Array of Terms '(1)a+(-1)b+(-1)a+(1)b'" do
+        (@fs_1-@fs_1).show.should == '(1)a+(-1)b+(-1)a+(1)b'
+      end
+      #
+      context "follwed by simplification" do
+        it { (@fs_1-@fs_1).simplify.show.should == '(0)a+(0)b' }
+      end
+    end
+    #
+    #
+  end
+  #------------------------------------
+
+  #------------------------------------
   describe "#opposite, #opposite!" do
     before :each do
       @fs = FormalSum.new('a-b+c-3de')
@@ -230,32 +256,6 @@ describe FormalSum do
       end
       #
     end
-    #
-  end
-  #------------------------------------
-
-  #------------------------------------
-  describe "subtraction" do
-    before :all do
-      @fs_1 = FormalSum.new('a-b')
-      @fs_2 = FormalSum.new('c-3de')
-      @zfs = FormalSum.new('0a-0b')
-    end
-    #
-    context "of 'c-3de' from 'a-b'" do
-      it { (@fs_1-@fs_2).to_s.should == 'a-b-c+3de' }
-    end
-    # 
-    context "of a FormalSum 'a-b' from itself" do
-      it "should simply connect two Array of Terms '(1)a+(-1)b+(-1)a+(1)b'" do
-        (@fs_1-@fs_1).show.should == '(1)a+(-1)b+(-1)a+(1)b'
-      end
-      #
-      context "follwed by simplification" do
-        it { (@fs_1-@fs_1).simplify.show.should == '(0)a+(0)b' }
-      end
-    end
-    #
     #
   end
   #------------------------------------
@@ -313,7 +313,7 @@ describe FormalSum do
   #------------------------------------
 
   #------------------------------------
-  describe "#reverse" do
+  describe "#reverse(!)" do
     before(:all){ @fs = FormalSum.new('a-1+bA-34+7cAkK') }
     #
     context "for a FormalSum 'a+1+bA-34+7cAkK'" do
@@ -337,6 +337,7 @@ describe FormalSum do
     before(:all){ @fs = FormalSum.new('a-1+bA') }
     #
     context "for a FormalSum 'a+1+bA'" do
+      #binding.pry
       subject { @fs.sort.to_s }
       it { should == '-1+a+bA' }
     end

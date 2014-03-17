@@ -1,7 +1,7 @@
 #
 # GLA/src/Term.rb
 #
-# Time-stamp: <2014-03-13 17:56:09 (ryosuke)>
+# Time-stamp: <2014-03-14 18:47:20 (ryosuke)>
 #
 require('Word')
 
@@ -136,13 +136,11 @@ class Term < Hash
   end
 
   def degree
-    rtn = 0
-    #
     if self[:coeff] == 0 then 
-      rtn = -1.0/0.0 
+      rtn = -1/0.0 # which means -Infinity.
     else
       cont_word = self[:word].dup.contract
-      rtn = cont_word.size unless cont_word == '1'
+      rtn = (cont_word == '1') ? 0 : cont_word.size
     end
     #
     return rtn

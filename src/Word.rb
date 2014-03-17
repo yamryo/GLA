@@ -1,7 +1,7 @@
 #
 # GLA/src/Word.rb
 #
-# Time-stamp: <2014-03-12 16:50:11 (ryosuke)>
+# Time-stamp: <2014-03-17 09:20:41 (ryosuke)>
 #
 require('Generator')
 
@@ -17,16 +17,27 @@ class Word < String
   end
 #-------------------------------
 
-  def show 
+  def show
     {:value => self, :obj_id => self.object_id}
   end
 
+  def each_gen(&block) 
+    itr = Enumerator.new do |y|
+      (self.size).times{ |k| y << Generator.new(self[k]) } 
+    end
+    itr.each(&block)
+  end
+
+   def gen_at(int)
+     Generator.new( self[int] ) rescue raise(InvalidArgument)
+   end
+   
  #--- mathematical operations ---
   def ===(word)
     (word*self.invert).dup.contract == '1'
   end
 
-  def invert
+  def invert()
     self.dup.reverse.swapcase
   end
 
@@ -45,20 +56,22 @@ class Word < String
     self.product_with(another_word)
   end
 
-   def powered_by(int)
-     k = int.to_i rescue raise(InvalidArgument)
-     str = ( k == 0 ? '1' : "#{self}"*k )
-     return self.class.new(str)
-   end
-   def ^(int) self.powered_by(int) end
-
-   def conjugated_with(other)  # The argument 'other' can be a String object.
-     other = self.class.new(other) if other.is_a?(String)
-     (other.invert)*self*other
-   end
-   def conj(another_word)
-     self.conjugated_with(another_word)
-   end
+  def powered_by(int)
+    k = int.to_i rescue raise(InvalidArgument)
+    str = ( k == 0 ? '1' : "#{self}"*k )
+    return self.class.new(str)
+  end
+  def ^(int)
+    self.powered_by(int)
+  end
+  
+  def conjugated_with(other)  # The argument 'other' can be a String object.
+    other = self.class.new(other) if other.is_a?(String)
+    (other.invert)*self*other
+  end
+  def conj(another_word)
+    self.conjugated_with(another_word)
+  end
 
 #--- destructive methods ------  
    def replace(other)
@@ -66,25 +79,9 @@ class Word < String
      return self
    end
 
-   def [](int)
-     c = super(int) rescue raise(InvalidArgument)
-     #
-     (c == c.downcase)? k=0 : k=1 
-     gen = Generator.new(c.downcase).inverse(k)
-     return gen
-   end
-
-   def each_gen(&block) 
-     itr = Enumerator.new do |y|
-       (self.size).times{ |k| y << self[k] } 
-     end
-     itr.each(&block)
-   end
-
-   def contract(*accelerate)
-     #-- proccess with Generator class
-     marr = self.each_gen.map{ |g| g }
-
+   def contract
+     marr = self.each_gen.map{ |g| g } # split self into an Array of Generators
+     
      size_diff = 1
      while (size_diff > 0 and marr.size > 1)
        previous_size = marr.size
@@ -99,11 +96,7 @@ class Word < String
        size_diff = previous_size - marr.size
      end
      #
-     # my_str = ''
-     # marr.each{|g| my_str << g.to_c}
-     my_str = marr.map!{|g| g.to_c}.join
-     #
-     return self.replace(my_str)
+     return self.replace( marr.map!{|g| g.to_char}.join )
    end
 
    undef_method :upcase!, :downcase!, :sub!, :gsub!, :concat, :[]=
