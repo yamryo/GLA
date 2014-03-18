@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-03-17 09:20:24 (ryosuke)>
+# Time-stamp: <2014-03-18 13:46:01 (ryosuke)>
 #
 
 require('pry')
@@ -26,6 +26,8 @@ class LieBracket < FormalSum
         elm
       when Term, Word, String
         FormalSum.new(elm)
+      when Generator
+        FormalSum.new(elm.to_char)
       when Numeric
         FormalSum.new(Term.new(elm))
       else
@@ -63,17 +65,24 @@ class LieBracket < FormalSum
       raise(InvalidArgument)
     end
   end
-  def multiply_by(scaler)
-    mylb = super(scaler)
-    mylb.couple[0] = mylb.couple[0]*scaler
+  def multiply_by(scalar)
+    mylb = super(scalar)
+    mylb.couple[0] = mylb.couple[0]*scalar
     return mylb
-    #return scaler.kind_of?(Fixnum) ? super(scaler).couple[0]*scaler : self
+    #return scalar.kind_of?(Fixnum) ? super(scalar).couple[0]*scalar : self
   end
 
   def to_s
     return "[#{(@couple.map{ |x| x.to_s }).join(',')}]"
   end
-  #
+#  def inspect
+#    string = "#<#{self.class.name}:0x" << ('%x' % (self.object_id << 1)) << '>'
+#    return string
+#  end
+  def inspect_couple
+    return "[#{@couple.map{ |x| x.inspect }.join(',')}]"
+  end
+  
   def expand
     return FormalSum.new(self.terms)
   end

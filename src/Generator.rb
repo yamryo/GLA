@@ -1,7 +1,7 @@
 #
 # GLA/src/Generator.rb
 #
-# Time-stamp: <2014-03-17 09:11:20 (ryosuke)>
+# Time-stamp: <2014-03-18 15:40:54 (ryosuke)>
 #
 
 class Generator
@@ -9,21 +9,20 @@ class Generator
   InvalidLetter = Class.new(StandardError)
 #
   def initialize(arg='1')
-    self.set(arg)
-  end
-  attr_reader :letter
-#
-  def set(char)
-    raise(InvalidLetter) unless char =~ /[1a-zA-Z]/
+    raise(InvalidLetter) unless arg =~ /[1a-zA-Z]/
     #
-    @letter = char.downcase
-    @letter == '1' ? @inverse = nil : @inverse = (@letter != char) # true or false
+    @letter = arg[0].downcase
+    @letter == '1' ? @inverse = nil : @inverse = (@letter != arg) # true or false
     #
     return self
   end
+  attr_reader :letter
 #
   def to_char
     @inverse ? @letter.upcase : @letter
+  end
+  def to_s
+    to_char
   end
 #
   def inverse?

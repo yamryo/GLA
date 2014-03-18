@@ -1,7 +1,7 @@
 #
 # GLA/test/FormalSum_spec.rb
 #
-# Time-stamp: <2014-03-14 18:51:24 (ryosuke)>
+# Time-stamp: <2014-03-18 15:30:32 (ryosuke)>
 #
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -20,81 +20,69 @@ end
 describe FormalSum do 
 
   #------------------------------------
-  describe "when initialized" do
+  describe "#initialize:" do
+    before do
+      @t = Term.new('aAB', -2)
+      @zt = Term.new('Wiejr',0)
+      @fs = FormalSum.new(@t)
+    end
     #
-    context "with a Term" do
-      before do
-        @trm = Term.new('-5wojCSisA')
-        @fs = FormalSum.new(@trm)
+    context "with the Zero" do
+      subject{ FormalSum.new(Zero) }
+      its(:terms){ should be_kind_of(Array) }
+      its(:terms){ should eq [Zero] }
+    end
+    #
+    context "with a single Term" do
+      subject{ @fs.terms }
+      it{ should be_kind_of(Array) }
+      it{ should eq [@t] }
+    end
+    #
+    context "with Terms" do
+      context "including the Zero" do
+        subject { FormalSum.new(Zero, One, @t).terms }
+        its(:size){ should be 3}
+        its(:first){ should be Zero}
       end
       #
-      it "should equip an Array of a single Term" do
-        @fs.terms.should be_kind_of(Array)
-        @fs.terms.should == [@trm]
-      end
-      #
-      context "with the Zero" do
-        it "should equip an Array of a single Zero" do
-          zerofs = FormalSum.new(Zero)
-          zerofs.terms.should be_kind_of(Array)
-          zerofs.terms.should == [Zero]
-        end 
+      context "in an Array" do
+        it "should be a FormalSum of the given Terms" do
+          expect(FormalSum.new([One, @t]).terms).to eq [One, @t]
+        end
+        #
+        it "should not ignore the Zero" do
+          FormalSum.new([One, Zero]).terms.should == [One, Zero]
+          FormalSum.new([@zt, One, @t]).terms.should == [@zt, One, @t]
+        end
       end
       #
     end
     # 
-    context "without arguments" do
-      subject { @fs = FormalSum.new.terms }
-      it { should == [Zero] }
-    end
-    #
-    context "with Terms" do
-      before { @t = Term.new('aAB', -2)}
-      #
-      it "should not ignore the Zero term" do
-        FormalSum.new(One, Zero, @t).terms[0].should == One
-        FormalSum.new(One, Zero, @t).terms[1].should == Zero
-        FormalSum.new(One, Zero, @t).terms[2].should == @t
-        FormalSum.new(One, Zero, @t).terms.size.should == 3
-      end
-    end
-    #
-    context "with an Array of Terms" do
-      before :all do
-        @t = Term.new('2xe', -4)
-        @zero = Term.new('Wiejr',0)
-      end
-      #
-      it "should be a FormalSum of the given Terms" do
-        FormalSum.new([One, @t]).terms.should == [One, @t]
-      end
-      #
-      it "should not ignore the Zero" do
-        FormalSum.new([One, Zero]).terms.should == [One, Zero]
-        FormalSum.new([@zero, One, @t]).terms.should == [@zero, One, @t]
-      end
-    end
-    #
     context "with a String" do
       before do
         @str = '2+c-B-4s'
         @arr= %w[(2)1 (1)c (-1)B (-4)s]
-        @fs = FormalSum.new(@str)
-        @tarr = @fs.terms
+        @tarr = FormalSum.new(@str).terms
       end
       #
       it "should equip an Array of Terms" do
         (@tarr.size).times do |k|
-          @tarr[k].should be_kind_of(Term)
-          (@tarr[k].show).should == @arr[k]
+          expect(@tarr[k]).to be_kind_of(Term)
+          expect(@tarr[k].show).to eq @arr[k]
         end
       end
       #
       it "should not ignore zero terms" do
-        t = FormalSum.new('-3+6acB-a+0bKde-00+0-50')
-        t.terms.join(',').should == '-3,6acB,-a,0,0,0,-50'
-        (t.terms[3]) == { word: 'bKde', coeff: 0 }
+        ts = FormalSum.new('-3+6acB-a+0bKde-00+0-50').terms
+        expect(ts.join(',')).to eq '-3,6acB,-a,0,0,0,-50'
+        expect(ts[3]).to include(:word => 'bKde', :coeff => 0)
+        #expect(ts[3]).to eq {word: 'bKde', coeff: 0}
       end
+    end
+    #
+    context "without arguments" do
+      it { expect(FormalSum.new.terms).to eq [Zero] }
     end
     #
   end
@@ -103,7 +91,7 @@ describe FormalSum do
   #------------------------------------
   describe "#to_s" do
     context "for a FormalSum without zero terms" do
-      subject { FormalSum.new('-3+6acB-a-50').to_s}
+      subject { FormalSum.new('-3+6acB-a-50').to_s }
       it { should == '-3+6acB-a-50'} 
     end
     #
@@ -161,49 +149,103 @@ describe FormalSum do
   #------------------------------------
 
   #------------------------------------
-  describe "addition" do
+  describe "Arithmetic operations" do
     before :all do
       @fs_1 = FormalSum.new('a-b')
       @fs_2 = FormalSum.new('c-3de')
       @zfs = FormalSum.new('0a-0b')
     end
     #
-    context "for 'a-b' and 'c-3de'" do
-      it { (@fs_1+@fs_2).to_s.should == 'a-b+c-3de' }
-    end
-    # 
-    context "for a FormalSum and Zero" do
-      it "should simply connect two Array of Terms" do
-        (@fs_1+@zfs).show.should == '(1)a+(-1)b+(0)a+(0)b'
+    #------------------------------------
+    describe "#+ [addition]" do
+      context "of 'a-b' and 'c-3de'" do
+        subject{ @fs_1+@fs_2 }
+        its(:class){ should eq FormalSum }
+        its(:to_s){ should eq 'a-b+c-3de' }
+        its(:show){ should eq '(1)a+(-1)b+(1)c+(-3)de' }
       end
-    end
-    #
-  end
-  #------------------------------------
-
-  #------------------------------------
-  describe "subtraction" do
-    before :all do
-      @fs_1 = FormalSum.new('a-b')
-      @fs_2 = FormalSum.new('c-3de')
-      @zfs = FormalSum.new('0a-0b')
-    end
-    #
-    context "of 'c-3de' from 'a-b'" do
-      it { (@fs_1-@fs_2).to_s.should == 'a-b-c+3de' }
-    end
-    # 
-    context "of a FormalSum 'a-b' from itself" do
-      it "should simply connect two Array of Terms '(1)a+(-1)b+(-1)a+(1)b'" do
-        (@fs_1-@fs_1).show.should == '(1)a+(-1)b+(-1)a+(1)b'
+      # 
+      context "of 'a-b' and Zero" do
+        subject{ @fs_1+@zfs }
+        its(:class){ should eq FormalSum }
+        its(:to_s){ should eq 'a-b' }
+        its(:show){ should eq '(1)a+(-1)b+(0)a+(0)b' }
       end
       #
-      context "follwed by simplification" do
-        it { (@fs_1-@fs_1).simplify.show.should == '(0)a+(0)b' }
+    end
+    #------------------------------------
+
+    #------------------------------------
+    describe "#- [subtraction]" do
+      context "of 'c-3de' from 'a-b'" do
+        subject{ @fs_1-@fs_2 }
+        its(:class){ should eq FormalSum }
+        its(:to_s){ should eq 'a-b-c+3de' }
+        its(:show){ should eq '(1)a+(-1)b+(-1)c+(3)de' }
+      end
+      # 
+      context "of 'a-b' from itself" do
+        subject{ @fs_1-@fs_1 }
+        its(:class){ should eq FormalSum }
+        its(:to_s){ should eq 'a-b-a+b' }
+        its(:show){ should eq '(1)a+(-1)b+(-1)a+(1)b' }
+      end
+      #
+      context "of 'a-b' from itself followed by simplification" do
+        subject{ (@fs_1-@fs_1).simplify }
+        its(:class){ should eq FormalSum }
+        its(:to_s){ should eq '0' }
+        its(:show){ should eq '(0)a+(0)b' }
+      end
+      #
+    end
+    #------------------------------------
+
+    #------------------------------------
+    describe "#*" do
+      describe "#product" do
+        context "to be non-destructive" do
+          it { expect { @fs_1*@fs_2 }.not_to change{ @fs_1 } }
+        end
+        #
+        context "for 'a-b' and 'c-3de'" do
+          it { (@fs_1*@fs_2).to_s.should == 'ac-3ade-bc+3bde' }
+        end
+        # 
+        context "for a FormalSum and Zero" do
+          it "should simply connect two Array of Terms" do
+            (@fs_1*@zfs).show.should == '(0)aa+(0)ab+(0)ba+(0)bb'
+          end
+        end
+      end
+      #
+      describe "#multiply_by" do
+        #
+        context "to be non-destructive" do
+          it { expect { @fs_1*10 }.not_to change{ @fs_1 } }
+        end
+        #
+        context "to be scaler multiplication by an Integer" do
+          it { (@fs_1*(-2)).show.should == '(-2)a+(2)b'}
+        end
+        #
       end
     end
     #
-    #
+    describe "#multiply_by!" do
+      before(:all){ @fs = FormalSum.new('a-1+bA-34+7cAkK') }
+      #
+      context "to be destructive" do
+        it { expect { @fs.multiply_by!(10) }.to change{ @fs.terms[1][:coeff] }.from(-1).to(-10) }
+      end
+      #
+      context "to be scaler multiplication by an Integer" do
+        it { (@fs*(-5)).show.should == '(-50)a+(50)1+(-50)bA+(1700)1+(-350)cAkK'}
+        it { (@fs*(-5)).to_s.should == '-50a+50-50bA+1700-350cAkK'}
+      end
+      #
+    end
+    #------------------------------------
   end
   #------------------------------------
 
@@ -255,58 +297,6 @@ describe FormalSum do
         end
       end
       #
-    end
-    #
-  end
-  #------------------------------------
-
-  #------------------------------------
-  describe "#*" do
-    before :all do
-      @fs_1 = FormalSum.new('a-b')
-      @fs_2 = FormalSum.new('c-3de')
-      @zfs = FormalSum.new('0a-0b')
-    end
-    #
-    describe "#product" do
-      context "to be non-destructive" do
-        it { expect { @fs_1*@fs_2 }.not_to change{ @fs_1 } }
-      end
-      #
-      context "for 'a-b' and 'c-3de'" do
-        it { (@fs_1*@fs_2).to_s.should == 'ac-3ade-bc+3bde' }
-      end
-      # 
-      context "for a FormalSum and Zero" do
-        it "should simply connect two Array of Terms" do
-          (@fs_1*@zfs).show.should == '(0)aa+(0)ab+(0)ba+(0)bb'
-        end
-      end
-    end
-    #
-    describe "#multiply_by" do
-      #
-      context "to be non-destructive" do
-        it { expect { @fs_1*10 }.not_to change{ @fs_1 } }
-      end
-      #
-      context "to be scaler multiplication by an Integer" do
-        it { (@fs_1*(-2)).show.should == '(-2)a+(2)b'}
-      end
-      #
-    end
-  end
-  #
-  describe "#multiply_by!" do
-    before(:all){ @fs = FormalSum.new('a-1+bA-34+7cAkK') }
-    #
-    context "to be destructive" do
-      it { expect { @fs.multiply_by!(10) }.to change{ @fs.terms[1][:coeff] }.from(-1).to(-10) }
-    end
-    #
-    context "to be scaler multiplication by an Integer" do
-      it { (@fs*(-5)).show.should == '(-50)a+(50)1+(-50)bA+(1700)1+(-350)cAkK'}
-      it { (@fs*(-5)).to_s.should == '-50a+50-50bA+1700-350cAkK'}
     end
     #
   end

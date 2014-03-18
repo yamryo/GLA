@@ -1,7 +1,7 @@
 #
 # GLA/src/Term.rb
 #
-# Time-stamp: <2014-03-14 18:47:20 (ryosuke)>
+# Time-stamp: <2014-03-18 13:46:23 (ryosuke)>
 #
 require('Word')
 
@@ -9,8 +9,8 @@ require('Word')
 class Term < Hash
   
   InvalidArgument = Class.new(StandardError)
-  # A Regexp which matchs the scalers (Integers and Rationals) part of Strings
-  RgxScaler = /(^[+-]\d*|^\d+)(\/\d+)?/
+  # A Regexp which matchs the scalars (Integers and Rationals) part of Strings
+  RgxScalar = /(^[+-]\d*|^\d+)(\/\d+)?/
   
 #--- initialize ----------------
   def initialize(*arg)
@@ -26,21 +26,21 @@ class Term < Hash
         self[:word] = arg[0]
         self[:coeff] = 1
       when String
-        # First, seperate arg[0] to the scaler part and the other.
-        sparr = arg[0].split(RgxScaler).delete_if{ |x| x.empty?}
-        # Second, fix Array sparr up to have just two entries, the scaler and the another.
+        # First, seperate arg[0] to the scalar part and the other.
+        sparr = arg[0].split(RgxScalar).delete_if{ |x| x.empty?}
+        # Second, fix Array sparr up to have just two entries, the scalar and the another.
         #binding.pry if arg[0] == '+/50'
         if (%r{[+-]/}.match(arg[0]).nil?) then
           unless (%r{/\d+}.match(sparr[1]).nil?) then
-            # if you are here, the scaler is a Rational
+            # if you are here, the scalar is a Rational
             tmp = sparr.shift
             sparr[0] = tmp+sparr[0]
           end
         end
         case sparr.size
-        when 1 # The case where no scalers or no letters
+        when 1 # The case where no scalars or no letters
           sparr.push('1')
-          sparr.reverse! if sparr[0].match(RgxScaler).nil?
+          sparr.reverse! if sparr[0].match(RgxScalar).nil?
         when 2 # The normal case
           sparr[0] += '1' if sparr[0].match( %r{^[+-]$} )            
         else
