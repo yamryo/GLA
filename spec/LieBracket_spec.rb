@@ -1,12 +1,8 @@
 #
-# GLA/test/LieBracket_spec.rb
+# GLA/spec/LieBracket_spec.rb
 #
-# Time-stamp: <2014-03-18 19:17:11 (ryosuke)>
-#
-$LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
-
-require('pry')
-require('pry-byebug')
+# Time-stamp: <2014-08-04 19:33:53 (ryosuke)>
+require('spec_helper')
 
 require('LieBracket')
 
@@ -25,26 +21,26 @@ describe LieBracket do
   describe "#initialize" do
     context "with two Strings 'a' and 'b'" do
       subject{ LieBracket.new('a', 'b') }
-      its(:to_s){ should == '[a,b]' }
-      its("expand.to_s"){ should == 'ab-ba' }
+      it{ expect(subject.to_s).to eq '[a,b]' }
+      it{ expect(subject.expand.to_s).to eq 'ab-ba' }
     end
     #
     context "with Word 'w' and String 's'" do
       subject{ LieBracket.new(Word.new('w'), 's') }
-      its(:to_s){ should eq '[w,s]' }
-      its("expand.to_s"){ should == 'ws-sw' }
+      it{ expect(subject.to_s).to eq '[w,s]' }
+      it{ expect(subject.expand.to_s).to eq 'ws-sw' }
     end
     #
     context "with String 's' and Term 't'" do
       subject{ LieBracket.new('s', Term.new('t')) }
-      its(:to_s){ should == '[s,t]' }
-      its("expand.to_s"){ should == 'st-ts' }
+      it{ expect(subject.to_s).to eq '[s,t]' }
+      it{ expect(subject.expand.to_s).to eq 'st-ts' }
     end
     #
     context "with Generator 'g' and Term 't'" do
       subject{ LieBracket.new(Generator.new('g'), Term.new('t')) }
-      its(:to_s){ should == '[g,t]' }
-      its("expand.to_s"){ should == 'gt-tg' }
+      it{ expect(subject.to_s).to eq '[g,t]' }
+      it{ expect(subject.expand.to_s).to eq 'gt-tg' }
     end
     #
   end
@@ -90,12 +86,12 @@ describe "#expand" do
     context "[a,b]" do
       subject{ @a_b.expand }
       it { should be_kind_of(FormalSum) }
-      its(:to_s){ should == 'ab-ba' }
+      it{ expect(subject.to_s).to eq 'ab-ba' }
     end
     context "[a,a]" do
       subject{ @a_a.expand }
-      its(:to_s){ should == 'aa-aa'}
-      its("simplify.to_s"){ should == '0'}
+      it{ expect(subject.to_s).to eq 'aa-aa'}
+      it{ expect(subject.simplify.to_s).to eq '0'}
     end
     context "some more liebrackets" do
       context "[a,[a,b]]" do
@@ -108,18 +104,20 @@ describe "#expand" do
       end 
       context "[[a,b], 8]" do
         subject{ LieBracket.new(@a_b, 8).expand }
-        its(:to_s){ should == '8ab-8ba-8ab+8ba'}
-        its("simplify.to_s"){ should == '0'}
+        it{ expect(subject.to_s).to eq '8ab-8ba-8ab+8ba'}
+        it{ expect(subject.simplify.to_s).to eq '0'}
       end 
       context "[2/3r, [a,b]]" do
         subject{ LieBracket.new(2/3r, @a_b).expand }
-        its(:to_s){ should == '2/3ab-2/3ba-2/3ab+2/3ba'}
-        its("simplify.to_s"){ should == '0'}
+        it{ expect(subject.to_s).to eq '2/3ab-2/3ba-2/3ab+2/3ba'}
+        it{ expect(subject.simplify.to_s).to eq '0'}
       end 
       context "expansion of [lb, num] and [num, lb]" do
-        [89, -2, 3/8r, -8/121r].each do |num|
-          it { expect( LieBracket.new(num, @a_b).expand.simplify.to_s ).to eq '0'}
-          it { expect( LieBracket.new(@a_ab, num).expand.simplify.to_s ).to eq '0'}
+        it "are equal to zero" do
+          [89, -2, 3/8r, -8/121r].each do |num|
+            expect( LieBracket.new(num, @a_b).expand.simplify.to_s ).to eq '0'
+            expect( LieBracket.new(@a_ab, num).expand.simplify.to_s ).to eq '0'
+          end
         end
       end
     end
@@ -135,76 +133,48 @@ end
     [3, -4, 5/2r, -8/7r].each do |num|
       context "[a,b]*#{num}" do
         subject{ @a_b*num }
-        its(:to_s){ should == "[#{num}a,b]"}
-        its("expand.to_s"){ should == "#{num}ab-#{num}ba".gsub('--', '+')}
+        it{ expect(subject.to_s).to eq "[#{num}a,b]"}
+        it{ expect(subject.expand.to_s).to eq "#{num}ab-#{num}ba".gsub('--', '+')}
         #
-        it { expect((@a_b.multiply_by(num)).to_s).to eq "[#{num}a,b]"}
+        #it { expect((@a_b.multiply_by(num)).to_s).to eq "[#{num}a,b]"}
       end
     end
     #
-    context "[b,[a,b]]*(-6)" do
-      it { (@b_ab*(-6)).to_s.should == '[-6b,[a,b]]'}
-      it { @b_ab.multiply_by(-6).to_s.should == '[-6b,[a,b]]'}
-      it { @b_ab.multiply_by(-6).expand.to_s.should == '-6bab+6bba+6abb-6bab'} #(-6b)(ab-ba)-(ab-ba)(-6b)
+    context "of a 2-degree lb with an integer" do
+      it "goes well" do
+        ex_list = []
+        ex_list << {obj: @b_ab, num: -6,
+          str: '[-6b,[a,b]]', exp: '-6bab+6bba+6abb-6bab'}
+        ex_list << {obj: @ab_a, num: 23,
+          str: '[[23a,b],a]', exp: '23aba-23baa-23aab+23aba'}
+      #binding.pry
+        ex_list.each do |ex|
+          sbj = ex[:obj]*ex[:num] 
+          expect(sbj.to_s).to eq ex[:str]
+          expect(sbj.expand.to_s).to eq ex[:exp]
+        end
+      end
     end
     #
-    context "[[a,b],a]*23" do
-      it { (@ab_a*(23)).to_s.should == '[[23a,b],a]'}
-      it { @ab_a.multiply_by(23).to_s.should == '[[23a,b],a]'}
-      it { @ab_a.multiply_by(23).expand.to_s.should == '23aba-23baa-23aab+23aba'} #23(ab-ba)a-a23(ab-ba)
+    context "of a 2-degree lb with a rational number" do
+      it "goes well" do
+        ex_list = []
+        ex_list << {obj: @ab_a, num: 5/3r,
+          str: '[[5/3a,b],a]', exp: '5/3aba-5/3baa-5/3aab+5/3aba'}
+        ex_list << {obj: @ab_a, num: -4/8r,
+          str: '[[-1/2a,b],a]', exp: '-1/2aba+1/2baa+1/2aab-1/2aba'}
+        ex_list << {obj: @ab_a, num: 5/1r,
+          str: '[[5/1a,b],a]', exp: '5/1aba-5/1baa-5/1aab+5/1aba'}
+        ex_list.each do |ex|
+          sbj = ex[:obj]*ex[:num] 
+          expect(sbj.to_s).to eq ex[:str]
+          expect(sbj.expand.to_s).to eq ex[:exp]
+        end
+      end
     end
     #
-    context "[[a,b],a]*(5/3r)" do
-      it { (@ab_a*(5/3r)).to_s.should == '[[5/3a,b],a]'}
-      it { @ab_a.multiply_by(5/3r).to_s.should == '[[5/3a,b],a]'}
-      it { @ab_a.multiply_by(5/3r).expand.to_s.should == '5/3aba-5/3baa-5/3aab+5/3aba'}
-    end
-    #
-    context "[[a,b],a]*(-4/8r)" do
-      it { (@ab_a*(-4/8r)).to_s.should == '[[-1/2a,b],a]'}
-      it { @ab_a.multiply_by(-4/8r).to_s.should == '[[-1/2a,b],a]'}
-      it { @ab_a.multiply_by(-4/8r).expand.to_s.should == '-1/2aba+1/2baa+1/2aab-1/2aba'}
-    end
-    #
-    context "[[a,b],a]*(5/1r)" do
-      it { (@ab_a*(5/1r)).to_s.should == '[[5/1a,b],a]'}
-    end
   end
 #---------------------------------
-
-  #---------------------------------
-  describe "#opposite" do
-    context "of [a,b]" do
-      subject{ @a_b.opposite }
-      its("expand.to_s"){ should == '-ab+ba' }
-      pending{ expect(subject.to_s).to eq '-[a,b]' }
-    end
-    #
-  end
-  #---------------------------------
-
-  #---------------------------------
-  describe "Addition and subtraction:" do
-    context "[a,b] + [[a,b],a]" do
-      subject{ @a_b+@ab_a }
-      its("expand.to_s"){ should == 'ab-ba+aba-baa-aab+aba' }
-      pending do
-        expect(subject.to_s).to eq '[a,b]+[[a,b],a]'
-        expect(subject.class).to eq WHAT?
-      end
-    end
-    #
-    context "[a,b] - [[a,b],a]" do
-      subject{ @a_b-@ab_a }
-      #its("expand.to_s"){ should == 'ab-ba-aba+baa+aab-aba' }
-      pending "" do
-        expect(subject.to_s).to eq '[a,b]-[[a,b],a]'
-        expect(subject.class).to eq WHAT?
-      end
-    end
-    #
-  end
-  #---------------------------------
 
 # #---------------------------------
 # describe "" do

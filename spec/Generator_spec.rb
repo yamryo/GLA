@@ -1,12 +1,8 @@
 #
 # GLA/test/Generator_spec.rb
 #
-# Time-stamp: <2014-03-18 18:09:15 (ryosuke)>
-#
-$LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
-
-require('pry')
-require('pry-byebug')
+# Time-stamp: <2014-08-04 15:56:28 (ryosuke)>
+require('spec_helper')
 
 require('Generator')
 
@@ -19,9 +15,8 @@ describe Generator do
   #---------------------------------------
   describe "#initialize" do
     context "with a single letter 'g'" do
-      subject{ @gen }
-      its(:letter){ should eq 'g' }
-      its(:inverse?){ should be_false }
+      it{ expect(@gen.letter).to eq 'g' }
+      it{ expect(@gen.inverse?).to be false }
     end
     #
     context "with bad letters '&','2' and ' '(space)" do
@@ -31,8 +26,7 @@ describe Generator do
     end
     #
     context "with no argument" do
-      subject{ @identity }
-      its(:to_char){ should eq '1' }
+      it{ expect(@identity.to_char).to eq '1' }
     end
     #
   end
@@ -49,25 +43,25 @@ describe Generator do
     #
     context "=~, the lax conparing," do
       it "should return true iff the letters coinside" do
-        expect(@gen_1 =~ @gen_2).to be_true
-        expect(@gen_1 =~ @gen_3).to be_true
-        expect(@gen_1 =~ @gen_4).not_to be_true
+        expect(@gen_1 =~ @gen_2).to be true
+        expect(@gen_1 =~ @gen_3).to be true
+        expect(@gen_1 =~ @gen_4).not_to be true
       end
     end
     #
     context "==, the normal comparing," do
       it "should return true iff the letters and inverseness coinside" do
-        expect(@gen_1 == @gen_2).to be_true
-        expect(@gen_1 == @gen_3).not_to be_true
-        expect(@gen_1 == @gen_4).not_to be_true
+        expect(@gen_1 == @gen_2).to be true
+        expect(@gen_1 == @gen_3).not_to be true
+        expect(@gen_1 == @gen_4).not_to be true
       end
     end
     #
     context "===, the strict comparing," do
       it "should return true iff the two objects exactly coinside" do
-        expect(@gen_1 === @gen_2).to be_false
-        expect(@gen_1 === @gen_3).to be_false
-        expect(@gen_1 === @gen_4).to be_false
+        expect(@gen_1 === @gen_2).to be false
+        expect(@gen_1 === @gen_3).to be false
+        expect(@gen_1 === @gen_4).to be false
       end
     end
     #
@@ -132,10 +126,7 @@ describe Generator do
     end
     #
     context "of two normal Generators" do
-      subject { @gen*@another }
-      #
-      it { should eq [@gen, @another]}
-      #its(:class){ should be_kind_of(Array) }
+      it { expect(@gen*@another).to eq [@gen, @another]}
     end
     #
     context "of a Genarator 'g' and the identity '1'" do

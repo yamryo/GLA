@@ -1,21 +1,17 @@
 #
-# GLA/test/FormalSum_spec.rb
+# GLA/spec/FormalSum_spec.rb
 #
-# Time-stamp: <2014-03-18 15:30:32 (ryosuke)>
-#
-$LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
-
-require('pry')
-require('pry-byebug')
+# Time-stamp: <2014-08-04 15:55:32 (ryosuke)>
+require('spec_helper')
 
 require('FormalSum.rb')
 
 Zero = FormalSum::Zero
 One = FormalSum::One
 
-share_examples_for 'Should be Zero' do
-  it { should == Zero }
-end
+# share_examples_for 'Should be Zero' do
+#   it {expect.to eq Zero }
+# end
 
 describe FormalSum do 
 
@@ -28,22 +24,22 @@ describe FormalSum do
     end
     #
     context "with the Zero" do
-      subject{ FormalSum.new(Zero) }
-      its(:terms){ should be_kind_of(Array) }
-      its(:terms){ should eq [Zero] }
+      subject{ FormalSum.new(Zero).terms }
+      it{ is_expected.to be_kind_of Array }
+      it{ is_expected.to eq [Zero] }
     end
     #
     context "with a single Term" do
       subject{ @fs.terms }
-      it{ should be_kind_of(Array) }
-      it{ should eq [@t] }
+      it{ is_expected.to be_kind_of(Array) }
+      it{ is_expected.to eq [@t] }
     end
     #
     context "with Terms" do
       context "including the Zero" do
-        subject { FormalSum.new(Zero, One, @t).terms }
-        its(:size){ should be 3}
-        its(:first){ should be Zero}
+        let(:fst){ FormalSum.new(Zero, One, @t).terms }
+        it{ expect(fst.size).to be 3}
+        it{ expect(fst.first).to be Zero}
       end
       #
       context "in an Array" do
@@ -52,8 +48,8 @@ describe FormalSum do
         end
         #
         it "should not ignore the Zero" do
-          FormalSum.new([One, Zero]).terms.should == [One, Zero]
-          FormalSum.new([@zt, One, @t]).terms.should == [@zt, One, @t]
+          expect(FormalSum.new([One, Zero]).terms).to eq [One, Zero]
+          expect(FormalSum.new([@zt, One, @t]).terms).to eq [@zt, One, @t]
         end
       end
       #
@@ -92,27 +88,27 @@ describe FormalSum do
   describe "#to_s" do
     context "for a FormalSum without zero terms" do
       subject { FormalSum.new('-3+6acB-a-50').to_s }
-      it { should == '-3+6acB-a-50'} 
+      it { is_expected.to eq '-3+6acB-a-50'} 
     end
     #
     context "for a FormalSum with zero terms" do
       subject { FormalSum.new('-3+6acB-a+0bKde-0+0-50').to_s}
-      it { should == '-3+6acB-a-50'} 
+      it { is_expected.to eq '-3+6acB-a-50'} 
     end
     #
     context "for a FormalSum with zero terms only" do
       subject { FormalSum.new('-0+0acB-0a+0bKde-0+0+0').to_s}
-      it { should == '0'} 
+      it { is_expected.to eq '0'} 
     end
     #
     context "for Zero" do
       subject { FormalSum.new.to_s}
-      it { should == '0'} 
+      it { is_expected.to eq '0'} 
     end
     #
     context "for One" do
       subject { FormalSum.new(One).to_s}
-      it { should == '1'} 
+      it { is_expected.to eq '1'} 
     end
     #
   end
@@ -122,27 +118,27 @@ describe FormalSum do
   describe "#show" do
     context "for a FormalSum without zero terms" do
       subject { FormalSum.new('-3+6acB-a-50').show}
-      it { should == '(-3)1+(6)acB+(-1)a+(-50)1'} 
+      it { is_expected.to eq '(-3)1+(6)acB+(-1)a+(-50)1'} 
     end
     #
     context "for a FormalSum with zero terms" do
       subject { FormalSum.new('-3+6acB-a+0bKde-0+0-50').show}
-      it { should == '(-3)1+(6)acB+(-1)a+(0)bKde+(0)1+(0)1+(-50)1'} 
+      it { is_expected.to eq '(-3)1+(6)acB+(-1)a+(0)bKde+(0)1+(0)1+(-50)1'} 
     end
     #
     context "for a FormalSum with zero terms only" do
       subject { FormalSum.new('-0+0acB-0a+0bKde+0').show}
-      it { should == '(0)1+(0)acB+(0)a+(0)bKde+(0)1'} 
+      it { is_expected.to eq '(0)1+(0)acB+(0)a+(0)bKde+(0)1'} 
     end
     #
     context "for Zero" do
       subject { FormalSum.new.show}
-      it { should == '(0)1'} 
+      it { is_expected.to eq '(0)1'} 
     end
     #
     context "for One" do
       subject { FormalSum.new(One).show}
-      it { should == '(1)1'} 
+      it { is_expected.to eq '(1)1'} 
     end
     #
   end
@@ -159,17 +155,17 @@ describe FormalSum do
     #------------------------------------
     describe "#+ [addition]" do
       context "of 'a-b' and 'c-3de'" do
-        subject{ @fs_1+@fs_2 }
-        its(:class){ should eq FormalSum }
-        its(:to_s){ should eq 'a-b+c-3de' }
-        its(:show){ should eq '(1)a+(-1)b+(1)c+(-3)de' }
+        let(:add12){ @fs_1+@fs_2 }
+        it{ expect(add12.class).to eq FormalSum }
+        it{ expect(add12.to_s).to eq 'a-b+c-3de' }
+        it{ expect(add12.show).to eq '(1)a+(-1)b+(1)c+(-3)de' }
       end
       # 
       context "of 'a-b' and Zero" do
-        subject{ @fs_1+@zfs }
-        its(:class){ should eq FormalSum }
-        its(:to_s){ should eq 'a-b' }
-        its(:show){ should eq '(1)a+(-1)b+(0)a+(0)b' }
+        let(:add10){ @fs_1+@zfs }
+        it{ expect(add10.class).to eq FormalSum }
+        it{ expect(add10.to_s).to eq 'a-b' }
+        it{ expect(add10.show).to eq '(1)a+(-1)b+(0)a+(0)b' }
       end
       #
     end
@@ -178,24 +174,24 @@ describe FormalSum do
     #------------------------------------
     describe "#- [subtraction]" do
       context "of 'c-3de' from 'a-b'" do
-        subject{ @fs_1-@fs_2 }
-        its(:class){ should eq FormalSum }
-        its(:to_s){ should eq 'a-b-c+3de' }
-        its(:show){ should eq '(1)a+(-1)b+(-1)c+(3)de' }
+        let(:sbt21){ @fs_1-@fs_2 }
+        it{ expect(sbt21.class).to eq FormalSum }
+        it{ expect(sbt21.to_s).to eq 'a-b-c+3de' }
+        it{ expect(sbt21.show).to eq '(1)a+(-1)b+(-1)c+(3)de' }
       end
       # 
       context "of 'a-b' from itself" do
-        subject{ @fs_1-@fs_1 }
-        its(:class){ should eq FormalSum }
-        its(:to_s){ should eq 'a-b-a+b' }
-        its(:show){ should eq '(1)a+(-1)b+(-1)a+(1)b' }
+        let(:sbt11){ @fs_1-@fs_1 }
+        it{ expect(sbt11.class).to eq FormalSum }
+        it{ expect(sbt11.to_s).to eq 'a-b-a+b' }
+        it{ expect(sbt11.show).to eq '(1)a+(-1)b+(-1)a+(1)b' }
       end
       #
       context "of 'a-b' from itself followed by simplification" do
-        subject{ (@fs_1-@fs_1).simplify }
-        its(:class){ should eq FormalSum }
-        its(:to_s){ should eq '0' }
-        its(:show){ should eq '(0)a+(0)b' }
+        let(:sbt11s){ (@fs_1-@fs_1).simplify }
+        it{ expect(sbt11s.class).to eq FormalSum }
+        it{ expect(sbt11s.to_s).to eq '0' }
+        it{ expect(sbt11s.show).to eq '(0)a+(0)b' }
       end
       #
     end
@@ -205,16 +201,16 @@ describe FormalSum do
     describe "#*" do
       describe "#product" do
         context "to be non-destructive" do
-          it { expect { @fs_1*@fs_2 }.not_to change{ @fs_1 } }
+          it { expect{ @fs_1*@fs_2 }.not_to change{ @fs_1 } }
         end
         #
         context "for 'a-b' and 'c-3de'" do
-          it { (@fs_1*@fs_2).to_s.should == 'ac-3ade-bc+3bde' }
+          it { expect((@fs_1*@fs_2).to_s).to eq 'ac-3ade-bc+3bde' }
         end
         # 
         context "for a FormalSum and Zero" do
           it "should simply connect two Array of Terms" do
-            (@fs_1*@zfs).show.should == '(0)aa+(0)ab+(0)ba+(0)bb'
+            expect((@fs_1*@zfs).show).to eq '(0)aa+(0)ab+(0)ba+(0)bb'
           end
         end
       end
@@ -226,7 +222,7 @@ describe FormalSum do
         end
         #
         context "to be scaler multiplication by an Integer" do
-          it { (@fs_1*(-2)).show.should == '(-2)a+(2)b'}
+          it { expect((@fs_1*(-2)).show).to eq '(-2)a+(2)b'}
         end
         #
       end
@@ -240,8 +236,8 @@ describe FormalSum do
       end
       #
       context "to be scaler multiplication by an Integer" do
-        it { (@fs*(-5)).show.should == '(-50)a+(50)1+(-50)bA+(1700)1+(-350)cAkK'}
-        it { (@fs*(-5)).to_s.should == '-50a+50-50bA+1700-350cAkK'}
+        it { expect((@fs*(-5)).show).to eq '(-50)a+(50)1+(-50)bA+(1700)1+(-350)cAkK'}
+        it { expect((@fs*(-5)).to_s).to eq '-50a+50-50bA+1700-350cAkK'}
       end
       #
     end
@@ -260,13 +256,13 @@ describe FormalSum do
       context "for a normal FormalSum" do
         #
         it "should return a FormalSum of terms with opposite signs to the original" do
-          (@fs.opposite.terms.map{ |t| t.sign }).should == ['-','+','-','+'] 
+      expect((@fs.opposite.terms.map{ |t| t.sign })).to eq ['-','+','-','+'] 
         end
         #
         it "should cause no change to the original" do
-          expect { @fs.opposite }.not_to change{ @fs.terms } 
-          expect { @fs.opposite }.not_to change{ @fs.terms.map{ |t| t.sign } } 
-          expect { @fs.opposite }.not_to change{ @fs.terms.map{ |t| t[:coeff] } } 
+          expect{ @fs.opposite }.not_to change{ @fs.terms } 
+          expect{ @fs.opposite }.not_to change{ @fs.terms.map{ |t| t.sign } } 
+          expect{ @fs.opposite }.not_to change{ @fs.terms.map{ |t| t[:coeff] } } 
         end
       end
       #
@@ -308,7 +304,7 @@ describe FormalSum do
     #
     context "for a FormalSum 'a+1+bA-34+7cAkK'" do
       subject { @fs.reverse.to_s }
-      it { should == '7cAkK-34+bA-1+a' }
+      it { is_expected.to eq '7cAkK-34+bA-1+a' }
     end
     #
     context "of non-destructive type" do
@@ -329,12 +325,12 @@ describe FormalSum do
     context "for a FormalSum 'a+1+bA'" do
       #binding.pry
       subject { @fs.sort.to_s }
-      it { should == '-1+a+bA' }
+      it { is_expected.to eq '-1+a+bA' }
     end
     #
     context "for a FormalSum 'a-1+bA+0a-0kZ'" do
       subject { (@fs+'0a-0kZ').sort.show }
-      it { should == '(0)a+(0)kZ+(-1)1+(1)a+(1)bA' }
+      it { is_expected.to eq '(0)a+(0)kZ+(-1)1+(1)a+(1)bA' }
     end
     #
     context "of non-destructive type" do
@@ -346,7 +342,8 @@ describe FormalSum do
     end
     #
     context "about uppercases and lowercases" do
-      it { FormalSum.new('a+bs-bS+M+1-A-0b+bsX').sort.to_s.should == '1+a-A+M+bs-bS+bsX' }
+      subject{ FormalSum.new('a+bs-bS+M+1-A-0b+bsX') }
+      it { expect(subject.sort.to_s).to eq '1+a-A+M+bs-bS+bsX' }
     end
     #
   end
@@ -356,27 +353,27 @@ describe FormalSum do
   describe "#degree" do
     context "of a FormalSum '-2bA'" do
       subject { FormalSum.new('-2bA').degree }
-      it { should == 2}
+      it { is_expected.to eq 2}
     end
     #
     context "of a FormalSum '1-a-2bAc+3DVe-10oLfP+M+29'" do
       subject { FormalSum.new('1-a-2bAc+3DVe-10oLfP+M+29').degree }
-      it { should == 4}
+      it { is_expected.to eq 4}
     end
     #
     context "of the FormalSum One" do
       subject { FormalSum.new(One).degree }
-      it { should == 0}
+      it { is_expected.to eq 0}
     end
     #
     context "of the FormalSum Zero" do
       subject { FormalSum.new(Zero).degree }
-      it { should == -1.0/0.0}
+      it { is_expected.to eq -1.0/0.0}
     end
     #
     context "for a FormalSum '2Bc+1+a-2Bc+a+3aCb-6b+2-5aCb'" do
       subject { FormalSum.new('2Bc+1+a-2Bc+a+3aCb-6b+2-5aCb').degree }
-      it { should == 3 }
+      it { is_expected.to eq 3 }
     end
     #
   end
@@ -394,18 +391,18 @@ describe FormalSum do
         5.times do |k|
           context "degree-#{k} part" do
             subject { @mfs.homo_part(k).to_s }
-            it { should == @marr[k] }
+            it { is_expected.to eq @marr[k] }
           end
         end
         #
         context "too big degree part" do
           subject { @mfs.homo_part(5).terms }
-          it { should == [Zero] }
+          it { is_expected.to eq [Zero] }
         end
         #
         context "negative degree parts" do
           subject { @mfs.homo_part(-1).terms }
-          it { should == [Zero] }
+          it { is_expected.to eq [Zero] }
         end
         #
       end
@@ -413,17 +410,17 @@ describe FormalSum do
       context "for more than one argument" do
         context "degree-(0..2) part" do
           subject { @mfs.homo_part(0..2).to_s }
-          it { should == '29-a+M+1' }
+          it { is_expected.to eq '29-a+M+1' }
         end
         #
         context "(degree-0,2, and 5) part" do
           subject { @mfs.homo_part(1,2,4).to_s }
-          it { should == '-a-10oLfP+M'  }
+          it { is_expected.to eq '-a-10oLfP+M'  }
         end
         #
         context "(degree-0 and higher than 3) part" do
           subject { @mfs.homo_part(0,3..@mfs.degree).to_s }
-          it { should == '29+3DVe-10oLfP-2bAc+1' }
+          it { is_expected.to eq '29+3DVe-10oLfP-2bAc+1' }
         end
         #
       end
@@ -442,12 +439,12 @@ describe FormalSum do
     #
     context "for a FormalSum 'a-b+a'" do
       subject { FormalSum.new('a-b+a').simplify.show }
-      it { should == '(2)a+(-1)b' }
+      it { is_expected.to eq '(2)a+(-1)b' }
     end
     #
     context "for a FormalSum '3b+2Bc+1+a-2Bc+a+3aCb-6b-9-5aCb+5b'" do
       subject { FormalSum.new('3b+2Bc+1+a-2Bc+a+3aCb-6b-9-5aCb+5b').simplify.to_s }
-      it { should == '-8+2a+2b-2aCb' }
+      it { is_expected.to eq '-8+2a+2b-2aCb' }
     end
     #
     context "#simplify! for a FormalSum" do

@@ -1,19 +1,14 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-03-18 13:46:01 (ryosuke)>
+# Time-stamp: <2014-08-04 14:29:33 (ryosuke)>
 #
-
-require('pry')
-require('pry-byebug')
 
 require('FormalSum')
 
 #-------------------------------
 class LieBracket < FormalSum
-
-  InvalidArgument = Class.new(StandardError)
-
+  
   #-----------------
   def initialize(elm_1=One, elm_2=One)
     @couple = [elm_1, elm_2]
