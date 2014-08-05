@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-08-04 14:29:33 (ryosuke)>
+# Time-stamp: <2014-08-05 23:17:08 (ryosuke)>
 #
 
 require('FormalSum')
@@ -11,6 +11,7 @@ class LieBracket < FormalSum
   
   #-----------------
   def initialize(elm_1=One, elm_2=One)
+    @coeff = 1
     @couple = [elm_1, elm_2]
     #
     tmp = @couple.map do |elm|
@@ -35,7 +36,7 @@ class LieBracket < FormalSum
     #
   end
   #-----------------
-  attr_accessor :couple
+  attr_accessor :couple, :coeff
 
   def deepcopy
     # Override FormalSum.deepcopy
@@ -62,13 +63,14 @@ class LieBracket < FormalSum
   end
   def multiply_by(scalar)
     mylb = super(scalar)
-    mylb.couple[0] = mylb.couple[0]*scalar
+    mylb.coeff *= scalar
     return mylb
     #return scalar.kind_of?(Fixnum) ? super(scalar).couple[0]*scalar : self
   end
 
   def to_s
-    return "[#{(@couple.map{ |x| x.to_s }).join(',')}]"
+    rtn = @coeff.to_s+"["+(@couple.map{ |x| x.to_s }).join(',')+"]"
+    return rtn.gsub(/^([-]*)1(\[)/, '\1\2')
   end
 #  def inspect
 #    string = "#<#{self.class.name}:0x" << ('%x' % (self.object_id << 1)) << '>'

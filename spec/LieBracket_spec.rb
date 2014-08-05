@@ -1,7 +1,7 @@
 #
 # GLA/spec/LieBracket_spec.rb
 #
-# Time-stamp: <2014-08-04 19:33:53 (ryosuke)>
+# Time-stamp: <2014-08-05 23:27:14 (ryosuke)>
 require('spec_helper')
 
 require('LieBracket')
@@ -19,28 +19,48 @@ describe LieBracket do
   #
 #---------------------------------
   describe "#initialize" do
-    context "with two Strings 'a' and 'b'" do
+    context "with two Strings" do
       subject{ LieBracket.new('a', 'b') }
-      it{ expect(subject.to_s).to eq '[a,b]' }
-      it{ expect(subject.expand.to_s).to eq 'ab-ba' }
+      it "goes well" do
+        expect(subject.terms[0]).to be_a_kind_of Term
+        expect(subject.couple).to be_a_kind_of Array
+        expect(subject.coeff).to eq 1
+        expect(subject.to_s).to eq '[a,b]'
+        expect(subject.expand.to_s).to eq 'ab-ba'
+      end
     end
     #
     context "with Word 'w' and String 's'" do
       subject{ LieBracket.new(Word.new('w'), 's') }
-      it{ expect(subject.to_s).to eq '[w,s]' }
-      it{ expect(subject.expand.to_s).to eq 'ws-sw' }
+      it "goes well" do
+        expect(subject.terms[0]).to be_a_kind_of Term
+        expect(subject.couple).to be_a_kind_of Array
+        expect(subject.coeff).to eq 1
+        expect(subject.to_s).to eq '[w,s]'
+        expect(subject.expand.to_s).to eq 'ws-sw'
+      end
     end
     #
     context "with String 's' and Term 't'" do
       subject{ LieBracket.new('s', Term.new('t')) }
-      it{ expect(subject.to_s).to eq '[s,t]' }
-      it{ expect(subject.expand.to_s).to eq 'st-ts' }
+      it "goes well" do
+        expect(subject.terms[0]).to be_a_kind_of Term
+        expect(subject.couple).to be_a_kind_of Array
+        expect(subject.coeff).to eq 1
+        expect(subject.to_s).to eq '[s,t]'
+        expect(subject.expand.to_s).to eq 'st-ts'
+      end
     end
     #
     context "with Generator 'g' and Term 't'" do
       subject{ LieBracket.new(Generator.new('g'), Term.new('t')) }
-      it{ expect(subject.to_s).to eq '[g,t]' }
-      it{ expect(subject.expand.to_s).to eq 'gt-tg' }
+      it "goes well" do
+        expect(subject.terms[0]).to be_a_kind_of Term
+        expect(subject.couple).to be_a_kind_of Array
+        expect(subject.coeff).to eq 1
+        expect(subject.to_s).to eq '[g,t]'
+        expect(subject.expand.to_s).to eq 'gt-tg'
+      end
     end
     #
   end
@@ -130,11 +150,22 @@ end
       it { expect { @a_b*4 }.not_to change{ @a_b } }
     end
     #
+    context "[a,b]*(-1)" do
+      subject{ @a_b*(-1) }
+      it "includes an array of Terms" do
+        expect(subject.terms[0]).to be_a_kind_of Term
+      end
+      it{ expect(subject.to_s).to eq "-[a,b]" }
+      it{ expect(subject.expand.to_s).to eq "-ab+ba" }
+    end
     [3, -4, 5/2r, -8/7r].each do |num|
       context "[a,b]*#{num}" do
         subject{ @a_b*num }
-        it{ expect(subject.to_s).to eq "[#{num}a,b]"}
-        it{ expect(subject.expand.to_s).to eq "#{num}ab-#{num}ba".gsub('--', '+')}
+        it "includes an array of Terms" do
+          expect(subject.terms[0]).to be_a_kind_of Term
+        end
+        it{ expect(subject.to_s).to eq "#{num}[a,b]" }
+        it{ expect(subject.expand.to_s).to eq "#{num}ab-#{num}ba".gsub('--', '+') }
         #
         #it { expect((@a_b.multiply_by(num)).to_s).to eq "[#{num}a,b]"}
       end
@@ -144,9 +175,11 @@ end
       it "goes well" do
         ex_list = []
         ex_list << {obj: @b_ab, num: -6,
-          str: '[-6b,[a,b]]', exp: '-6bab+6bba+6abb-6bab'}
+          str: '-6[b,[a,b]]', exp: '-6bab+6bba+6abb-6bab'}
         ex_list << {obj: @ab_a, num: 23,
-          str: '[[23a,b],a]', exp: '23aba-23baa-23aab+23aba'}
+          str: '23[[a,b],a]', exp: '23aba-23baa-23aab+23aba'}
+        ex_list << {obj: LieBracket.new(LieBracket.new('a','b')*5,@b), num: 3,
+          str: '3[5[a,b],b]', exp: '15abb-15bab-15bab+15bba'}
       #binding.pry
         ex_list.each do |ex|
           sbj = ex[:obj]*ex[:num] 
@@ -160,11 +193,11 @@ end
       it "goes well" do
         ex_list = []
         ex_list << {obj: @ab_a, num: 5/3r,
-          str: '[[5/3a,b],a]', exp: '5/3aba-5/3baa-5/3aab+5/3aba'}
+          str: '5/3[[a,b],a]', exp: '5/3aba-5/3baa-5/3aab+5/3aba'}
         ex_list << {obj: @ab_a, num: -4/8r,
-          str: '[[-1/2a,b],a]', exp: '-1/2aba+1/2baa+1/2aab-1/2aba'}
+          str: '-1/2[[a,b],a]', exp: '-1/2aba+1/2baa+1/2aab-1/2aba'}
         ex_list << {obj: @ab_a, num: 5/1r,
-          str: '[[5/1a,b],a]', exp: '5/1aba-5/1baa-5/1aab+5/1aba'}
+          str: '5/1[[a,b],a]', exp: '5/1aba-5/1baa-5/1aab+5/1aba'}
         ex_list.each do |ex|
           sbj = ex[:obj]*ex[:num] 
           expect(sbj.to_s).to eq ex[:str]
