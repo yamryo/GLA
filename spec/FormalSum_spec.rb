@@ -1,7 +1,7 @@
 #
 # GLA/spec/FormalSum_spec.rb
 #
-# Time-stamp: <2014-08-04 15:55:32 (ryosuke)>
+# Time-stamp: <2014-08-05 22:41:28 (ryosuke)>
 require('spec_helper')
 
 require('FormalSum.rb')
@@ -58,18 +58,18 @@ describe FormalSum do
     context "with a String" do
       before do
         @str = '2+c-B-4s'
-        @arr= %w[(2)1 (1)c (-1)B (-4)s]
+        @arr = %w[(2)1 (1)c (-1)B (-4)s]
         @tarr = FormalSum.new(@str).terms
       end
       #
-      it "should equip an Array of Terms" do
+      it "equips an Array of Terms" do
         (@tarr.size).times do |k|
-          expect(@tarr[k]).to be_kind_of(Term)
+          expect(@tarr[k]).to be_a_kind_of Term
           expect(@tarr[k].show).to eq @arr[k]
         end
       end
       #
-      it "should not ignore zero terms" do
+      it "does not ignore zero terms" do
         ts = FormalSum.new('-3+6acB-a+0bKde-00+0-50').terms
         expect(ts.join(',')).to eq '-3,6acB,-a,0,0,0,-50'
         expect(ts[3]).to include(:word => 'bKde', :coeff => 0)

@@ -2,7 +2,7 @@
 #
 # spec_helper.rb
 #
-#Time-stamp: <2014-08-04 14:33:00 (ryosuke)>
+#Time-stamp: <2014-08-05 22:34:00 (ryosuke)>
 
 $LOAD_PATH.push File.expand_path(File.dirname(__FILE__)+'/../src')
 
@@ -15,6 +15,9 @@ RSpec.configure do |config|
   config.filter_run :focus
   # focus: true が設定された example がない時全ての example を実行する
   config.run_all_when_everything_filtered = true
+ 
+  # エラーが出たら即停止
+  config.fail_fast = true
  
   # テストをランダムな順序で実行する
   # config.order = :random
