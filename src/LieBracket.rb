@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-08-05 23:17:08 (ryosuke)>
+# Time-stamp: <2014-08-08 12:36:31 (ryosuke)>
 #
 
 require('FormalSum')
@@ -63,7 +63,7 @@ class LieBracket < FormalSum
   end
   def multiply_by(scalar)
     mylb = super(scalar)
-    mylb.coeff *= scalar
+    mylb.coeff = @coeff * scalar
     return mylb
     #return scalar.kind_of?(Fixnum) ? super(scalar).couple[0]*scalar : self
   end
