@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-08-08 12:36:31 (ryosuke)>
+# Time-stamp: <2014-10-26 00:41:40 (ryosuke)>
 #
 
 require('FormalSum')
@@ -38,6 +38,11 @@ class LieBracket < FormalSum
   #-----------------
   attr_accessor :couple, :coeff
 
+  def coeff=(arg)
+    raise(InvalidArgument) unless arg.kind_of?(Numeric)
+    arg = arg.truncate(0) if (arg.kind_of?(Rational) && arg.denominator == 1) 
+    @coeff = arg
+  end
   def deepcopy
     # Override FormalSum.deepcopy
     # couple_copy = []
