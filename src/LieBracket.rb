@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-10-26 00:41:40 (ryosuke)>
+# Time-stamp: <2014-11-04 23:36:29 (kaigishitsu)>
 #
 
 require('FormalSum')
@@ -73,6 +73,15 @@ class LieBracket < FormalSum
     #return scalar.kind_of?(Fixnum) ? super(scalar).couple[0]*scalar : self
   end
 
+  def flip
+    self.class.new(@couple[1], @couple[0])*(@coeff*(-1))
+  end
+  def flip!
+    @couple.reverse!
+    @coeff = @coeff*(-1)
+    return self.opposite!
+  end
+  
   def to_s
     rtn = @coeff.to_s+"["+(@couple.map{ |x| x.to_s }).join(',')+"]"
     return rtn.gsub(/^([-]*)1(\[)/, '\1\2')

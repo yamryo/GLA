@@ -1,7 +1,7 @@
 #
 # GLA/spec/LieBracket_spec.rb
 #
-# Time-stamp: <2014-08-05 23:27:14 (ryosuke)>
+# Time-stamp: <2014-11-04 23:48:24 (kaigishitsu)>
 require('spec_helper')
 
 require('LieBracket')
@@ -105,7 +105,7 @@ end
 describe "#expand" do
     context "[a,b]" do
       subject{ @a_b.expand }
-      it { should be_kind_of(FormalSum) }
+      it { is_expected.to be_kind_of(FormalSum) }
       it{ expect(subject.to_s).to eq 'ab-ba' }
     end
     context "[a,a]" do
@@ -116,11 +116,11 @@ describe "#expand" do
     context "some more liebrackets" do
       context "[a,[a,b]]" do
         subject{ @a_ab.expand.to_s }
-        it { should == 'aab-aba-aba+baa'}
+        it { is_expected.to eq 'aab-aba-aba+baa'}
       end 
       context "[[a,b],a]" do
         subject{ @ab_a.expand.to_s }
-        it { should == 'aba-baa-aab+aba'}
+        it { is_expected.to eq 'aba-baa-aab+aba'}
       end 
       context "[[a,b], 8]" do
         subject{ LieBracket.new(@a_b, 8).expand }
@@ -197,7 +197,7 @@ end
         ex_list << {obj: @ab_a, num: -4/8r,
           str: '-1/2[[a,b],a]', exp: '-1/2aba+1/2baa+1/2aab-1/2aba'}
         ex_list << {obj: @ab_a, num: 5/1r,
-          str: '5/1[[a,b],a]', exp: '5/1aba-5/1baa-5/1aab+5/1aba'}
+          str: '5[[a,b],a]', exp: '5/1aba-5/1baa-5/1aab+5/1aba'}
         ex_list.each do |ex|
           sbj = ex[:obj]*ex[:num] 
           expect(sbj.to_s).to eq ex[:str]
@@ -206,6 +206,19 @@ end
       end
     end
     #
+  end
+#---------------------------------
+
+#---------------------------------
+describe "#flip, #flip!" do
+    before{ @lb = (@a_b*(2/3r)).flip}
+    it { expect(@lb.couple).to eq @a_b.couple.reverse }
+    it { expect(@lb.coeff).to eq (-2/3r) }
+    it { expect(@lb.expand.to_s).to eq '-2/3ba+2/3ab' }
+    #---
+    it { expect { @a_b.flip }.not_to change{ @a_b } }
+    it { expect { @lb.flip! }.to change{ @lb.couple } }
+    it { expect { @lb.flip! }.to change{ @lb.coeff }.from(-2/3r).to(2/3r) }
   end
 #---------------------------------
 
