@@ -1,7 +1,7 @@
 #
 # GLA/test/Word_spec.rb
 #
-# Time-stamp: <2014-08-04 16:50:12 (ryosuke)>
+# Time-stamp: <2014-11-07 10:11:52 (kaigishitsu)>
 require('spec_helper')
 
 require('Word.rb')
@@ -18,6 +18,10 @@ describe "when initializing" do
 #
   context "without arguments" do
     it { expect{ Word.new }.to raise_error }
+  end
+#
+  context "with the null word" do
+    it { expect{ Word.new('') }.to raise_error }
   end
 #
   context "with a String including non-alphabet letters" do
@@ -55,15 +59,26 @@ end
 
 #------------------------
   describe "#gen_at" do
-    before { @mwd = Word.new('aioStwfmXb')}
+    before { @mwd = Word.new('aioStwfmXb') }
     #
-     context "with a given integer k" do
-       it "is a k-th Generator" do
-      expect(@mwd.gen_at(3)).to be_kind_of Generator
-    #     @third_gen.to_c.should == 'S'
-    #     @third_gen.should be_inverse
-       end
-     end
+    context "with an Integer <= self.length" do
+      it "starts from 0" do
+        #expect{ @mwd[0] }.not_to raise_error
+        expect{ @mwd.gen_at(0) }.not_to raise_error
+      end
+      it { expect(@mwd.gen_at(3)).to be_kind_of Generator }
+      it { expect(@mwd.gen_at(3).to_char).to eq @mwd[3] }
+    end
+    context "with an Integer > self.length" do
+      it { expect{ @mwd.gen_at(@mwd.length) }.to raise_error }
+    end
+    context "with a negative Integer" do
+      it { expect( @mwd.gen_at(-3).to_char ).to eq @mwd[@mwd.length-3] }
+    end
+    #
+    context "with the word 1" do
+      it{ expect( Word.new('1').gen_at(0)).to be_nil }
+    end
     #
   end
 #------------------------
