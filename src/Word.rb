@@ -1,13 +1,14 @@
 #
 # GLA/src/Word.rb
 #
-# Time-stamp: <2014-03-17 09:20:41 (ryosuke)>
+# Time-stamp: <2014-11-07 11:34:41 (kaigishitsu)>
 #
 require('Generator')
 
 class Word < String
 
   InvalidArgument = Class.new(StandardError)
+  Identity = '1'
 
 #--- initialize ----------------
   def initialize(str)
@@ -21,30 +22,31 @@ class Word < String
     {:value => self, :obj_id => self.object_id}
   end
 
+  def gen_at(int)
+    Generator.new( self[int] ) rescue raise(InvalidArgument)
+  end
+   
   def each_gen(&block) 
     itr = Enumerator.new do |y|
-      (self.size).times{ |k| y << Generator.new(self[k]) } 
+      (self.size).times{ |k| y << self.gen_at(k) } 
     end
     itr.each(&block)
   end
-
-   def gen_at(int)
-     Generator.new( self[int] ) rescue raise(InvalidArgument)
-   end
    
  #--- mathematical operations ---
   def ===(word)
-    (word*self.invert).dup.contract == '1'
+    (word*self.invert).dup.contract == Identity
   end
 
   def invert()
     self.dup.reverse.swapcase
   end
 
-  def product_with(another_word)  # another_word can be a String object.
-    if self == '1' then 
+  def product_with(another_word)  # another_word can be a String or a Generator.
+    another_word = another_word.to_char if another_word.kind_of?(Generator)
+    if self == Identity then 
       mystr = another_word
-    elsif another_word == '1' then
+    elsif another_word == Identity then
       mystr = self
     else
       mystr = self+another_word
@@ -58,7 +60,7 @@ class Word < String
 
   def powered_by(int)
     k = int.to_i rescue raise(InvalidArgument)
-    str = ( k == 0 ? '1' : "#{self}"*k )
+    str = ( k == 0 ? Identity : "#{self}"*k )
     return self.class.new(str)
   end
   def ^(int)

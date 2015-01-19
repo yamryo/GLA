@@ -1,7 +1,7 @@
 #
 # GLA/test/Word_spec.rb
 #
-# Time-stamp: <2014-11-07 10:11:52 (kaigishitsu)>
+# Time-stamp: <2014-11-07 11:36:49 (kaigishitsu)>
 require('spec_helper')
 
 require('Word.rb')
@@ -77,7 +77,7 @@ end
     end
     #
     context "with the word 1" do
-      it{ expect( Word.new('1').gen_at(0)).to be_nil }
+      it{ expect( Word.new('1').gen_at(0) ).to eq Generator.new('1') }
     end
     #
   end
@@ -166,7 +166,7 @@ describe "#contract" do
   context "for a product of a word with its inverse" do
     before  { @myw = Word.new('aBcdE') }
     subject { (@myw*@myw.invert).contract }
-    it { is_expected.to eq '1' }
+    it { is_expected.to eq Word::Identity }
   end
 #
 end
@@ -180,8 +180,8 @@ describe "#product" do
  #
   context "with the identity" do
     it "is the original Word 'aBc'" do
-      expect(@mwd*Word.new('1')).to eq @mwd 
-      expect(Word.new('1')*@mwd).to eq @mwd 
+      expect(@mwd*Word.new(Word::Identity)).to eq @mwd 
+      expect(Word.new(Word::Identity)*@mwd).to eq @mwd 
     end
   end
  #
@@ -190,13 +190,18 @@ describe "#product" do
     it { is_expected.to eq 'aBcxYz'}
   end
  #
-  context "with a String 'UvW'" do
+  context "with a String" do
     it { expect(@mwd*'UvW').to eq 'aBcUvW'}
     it "is an instance of Word class" do
       expect(@mwd*'UvW').to be_a_kind_of Word
+      end
     end
-  end
- #
+#
+  context "with a Generator" do
+      subject{ @mwd*Generator.new('g') }
+      it { is_expected.to eq 'aBcg' and be_a_kind_of Word }
+    end
+#
   context "with the inverse" do
     subject { @mwd*@mwd.invert}
     it { is_expected.to eq 'aBcCbA'}
@@ -218,8 +223,8 @@ describe "#invert" do
   end
 #
   context "of the identity" do
-    subject { Word.new('1').invert }
-    it { is_expected.to eq '1' }
+    subject { Word.new(Word::Identity).invert }
+    it { is_expected.to eq Word::Identity }
   end
 #
 end
@@ -234,9 +239,9 @@ describe "#^ (power)" do
   end
 #
   context "with zero" do
-    it "is '1'" do
+    it "is the identity" do
      ['a', 'A', '1', 'ab', 'abC'].each do |str|
-        expect(@mwd.replace(str)^0).to eq '1'
+        expect(@mwd.replace(str)^0).to eq Word::Identity
       end
     end
 #
