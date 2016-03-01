@@ -1,52 +1,77 @@
 #
 # GLA/test/Word_spec.rb
 #
-# Time-stamp: <2014-11-07 11:36:49 (kaigishitsu)>
+# Time-stamp: <2016-03-01 11:29:04 (kaigishitsu)>
 require('spec_helper')
 
 require('Word.rb')
 
 describe Word do
-
-#--------------------------------------------------
-describe "when initializing" do
-  context "with a string of alphabet and '1'" do
-    it { expect(Word.new('xaybzc')).to eq 'xaybzc' }
-    it { %w[a A x aA].each{ |c| expect(Word.new(c)).to eq c} }
-    it { expect(Word.new('1')).to eq '1' }
-  end
-#
-  context "without arguments" do
-    it { expect{ Word.new }.to raise_error }
-  end
-#
-  context "with the null word" do
-    it { expect{ Word.new('') }.to raise_error }
-  end
-#
-  context "with a String including non-alphabet letters" do
-    it "does exclude non-alphabets" do
-      expect(Word.new('Al&p(hab]e$tO8nl0y/')).to eq 'AlphabetOnly'
+  #--------------------------------------------------
+  describe "when initializing" do
+    let(:myword) { Word.new(mystr) }
+    #--------------------------------------------------
+    context "raises no error" do
+      subject { myword }
+      #-----
+      shared_examples "is eq to the argument" do
+        it { is_expected.to eq mystr }
+      end
+      #-----
+      context "with a string of alphabet" do
+        %w[a A x aA xaybzc].each do |c|
+          let(:mystr) { c }
+          it_behaves_like "is eq to the argument"
+        end
+      end
+      #-----
+      context "with the empty word '1'" do
+        let(:mystr) { '1' }
+        it_behaves_like "is eq to the argument"
+      end
+      #-----
+      context "with a String including non-alphabet letters" do
+        let(:mystr) { 'Al&p(hab]e$tO8nl0y/' }
+        it "excludes non-alphabets" do
+          is_expected.to eq 'AlphabetOnly'
+        end
+      end
+      #-----
     end
-  end
-#
-  context "with a String consisting of non-alphabet letters" do
-    it "raises Word::InvalidArgument error" do
-      ['0', '2', '00', '28302370', '&;/:;*+][', '*3]0:[2+8;'].each do |str|
-        expect{ Word.new(str) }.to raise_error(Word::InvalidArgument)
+    #--------------------------------------------------
+    context "raises error" do
+      subject { lambda { myword } }
+      #-----
+      context "without arguments" do
+        it { expect{ Word.new }.to raise_error(ArgumentError) }
+      end
+      #-----
+      shared_examples "Raise Word::InvalidArgument" do
+        it { is_expected.to raise_error(Word::InvalidArgument) }
+      end
+      #-----
+      context "with the null word" do
+        let(:mystr) { '' }
+        it { is_expected.to raise_error(Word::InvalidArgument) }
+      end
+      #-----
+      context "with a String consisting of non-alphabet letters" do
+        data = ['0', '2', '00', '28302370', '&;/:;*+][', '*3]0:[2+8;']
+        data.each do |str|
+          let(:mystr) { str }
+          it_behaves_like "Raise Word::InvalidArgument"
+        end
+      end
+      #-----
+      context "with a non-String argument" do
+        data = [1, 0.238, [1,1,1], 5..10]
+        data.each do |nonstr|
+          let(:mystr) { nonstr }
+          it_behaves_like "Raise Word::InvalidArgument"
+        end
       end
     end
   end
-#
-  context "with a non-String argument" do
-    it "raises Word::InvalidArgument error" do
-      [1, 0.238, [1,1,1], 5..10].each do |non_str|
-        expect{ Word.new(non_str) }.to raise_error(Word::InvalidArgument)
-      end
-    end
-  end
-#
-end
 #------------------------
 
 #------------------------
@@ -88,7 +113,7 @@ describe "comparisons" do
   before { @mwrd = Word.new('aBAa') }
 #
   context "==, comparing as Strings," do
-#    
+#
     context "comparing a Word to itself" do
       subject { @mwrd == @mwrd}
       it { is_expected.to be true }
@@ -98,7 +123,7 @@ describe "comparisons" do
       subject { @mwrd == @mwrd.dup.contract }
       it { is_expected.to be false}
     end
-#    
+#
     context "comparing a Word with a String" do
       subject { @mwrd == 'aBAa' }
       it { is_expected.to be true }
@@ -117,7 +142,7 @@ end
 #------------------------
 describe "#replace" do
   before :all do
-    @mwrd = Word.new('abC') 
+    @mwrd = Word.new('abC')
     @id = @mwrd.show[:obj_id]
     @mstr = 'xoIeRs'
   end
@@ -146,7 +171,7 @@ describe "#replace" do
     end
   end
 #
-  context "with neither a Word nor a String" do    
+  context "with neither a Word nor a String" do
     it { expect{ @mwrd.replace(1) }.to raise_error(Word::InvalidArgument) }
   end
 #
@@ -180,8 +205,8 @@ describe "#product" do
  #
   context "with the identity" do
     it "is the original Word 'aBc'" do
-      expect(@mwd*Word.new(Word::Identity)).to eq @mwd 
-      expect(Word.new(Word::Identity)*@mwd).to eq @mwd 
+      expect(@mwd*Word.new(Word::Identity)).to eq @mwd
+      expect(Word.new(Word::Identity)*@mwd).to eq @mwd
     end
   end
  #
@@ -211,7 +236,7 @@ end
 #------------------------
 
 #------------------------
-describe "#invert" do  
+describe "#invert" do
   context "of a normal Word 'abCd'" do
     subject { Word.new('abCd').invert }
     it { is_expected.to eq 'DcBA' }
@@ -265,7 +290,7 @@ describe "#conjugate" do
     subject { (@word.replace('aBcde')).conj(@another.replace('dgKy')) }
     it { is_expected.to eq 'YkGDaBcdedgKy' }
     it "is equal to (@another.invert)*@word*@another" do
-      is_expected.to eq (@another.invert)*@word*@another 
+      is_expected.to eq (@another.invert)*@word*@another
     end
   end
 #
