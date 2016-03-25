@@ -1,7 +1,7 @@
 #
 # GLA/spec/FormalSum_spec.rb
 #
-# Time-stamp: <2014-08-05 22:41:28 (ryosuke)>
+# Time-stamp: <2016-03-09 10:06:06 (ryosuke)>
 require('spec_helper')
 
 require('FormalSum.rb')
@@ -13,48 +13,57 @@ One = FormalSum::One
 #   it {expect.to eq Zero }
 # end
 
-describe FormalSum do 
+describe FormalSum do
 
   #------------------------------------
   describe "#initialize:" do
-    before do
-      @t = Term.new('aAB', -2)
-      @zt = Term.new('Wiejr',0)
-      @fs = FormalSum.new(@t)
-    end
+    #before do
+    #  @t = Term.new('aAB', -2)
+    #  @zt = Term.new('Wiejr',0)
+    #  @fs = FormalSum.new(@t)
+    #end
+    let(:fs_terms) { FormalSum.new(tm).terms }
+    let(:term1) { Term.new('aAB', -2) }
     #
     context "with the Zero" do
-      subject{ FormalSum.new(Zero).terms }
+      let(:tm) { Zero }
+      subject{ fs_terms }
       it{ is_expected.to be_kind_of Array }
       it{ is_expected.to eq [Zero] }
     end
     #
     context "with a single Term" do
-      subject{ @fs.terms }
+      let(:tm) { term1 }
+      subject{ fs_terms }
       it{ is_expected.to be_kind_of(Array) }
-      it{ is_expected.to eq [@t] }
+      it{ is_expected.to eq [tm] }
     end
     #
     context "with Terms" do
       context "including the Zero" do
-        let(:fst){ FormalSum.new(Zero, One, @t).terms }
-        it{ expect(fst.size).to be 3}
-        it{ expect(fst.first).to be Zero}
+        let(:tm) { [Zero, One, term1] }
+        subject { fs_terms }
+        it{ expect(subject.size).to be 3}
+        it{ expect(subject.first).to be Zero}
       end
       #
       context "in an Array" do
+        let(:tm) { [One, term1] }
+        subject { fs_terms }
         it "should be a FormalSum of the given Terms" do
-          expect(FormalSum.new([One, @t]).terms).to eq [One, @t]
+          is_expected.to eq tm
         end
         #
+        let(:tm) { [One, Zero] }
+        subject { fs_terms }
         it "should not ignore the Zero" do
-          expect(FormalSum.new([One, Zero]).terms).to eq [One, Zero]
-          expect(FormalSum.new([@zt, One, @t]).terms).to eq [@zt, One, @t]
+          is_expected.to eq tm
+          #expect(FormalSum.new([@zt, One, @t]).terms).to eq [@zt, One, @t]
         end
       end
       #
     end
-    # 
+    #
     context "with a String" do
       before do
         @str = '2+c-B-4s'
@@ -88,27 +97,27 @@ describe FormalSum do
   describe "#to_s" do
     context "for a FormalSum without zero terms" do
       subject { FormalSum.new('-3+6acB-a-50').to_s }
-      it { is_expected.to eq '-3+6acB-a-50'} 
+      it { is_expected.to eq '-3+6acB-a-50'}
     end
     #
     context "for a FormalSum with zero terms" do
       subject { FormalSum.new('-3+6acB-a+0bKde-0+0-50').to_s}
-      it { is_expected.to eq '-3+6acB-a-50'} 
+      it { is_expected.to eq '-3+6acB-a-50'}
     end
     #
     context "for a FormalSum with zero terms only" do
       subject { FormalSum.new('-0+0acB-0a+0bKde-0+0+0').to_s}
-      it { is_expected.to eq '0'} 
+      it { is_expected.to eq '0'}
     end
     #
     context "for Zero" do
       subject { FormalSum.new.to_s}
-      it { is_expected.to eq '0'} 
+      it { is_expected.to eq '0'}
     end
     #
     context "for One" do
       subject { FormalSum.new(One).to_s}
-      it { is_expected.to eq '1'} 
+      it { is_expected.to eq '1'}
     end
     #
   end
@@ -118,27 +127,27 @@ describe FormalSum do
   describe "#show" do
     context "for a FormalSum without zero terms" do
       subject { FormalSum.new('-3+6acB-a-50').show}
-      it { is_expected.to eq '(-3)1+(6)acB+(-1)a+(-50)1'} 
+      it { is_expected.to eq '(-3)1+(6)acB+(-1)a+(-50)1'}
     end
     #
     context "for a FormalSum with zero terms" do
       subject { FormalSum.new('-3+6acB-a+0bKde-0+0-50').show}
-      it { is_expected.to eq '(-3)1+(6)acB+(-1)a+(0)bKde+(0)1+(0)1+(-50)1'} 
+      it { is_expected.to eq '(-3)1+(6)acB+(-1)a+(0)bKde+(0)1+(0)1+(-50)1'}
     end
     #
     context "for a FormalSum with zero terms only" do
       subject { FormalSum.new('-0+0acB-0a+0bKde+0').show}
-      it { is_expected.to eq '(0)1+(0)acB+(0)a+(0)bKde+(0)1'} 
+      it { is_expected.to eq '(0)1+(0)acB+(0)a+(0)bKde+(0)1'}
     end
     #
     context "for Zero" do
       subject { FormalSum.new.show}
-      it { is_expected.to eq '(0)1'} 
+      it { is_expected.to eq '(0)1'}
     end
     #
     context "for One" do
       subject { FormalSum.new(One).show}
-      it { is_expected.to eq '(1)1'} 
+      it { is_expected.to eq '(1)1'}
     end
     #
   end
@@ -160,7 +169,7 @@ describe FormalSum do
         it{ expect(add12.to_s).to eq 'a-b+c-3de' }
         it{ expect(add12.show).to eq '(1)a+(-1)b+(1)c+(-3)de' }
       end
-      # 
+      #
       context "of 'a-b' and Zero" do
         let(:add10){ @fs_1+@zfs }
         it{ expect(add10.class).to eq FormalSum }
@@ -179,7 +188,7 @@ describe FormalSum do
         it{ expect(sbt21.to_s).to eq 'a-b-c+3de' }
         it{ expect(sbt21.show).to eq '(1)a+(-1)b+(-1)c+(3)de' }
       end
-      # 
+      #
       context "of 'a-b' from itself" do
         let(:sbt11){ @fs_1-@fs_1 }
         it{ expect(sbt11.class).to eq FormalSum }
@@ -207,7 +216,7 @@ describe FormalSum do
         context "for 'a-b' and 'c-3de'" do
           it { expect((@fs_1*@fs_2).to_s).to eq 'ac-3ade-bc+3bde' }
         end
-        # 
+        #
         context "for a FormalSum and Zero" do
           it "should simply connect two Array of Terms" do
             expect((@fs_1*@zfs).show).to eq '(0)aa+(0)ab+(0)ba+(0)bb'
@@ -256,21 +265,21 @@ describe FormalSum do
       context "for a normal FormalSum" do
         #
         it "should return a FormalSum of terms with opposite signs to the original" do
-      expect((@fs.opposite.terms.map{ |t| t.sign })).to eq ['-','+','-','+'] 
+      expect((@fs.opposite.terms.map{ |t| t.sign })).to eq ['-','+','-','+']
         end
         #
         it "should cause no change to the original" do
-          expect{ @fs.opposite }.not_to change{ @fs.terms } 
-          expect{ @fs.opposite }.not_to change{ @fs.terms.map{ |t| t.sign } } 
-          expect{ @fs.opposite }.not_to change{ @fs.terms.map{ |t| t[:coeff] } } 
+          expect{ @fs.opposite }.not_to change{ @fs.terms }
+          expect{ @fs.opposite }.not_to change{ @fs.terms.map{ |t| t.sign } }
+          expect{ @fs.opposite }.not_to change{ @fs.terms.map{ |t| t[:coeff] } }
         end
       end
       #
       context "for a FormalSum with zero terms" do
         it "should cause no change" do
-          expect { @fs.opposite }.not_to change{ @fs.terms } 
-          expect { @zfs.opposite }.not_to change{ @zfs.terms.map{ |t| t.sign } } 
-          expect { @zfs.opposite }.not_to change{ @zfs.terms.map{ |t| t[:coeff] } } 
+          expect { @fs.opposite }.not_to change{ @fs.terms }
+          expect { @zfs.opposite }.not_to change{ @zfs.terms.map{ |t| t.sign } }
+          expect { @zfs.opposite }.not_to change{ @zfs.terms.map{ |t| t[:coeff] } }
         end
       end
       #
@@ -279,17 +288,17 @@ describe FormalSum do
     context "#opposite!" do
       context "for a normal FormalSum" do
         it "should cause change to the original" do
-          expect { @fs.opposite! }.not_to change{ @fs.terms } 
-          expect { @fs.opposite! }.to change{ @fs.terms.map{ |t| t.sign } } 
-          expect { @fs.opposite! }.to change{ @fs.terms.map{ |t| t[:coeff] } } 
+          expect { @fs.opposite! }.not_to change{ @fs.terms }
+          expect { @fs.opposite! }.to change{ @fs.terms.map{ |t| t.sign } }
+          expect { @fs.opposite! }.to change{ @fs.terms.map{ |t| t[:coeff] } }
         end
       end
       #
       context "for a FormalSum with zero terms" do
         it "should cause no change" do
-          expect { @fs.opposite! }.not_to change{ @fs.terms } 
-          expect { @zfs.opposite! }.not_to change{ @zfs.terms.map{ |t| t.sign } } 
-          expect { @zfs.opposite! }.not_to change{ @zfs.terms.map{ |t| t[:coeff] } } 
+          expect { @fs.opposite! }.not_to change{ @fs.terms }
+          expect { @zfs.opposite! }.not_to change{ @zfs.terms.map{ |t| t.sign } }
+          expect { @zfs.opposite! }.not_to change{ @zfs.terms.map{ |t| t[:coeff] } }
         end
       end
       #
@@ -382,7 +391,7 @@ describe FormalSum do
   #------------------------------------
   describe "#homo_part" do
     context "for a FormalSum '29-a+3DVe-10oLfP+M-2bAc+1'" do
-      before :all do 
+      before :all do
         @mfs = FormalSum.new('29-a+3DVe-10oLfP+M-2bAc+1')
         @marr = ["29+1", "-a+M", "0", "3DVe-2bAc", "-10oLfP"]
       end
