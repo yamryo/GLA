@@ -1,145 +1,168 @@
 #
 # GLA/test/Term_spec.rb
 #
-# Time-stamp: <2014-08-04 16:38:37 (ryosuke)>
+# Time-stamp: <2016-03-02 17:35:34 (ryosuke)>
 require('spec_helper')
 
 require('Term.rb')
 
 #--------------------------------------------
 describe Term do
-  
+  let(:default) { Term.new }
+  let(:mt) { Term.new(str, cof) }
   #--------------------------------------------
-  describe "initialized in the right manner" do
-    before :all do
-      @mt_pi = Term.new('aBcdE', 3)
-      @mt_ni = Term.new('aBcdE', -201)
-      @mt_pr = Term.new('aBcdE', 2/5r)
-      @mt_nr = Term.new('aBcdE', -8/13r)
+  describe "creating" do
+    shared_examples "a Hash with keys :word and :coeff" do
+      it { is_expected.to match(:word => be_kind_of(Word),
+                                :coeff => be_kind_of(Numeric)) }
     end
-    #
+    #-----
     context "with no arguments" do
-      let(:default){ Term.new }
-      it { is_expected.to include(:word => '1', :coeff => 0) }
+      subject{ default }
+      it { is_expected.to include(:word => '1', :coeff => 1) }
+      it_behaves_like "a Hash with keys :word and :coeff"
     end
-    #
-    context "is a Hash with keys, :word and :coeff" do
-      it "" do
-        [@mt_pi, @mt_ni, @mt_pr, @mt_nr].each do |mt|
-          expect(mt).to have_key :word and have_key :coeff
-          expect(mt[:word]).to be_kind_of(Word)
-          expect(mt[:coeff]).to be_kind_of(Numeric)
+    #-----
+    context "with two arguments" do
+      subject{ mt }
+      #-----
+      context "when a String and an Integer are given" do
+        [{s: 'aBcdE', n: 3}, {s: 'FGhiJk', n: -201}].each do |h|
+          let(:str) { h[:s] }
+          let(:cof) { h[:n] }
+          it {is_expected.to include(:word => str, :coeff => cof) }
+          it_behaves_like "a Hash with keys :word and :coeff"
+        end
+      end
+      context "when a String and a Rational are given" do
+        [{s: 'aBcdE', n: 2/5r}, {s: 'FGhiJk', n: -805/13r}].each do |h|
+          let(:str) { h[:s] }
+          let(:cof) { h[:n] }
+          it {is_expected.to include(:word => str, :coeff => cof) }
+          it_behaves_like "a Hash with keys :word and :coeff"
+        end
+      end
+      context "when ('1', 8) is given" do
+          let(:str) { '1' }
+          let(:cof) { 8 }
+          it {is_expected.to include(:word => str, :coeff => cof) }
+          it_behaves_like "a Hash with keys :word and :coeff"
+          #it { expect(Term.new('1',8)).to include(word: '1', coeff: 8) }
+      end
+    end
+    #-----
+    context "with a single argument" do
+      let(:mt_one) { Term.new(an_arg) }
+      subject { mt_one }
+      context "when only a String is given" do
+        let(:an_arg) { 'aBcdE' }
+        it {is_expected.to include(word: an_arg, coeff: 1) }
+        it_behaves_like "a Hash with keys :word and :coeff"
+      end
+      context "when the String '1' is given" do
+        let(:an_arg) { '1' }
+        it {is_expected.to include(word: an_arg, coeff: 1) }
+        it_behaves_like "a Hash with keys :word and :coeff"
+      end
+      context "when only a Numeric is given" do
+        [0, 102, -6, 6/97r, -103/7r].each do |num|
+          let(:an_arg) { num }
+          it { is_expected.to include(word: '1', coeff: an_arg) }
+          it_behaves_like "a Hash with keys :word and :coeff"
+        end
+      end
+      #
+      context "when a String of a Numeric is given" do
+        [0, 102, -6, 6/97r, -103/7r].each do |num|
+          let(:an_arg) { num.to_s }
+          it { is_expected.to include(word: '1', coeff: an_arg.to_r) }
+          it_behaves_like "a Hash with keys :word and :coeff"
+        end
+      end
+      #
+      context "when a String of a Numeric followed by a word is given" do
+        context "3a" do
+          let(:an_arg) { "3a" }
+          it { is_expected.to include(word: 'a', coeff: 3) }
+          it_behaves_like "a Hash with keys :word and :coeff"
+        end
+        context "-27/3KstUL" do
+          let(:an_arg) { "-27/3KstUL" }
+          it { is_expected.to include(word: 'KstUL', coeff: -27/3r) }
+          it_behaves_like "a Hash with keys :word and :coeff"
+        end
+      end
+      #
+      context "when '+' or '-' followed by a word is given" do
+        it "'+Bc'" do
+          expect(Term.new('+Bc')).to include(word: 'Bc', coeff: 1)
+        end
+        it "'-aKt'" do
+          expect(Term.new('-aKt')).to include(word: 'aKt', coeff: -1)
+        end
+      end
+      #
+      context "when a word with the coeff 0 is given" do
+        it { expect(Term.new('aBE',0)).to include(word: 'aBE', coeff: 0) }
+      end
+      #
+      context "when the contractible String 'aAB1c' is given" do
+        let(:an_arg) { 'aAB1c' }
+        subject { mt_one}
+        it { is_expected.to include(word: an_arg, coeff: 1) }
+      end
+      #
+    end
+    #-----
+    context "with more than two arguments" do
+      subject { lambda { Term.new('kLSt', 10, 'wouocei',  7, nil) } }
+      it { is_expected.not_to raise_error }
+    end
+    #-----
+    context "with a wrong second argument" do
+      subject { lambda { Term.new('aBc', '4') } }
+      it "ignores the second" do
+        is_expected.not_to raise_error(Term::InvalidArgument)
+      end
+    end
+    #-----
+    xcontext "with a Hash" do
+      subject { Term.new(word: 'aBcdE', coeff: -7) }
+      it { is_expected.to include(word: 'aBcdE', coeff: -7) }
+    end
+    #-----
+    context "with bad arguments" do
+      let(:mt_one) { Term.new( an_arg ) }
+      context "Strings, '&',' '(space), /[+-]?\/\d+/" do
+        bad_strs = ['&', ' ', '/2', '-9/', '+100', '+/50', '-/23098', '+-3']
+        bad_strs.each do |bs|
+          let(:an_arg) { bs }
+          subject { lambda { mt_one } }
+          it { is_expected.to raise_error(Word::InvalidArgument) }
+        end
+      end
+      #-----
+      context "with Array, Range and Term arguments" do
+        data = [[5,1,4], 1..9, 'a'..'Z', Term.new('a')]
+        data.each do |o|
+          let(:an_arg) { o }
+          subject { lambda { mt_one } }
+          it { is_expected.to raise_error(Term::InvalidArgument) }
         end
       end
     end
-      #
-    context "in the case of a String and an Integer" do
-      it { expect(@mt_pi).to include(:word => 'aBcdE', :coeff => 3) }
-      it { expect(@mt_ni).to include(:word => 'aBcdE', :coeff => -201) }
-    end
-      #
-    context "in the case of a String and a Rational" do
-      it { expect(@mt_pr).to include(:word => 'aBcdE', :coeff => 2/5r) }
-      it { expect(@mt_nr).to include(:word => 'aBcdE', :coeff => -8/13r) }
-    end
-    #
-    context "with a String only" do
-      it { expect(Term.new('aBcdE')).to include(word: 'aBcdE', coeff: 1) }
-    end
-    #
-    context "with the String '1'" do
-      it { expect(Term.new('1')).to include(word: '1', coeff: 1) }
-    end
-      #
-    context "with ('1', 8)" do
-      it { expect(Term.new('1',8)).to include(word: '1', coeff: 8) }
-    end
-    #
-    context "with a Numeric only" do
-      it { expect(Term.new(0)).to include(word: '1', coeff: 0) }
-      it { expect(Term.new(102)).to include(word: '1', coeff: 102) }
-      it { expect(Term.new(-6)).to include(word: '1', coeff: -6) }
-      it { expect(Term.new(6/97r)).to include(word: '1', coeff: 6/97r) }
-      it { expect(Term.new(-103/7r)).to include(word: '1', coeff: -103/7r) }
-    end
-    #
-    context "with a String of a Numeric" do
-      it { expect(Term.new('0')).to include(word: '1', coeff: 0) }
-      it { expect(Term.new('3')).to include(word: '1', coeff: 3) }
-      it { expect(Term.new('-7')).to include(word: '1', coeff: -7) }
-      
-      it { expect(Term.new('20/51')).to include(word: '1', coeff: 20/51r) }
-      it { expect(Term.new('-2/5')).to include(word: '1', coeff: -2/5r) }
-    end
-    #
-    context "with a String of a Numeric followed by a word" do
-      it { expect(Term.new('3a')).to include(word: 'a', coeff: 3) }
-      it { expect(Term.new('-7KstUL')).to include(word: 'KstUL', coeff: -7) }
-      it { expect(Term.new('-27/3KstUL')).to include(word: 'KstUL', coeff: -27/3r) }
-    end
-    #
-    context "with '+' or '-' followed by a word" do
-      it { expect(Term.new('+B')).to include(word: 'B', coeff: 1) }
-      it { expect(Term.new('-a')).to include(word: 'a', coeff: -1) }
-    end
-    #
-    context "with the coeff 0" do
-      it { expect(Term.new('aBE',0)).to include(word: 'aBE', coeff: 0) }
-    end
-    #    
-    context "with the contractible String 'aAB1c'" do
-      subject { Term.new('aAB1c')}
-      it { is_expected.to include(word: 'aAB1c', coeff: 1) }
-    end
-    #    
-    context "with leading two valid arguments and the rest, which will be ignored" do
-      it { expect{ Term.new('kLSt', 10, 'wouocei',  7, nil) }.not_to raise_error}
-    end
-    #
-    # context "with a Hash" do
-    #   subject { Term.new(word: 'aBcdE', coeff: -7) }
-    #   it { is_expected.to include(word: 'aBcdE', coeff: -7) }
-    # end
-    #
-  end
-  #
-  #--------------------------------------------
-
-  #--------------------------------------------
-  describe "when initialized in the wrong manner" do
-    context "with bad Strings, '&',' '(space), /[+-]?\/\d+/" do
-        it { expect{ Term.new('&') }.to raise_error{Term::InvalidArgument} }
-        it { expect{ Term.new('') }.to raise_error{Term::InvalidArgument} }
-        it { expect{ Term.new('/2') }.to raise_error{Term::InvalidArgument} }
-        it { expect{ Term.new('-9/') }.to raise_error{Term::InvalidArgument} }
-        it { expect{ Term.new('+100/') }.to raise_error{Term::InvalidArgument} }
-        it { expect{ Term.new('+/50') }.to raise_error{Term::InvalidArgument} }
-        it { expect{ Term.new('-/23098') }.to raise_error{Term::InvalidArgument} }
-        it { expect{ Term.new('+-3') }.to raise_error{Term::InvalidArgument} }
-    end
-    #
-    context "with Array, Range and Term arguments" do
-      [[5,1,4], 1..9, 'a'..'Z', Term.new('a')].each do |o| 
-        it { expect{ Term.new(o) }.to raise_error{Term::InvalidArgument} }
-      end
-    end
-    #
-    context "with a wrong secound argument" do
-      it { expect{ Term.new('aBc', '4') }.to raise_error{Term::InvalidArgument} }
-    end
-    #
   end
   #--------------------------------------------
 
   #--------------------------------------------
   describe "#[]=" do
-    before { @t = Term.new('nbwoaZLJ', 7) }
+    let(:mt) { Term.new('nbwoaZLJ', 7) }
     it "is a private method" do
-      expect { @t[:word] = 'aBC' }.to raise_error
+      expect { mt[:word] = 'aBC' }.to raise_error(NoMethodError)
     end
     #
-    it "does forbid to create new keys" do
-      expect { @t[:other_key] = 'aBC' }.to raise_error
+    it "forbids to create new keys" do
+      expect { mt[:other_key] = 'aBC' }.to raise_error(NoMethodError)
     end
     #
   end
@@ -147,17 +170,17 @@ describe Term do
 
   #--------------------------------------------
   describe "#word=" do
-    before(:all){ @t = Term.new('tErm')}
+    let(:mt) { Term.new('tErm') }
     #
     context "with a String" do
-      it { expect{ @t.word = 'aBCd' }.to change{ @t[:word] }.from('tErm').to('aBCd') }
-      it { @t[:word].kind_of?(Word) }
+      it { expect{ mt.word = 'aBCd' }.to change{ mt[:word] }.from('tErm').to('aBCd') }
+      it { mt[:word].kind_of?(Word) }
     end
     #
     context "with wrong arguments" do
       it "raises IvalidArgument Error" do
         [0, %w[1,2,3], 'a'..'Z', 0.58].each do |badarg|
-          expect{ @t.word = badarg }.to raise_error{Term::InvalidArgument}
+          expect{ mt.word = badarg }.to raise_error{Term::InvalidArgument}
         end
       end
     end
@@ -167,16 +190,16 @@ describe Term do
 
   #--------------------------------------------
   describe "#coeff=" do
-    before(:all){ @t = Term.new('tErm')}
+    let(:mt){ mt = Term.new('tErm')}
     #
     context "with an Integer" do
-      it { expect{ @t.coeff = 6 }.to change{ @t[:coeff] }.from(1).to(6) }
+      it { expect{ mt.coeff = 6 }.to change{ mt[:coeff] }.from(1).to(6) }
     end
     #
     context "with wrong arguments" do
       it "raises IvalidArgument Error" do
         ['a', [1,2,3], 1..6].each do |badarg|
-          expect{ @t.coeff = badarg }.to raise_error{Term::InvalidArgument}
+          expect{ mt.coeff = badarg }.to raise_error{Term::InvalidArgument}
         end
       end
     end
@@ -187,90 +210,138 @@ describe Term do
   #--------------------------------------------
   describe "#to_s" do
     context "for normal Terms" do
-      it { expect(Term.new('aBcdE',3).to_s).to eq '3aBcdE'}
-      it { expect(Term.new('aBcdE',-2301).to_s).to eq '-2301aBcdE'}
+      let(:mt) { Term.new('aBcdE', cf) }
+      #-----
+      context "with a positive coefficient" do
+        let(:cf)  { 3 }
+        subject { mt.to_s }
+        it { is_expected.to eq '3aBcdE'}
+      end
+      context "with a negative coefficient" do
+        let(:cf)  { -2301 }
+        subject { mt.to_s }
+        it { is_expected.to eq '-2301aBcdE'}
+      end
+      context "with coefficient 1" do
+        let(:cf)  { 1 }
+        subject { mt.to_s }
+        it { is_expected.to eq 'aBcdE' }
+      end
+      context "with coefficient -1" do
+        let(:cf)  { -1 }
+        subject { mt.to_s }
+        it { is_expected.to eq '-aBcdE' }
+      end
+      context "with coefficient 0" do
+        let(:cf)  { 0 }
+        subject { mt.to_s }
+        it { is_expected.to eq '0'}
+      end
     end
-    #
-    context "for the Term 'aBcdE'" do
-      subject{ Term.new('aBcdE').to_s}
-      it { is_expected.to eq 'aBcdE' }
+    #-----
+    context "for Terms of the word '1'" do
+      let(:one) { Term.new('1', cf) }
+      #-----
+      context "with coefficient 1" do
+        let(:cf) { 1 }
+        subject { one.to_s }
+        it { is_expected.to eq '1'}
+      end
+      context "with coefficient Integer 8" do
+        let(:cf) { 8 }
+        subject { one.to_s }
+        it { is_expected.to eq '8'}
+      end
+      context "with coefficient Integer -120" do
+        let(:cf) { -120 }
+        subject { one.to_s }
+        it { is_expected.to eq '-120'}
+      end
+      context "with coefficient Rational 1/3" do
+        let(:cf) { 1/3r }
+        subject { one.to_s }
+        it { is_expected.to eq '1/3'}
+      end
+      context "with coefficient Rational -131/120" do
+        let(:cf) { -131/120r }
+        subject { one.to_s }
+        it { is_expected.to eq '-131/120'}
+      end
     end
-    #
-    context "for the Term '-6aBcdE'" do
-      subject{ Term.new('aBcdE',-6).to_s}
-      it { is_expected.to eq '-6aBcdE' }
-    end
-    #
-    context "for the Term '1'" do
-      subject{ Term.new('1').to_s}
-      it { is_expected.to eq '1'}
-    end
-    #
-    context "with the String '1' and the Integer 8" do
-      subject{ Term.new('1',8).to_s}
-      it { is_expected.to eq '8'}
-    end
-    #
-    context "with the String '1' and the Integer -120" do
-      subject{ Term.new('1',-120).to_s}
-      it { is_expected.to eq '-120'}
-    end
-    #
-    context "with the String 'aBc' and the zero" do
-      subject{ Term.new('aBc',0).to_s}
-      it { is_expected.to eq '0'}
-    end
-    #    
+    #-----
     context "with the contractible String 'aAB1c'" do
       subject{ Term.new('aAB1c').to_s}
       it { is_expected.to eq 'aAB1c'}
     end
-    #    
   end
   #--------------------------------------------
 
   #--------------------------------------------
   describe "#show" do
     context "for normal Terms" do
-      it { expect(Term.new('aBcdE',3).show).to eq '(3)aBcdE'}
-      it { expect(Term.new('aBcdE',-2301).show).to eq '(-2301)aBcdE'}
+      let(:mt) { Term.new('aBcdE', cf) }
+      #-----
+      context "with a positive coefficient" do
+        let(:cf)  { 3 }
+        subject { mt.show }
+        it { is_expected.to eq '(3)aBcdE'}
+      end
+      context "with a negative coefficient" do
+        let(:cf)  { -2301 }
+        subject { mt.show }
+        it { is_expected.to eq '(-2301)aBcdE'}
+      end
+      context "with coefficient 1" do
+        let(:cf)  { 1 }
+        subject { mt.show }
+        it { is_expected.to eq '(1)aBcdE' }
+      end
+      context "with coefficient -1" do
+        let(:cf)  { -1 }
+        subject { mt.show }
+        it { is_expected.to eq '(-1)aBcdE' }
+      end
+      context "with coefficient 0" do
+        let(:cf)  { 0 }
+        subject { mt.show }
+        it { is_expected.to eq '(0)aBcdE' }
+      end
     end
-    #
-    context "for the Term 'aBcdE'" do
-      subject{ Term.new('aBcdE').show}
-      it { is_expected.to eq '(1)aBcdE' }
+    #-----
+    context "for Terms of the word '1'" do
+      let(:one) { Term.new('1', cf) }
+      #-----
+      context "with coefficient 1" do
+        let(:cf) { 1 }
+        subject { one.show }
+        it { is_expected.to eq '(1)1'}
+      end
+      context "with coefficient Integer 8" do
+        let(:cf) { 8 }
+        subject { one.show }
+        it { is_expected.to eq '(8)1'}
+      end
+      context "with coefficient Integer -120" do
+        let(:cf) { -120 }
+        subject { one.show }
+        it { is_expected.to eq '(-120)1'}
+      end
+      context "with coefficient Rational 1/3" do
+        let(:cf) { 1/3r }
+        subject { one.show }
+        it { is_expected.to eq '(1/3)1'}
+      end
+      context "with coefficient Rational -131/120" do
+        let(:cf) { -131/120r }
+        subject { one.show }
+        it { is_expected.to eq '(-131/120)1'}
+      end
     end
-    #
-    context "for the Term '-6aBcdE'" do
-      subject{ Term.new('aBcdE',-6).show}
-      it { is_expected.to eq '(-6)aBcdE' }
-    end
-    #
-    context "for the Term '1'" do
-      subject{ Term.new('1').show}
-      it { is_expected.to eq '(1)1'}
-    end
-    #
-    context "with the String '1' and the Integer 8" do
-      subject{ Term.new('1',8).show}
-      it { is_expected.to eq '(8)1'}
-    end
-    #
-    context "with the String '1' and the Integer -120" do
-      subject{ Term.new('1',-120).show}
-      it { is_expected.to eq '(-120)1'}
-    end
-    #
-    context "with the String 'aBc' and the zero" do
-      subject{ Term.new('aBc',0).show}
-      it { is_expected.to eq '(0)aBc'}
-    end
-    #    
+    #-----
     context "with the contractible String 'aAB1c'" do
       subject{ Term.new('aAB1c').show}
       it { is_expected.to eq '(1)aAB1c'}
     end
-    #    
   end
   #--------------------------------------------
 
@@ -333,99 +404,94 @@ describe Term do
 
   #--------------------------------------------
   describe "#*(product) of '5yAM'" do
-    before(:all){ @term = Term.new('yAM', 5) }
+    let(:mt) { Term.new('yAM', 5) }
     #
     context "with another Term" do
       it "yields a new Term and keep the original clean" do
-        expect{ (@term*Term.new('RyO',3))}.not_to change{@term}
+        expect{ (mt*Term.new('RyO',3))}.not_to change{mt}
       end
     end
     #
     context "with '-2RyO'" do
-      subject { (@term*Term.new('RyO',-2)).to_s }
+      subject { (mt*Term.new('RyO',-2)).to_s }
       it { is_expected.to eq "-10yAMRyO" }
     end
     #
     context "with '-maY'" do
-      subject { (@term*Term.new('maY',-1)).to_s }
+      subject { (mt*Term.new('maY',-1)).to_s }
       it { is_expected.to eq "-5yAMmaY" }
     end
     #
     context "with '1'" do
-      subject { (@term*Term.new('1')).to_s }
+      subject { (mt*Term.new('1')).to_s }
       it { is_expected.to eq "5yAM" }
     end
     #
     context "with '100'" do
-      subject { (@term*Term.new('1',100)).to_s }
+      subject { (mt*Term.new('1',100)).to_s }
       it { is_expected.to eq "500yAM" }
     end
     #
     context "with a Term with coeff '0'" do
-      before { @zero_term = @term*Term.new('RyO',0)}
-      #
-      it { expect(@zero_term.to_s).to eq "0" }
-      #
-      it "keeps :word information" do
-        expect(@zero_term[:word]).to eq "yAMRyO"
+      subject { mt*Term.new('RyO',0) }
+      it "combine words ant change coeff to 0" do
+        is_expected.to include(:word => 'yAMRyO') & include(:coeff => 0)
       end
     end
   end
-    #
+
+  #--------------------------------------------
   describe "#*(multiplied_by)" do
-    before(:all){ @term = Term.new('Yam', -2) }
-    #
+    let(:mt) { Term.new('Yam', -2) }
+    #-----
     context "'-2Yam' by an Integer (i.e. the scaler multiplication)" do
       it "yields a new Term and keep the original clean" do
-        expect{ @term*2 }.not_to change{@term[:coeff]}
-        expect{ @term*(-34) }.not_to change{@term}
+        expect{ mt*2 }.not_to change{mt[:coeff]}
+        expect{ mt*(-34) }.not_to change{mt}
       end
-      #
       it "multiplies @coeff" do
         [0, 1, 2, -3, 10, 203].each do |int|
-          expect((@term*int)[:coeff]).to eq (@term[:coeff])*int
+          expect((mt*int)[:coeff]).to eq (mt[:coeff])*int
         end
       end
     end
-    #
   end
+  #-----
   describe "#multiplied_by!" do
-    before(:all){ @tm = Term.new('Yam', -2) }
-    #
+    let(:mt) { Term.new('Yam', -2) }
+    #-----
     context "'-2Yam' by an Integer" do
       it "does change self.coeff (destractive method)" do
-        expect{ @tm.multiplied_by!(2) }.to change{@tm[:coeff]}
+        expect{ mt.multiplied_by!(2) }.to change{mt[:coeff]}
       end
-      #
       it "multiplies @coeff by the Integer" do
-        expect(@tm.multiplied_by!(5)[:coeff]).to eq @tm[:coeff]
+        expect(mt.multiplied_by!(5)[:coeff]).to eq mt[:coeff]
       end
     end
-    #
   end
   #--------------------------------------------
 
   #--------------------------------------------
   describe "#sign and related methods" do
-    before(:each){ @t = Term.new('Abc', 7) }
+    let(:mt) { Term.new('Abc', 7) }
     #
     context "The sign of Term('Abc',7)" do
-      subject { @t.sign }
+      subject { mt.sign }
       it { is_expected.to eq '+'}
     end
     #
     context "#positive? or #negative?" do
-      subject { @t }
+      subject { mt }
       it { is_expected.to be_positive }
       it { is_expected.not_to be_negative }
     end
     #
     context "#opposite" do
-      it { expect { @t.opposite }.to change{ @t.sign } }
-      it { expect { @t.opposite }.to change{ @t[:coeff] }.from(7).to(-7) }
+      it { expect { mt.opposite }.to change{ mt.sign } }
+      it { expect { mt.opposite }.to change{ mt[:coeff] }.from(7).to(-7) }
     end
     #
-    context "The sign of Zero" do
+    xcontext "The sign of Zero" do
       subject { Term.new.sign }
       it { is_expected.to be_nil }
     end
