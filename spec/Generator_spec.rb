@@ -1,14 +1,30 @@
 #
 # GLA/test/Generator_spec.rb
 #
-# Time-stamp: <2016-04-01 17:28:02 (ryosuke)>
+# Time-stamp: <2016-04-03 21:47:31 (ryosuke)>
 require('spec_helper')
 
 require('Generator')
 
 describe Generator do
   let(:gen) { Generator.new(letter) }
-  let(:identity) { Generator.new() }
+  #---------------------------------------
+  describe "Constants" do
+    context "Identity" do
+      subject { Generator::Identity }
+      it{ is_expected.to be_kind_of Generator }
+      it{ expect(subject.methods).to include(:inverse?) }
+      it{ expect(subject.inverse?).to be_falsy }
+      it{ expect(subject).to eq Generator.new }
+    end
+  end
+  describe "Errors" do
+    context "InvalidLetter" do
+      it { expect{Generator::InvalidLetter}.not_to raise_error(NameError) }
+    end
+  end
+  #---------------------------------------
+
   #---------------------------------------
   describe "#initialize" do
     let(:letter) { 'g' }
@@ -24,7 +40,7 @@ describe Generator do
     end
     #
     context "with no argument" do
-      subject { identity.to_char }
+      subject { Generator.new.to_char }
       it{ is_expected.to eq '1' }
     end
     #
@@ -78,14 +94,14 @@ describe Generator do
       it{ is_expected.not_to be_inverse }
     end
     #
-    context 'for a downcase letter' do
+    context 'for an uppercase letter' do
       let(:letter) { 'A' }
       subject{ gen }
       it{ is_expected.to be_inverse }
     end
     #
-    context 'for a downcase letter' do
-      subject{ identity }
+    context 'for the identity' do
+      subject{ Generator::Identity }
       it{ is_expected.not_to be_inverse }
     end
   end
@@ -94,6 +110,7 @@ describe Generator do
   #---------------------------------------
   describe "#invert!" do
     let(:letter) { 'g' }
+    let(:id) { Generator.new }
     context "with no arguments" do
       it "should change inverseness of a normal Generator" do
         expect{ gen.invert! }.to change{ gen.inverse? }.from(false).to(true)
@@ -102,7 +119,7 @@ describe Generator do
       it { expect(gen.invert!.to_char).to match /[A-Z]/ }
       #
       it "should not change inverseness of '1'" do
-        expect{ identity.invert! }.not_to change{ identity }
+        expect{ id.invert! }.not_to change{ id }
       end
     end
     #
@@ -123,6 +140,7 @@ describe Generator do
   #---------------------------------------
   describe "#* (product!)" do
     let(:letter) { 'g' }
+    let(:id) { Generator::Identity }
     #---
     context "of two normal Generators" do
       let(:another) { Generator.new('S')}
@@ -130,8 +148,8 @@ describe Generator do
     end
     #
     context "of a Genarator 'g' and the identity '1'" do
-      it { expect(gen*identity).to eq gen }
-      it { expect(identity*gen).to eq gen }
+      it { expect(gen*id).to eq gen }
+      it { expect(id*gen).to eq gen }
     end
     #
   end

@@ -1,7 +1,7 @@
 #
 # GLA/test/Word_spec.rb
 #
-# Time-stamp: <2016-03-01 17:13:58 (ryosuke)>
+# Time-stamp: <2016-04-03 21:48:24 (ryosuke)>
 require('spec_helper')
 
 require('Word.rb')
@@ -9,11 +9,15 @@ require('Word.rb')
 describe Word do
   #--------------------------------------------------
   describe "Constants" do
-    context "Word::Identity" do
+    context "Identity" do
       subject { Word::Identity }
       it { is_expected.to eq Word.new('1') }
+      it { is_expected.to be_kind_of Word }
     end
-    context "Word::InvalidArgument" do
+  end
+  #--------------------------------------------------
+  describe "Errors" do
+    context "InvalidArgument" do
       subject { Word::InvalidArgument.to_s }
       it { is_expected.to eq 'Word::InvalidArgument' }
     end
@@ -36,7 +40,7 @@ describe Word do
         end
       end
       #-----
-      context "with the empty word '1'" do
+      context "with the letter '1'" do
         let(:mystr) { '1' }
         it_behaves_like "is eq to the argument"
       end

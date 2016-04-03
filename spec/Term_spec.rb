@@ -1,7 +1,7 @@
 #
 # GLA/test/Term_spec.rb
 #
-# Time-stamp: <2016-03-02 17:35:34 (ryosuke)>
+# Time-stamp: <2016-04-03 21:48:58 (ryosuke)>
 require('spec_helper')
 
 require('Term.rb')
@@ -10,6 +10,19 @@ require('Term.rb')
 describe Term do
   let(:default) { Term.new }
   let(:mt) { Term.new(str, cof) }
+  #--------------------------------------------
+  describe "Constants" do
+    context "RgxScalar" do
+      subject { Term::RgxScalar }
+      it{ is_expected.to be_kind_of Regexp }
+    end
+  end
+  #--------------------------------------------
+  describe "Errors" do
+    context "InvalidArgument" do
+      it { expect{Term::InvalidArgument}.not_to raise_error(NameError) }
+    end
+  end
   #--------------------------------------------
   describe "creating" do
     shared_examples "a Hash with keys :word and :coeff" do

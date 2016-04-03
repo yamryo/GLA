@@ -1,33 +1,51 @@
 #
 # GLA/spec/FormalSum_spec.rb
 #
-# Time-stamp: <2016-04-01 18:18:32 (ryosuke)>
+# Time-stamp: <2016-04-03 22:24:52 (ryosuke)>
 require('spec_helper')
 
 require('FormalSum.rb')
 
-Zero = FormalSum::Zero
-One = FormalSum::One
-
-# share_examples_for 'Should be Zero' do
-#   it {expect.to eq Zero }
-# end
+TmZero = Term.new('1',0)
+TmOne = Term.new('1',1)
 
 describe FormalSum do
+  #------------------------------------
+  describe "Constants" do
+    context "Zero" do
+      subject { FormalSum::Zero }
+      it{ is_expected.to be_kind_of FormalSum }
+      it{ expect(subject.methods).to include(:terms) }
+      it{ expect(subject.to_s).to eq '0' }
+    end
+    context "One" do
+      subject { FormalSum::One }
+      it{ is_expected.to be_kind_of FormalSum }
+      it{ expect(subject.methods).to include(:terms) }
+      it{ expect(subject.to_s).to eq '1' }
+    end
+  end
+  #------------------------------------
+  describe "Errors" do
+    context "InvalidArgument" do
+      it { expect{ FormalSum::InvalidArgument }.not_to raise_error(NameError) }
+    end
+  end
+  #------------------------------------
   let(:fs) { FormalSum.new(arg) }
   let(:fs_terms) { fs.terms }
   let(:tm) { Term.new('aAB', -2) }
   #------------------------------------
   describe "#initialize:" do
     context "without arguments" do
-      it { expect(FormalSum.new().terms).to eq [Zero] }
+      subject { FormalSum.new.to_s }
+      it{ is_expected.to eq '0' }
     end
     #
-    context "with the Zero" do
-      let(:arg) { Zero }
-      subject{ fs_terms }
-      it{ is_expected.to be_kind_of Array }
-      it{ is_expected.to eq [Zero] }
+    context "with the Term '0'" do
+      let(:arg) { TmZero }
+      subject{ fs.to_s }
+      it{ is_expected.to eq '0' }
     end
     #
     context "with a single Term" do
@@ -39,20 +57,20 @@ describe FormalSum do
     #
     context "with Terms" do
       context "including the Zero" do
-        let(:arg) { [Zero, One, tm] }
+        let(:arg) { [TmZero, TmOne, tm] }
         subject { fs_terms }
         it{ expect(subject.size).to be 3}
-        it{ expect(subject.first).to be Zero}
+        it{ expect(subject.first.to_s).to eq '0' }
       end
       #
       context "in an Array" do
-        let(:arg) { [One, tm] }
+        let(:arg) { [TmOne, tm] }
         subject { fs_terms }
         it "should be a FormalSum of the given Terms" do
           is_expected.to eq arg
         end
         #
-        let(:arg) { [One, Zero] }
+        let(:arg) { [TmOne, TmZero] }
         subject { fs_terms }
         it "should not ignore the Zero" do
           is_expected.to eq arg
@@ -111,7 +129,7 @@ describe FormalSum do
     end
     #
     context "for One" do
-      subject { FormalSum.new(One).to_s}
+      subject { FormalSum.new(TmOne).to_s}
       it { is_expected.to eq '1' }
     end
     #
@@ -144,7 +162,7 @@ describe FormalSum do
     end
     #
     context "for One" do
-      subject { FormalSum.new(One).show }
+      subject { FormalSum.new(TmOne).show }
       it { is_expected.to eq '(1)1'}
     end
     #
@@ -365,12 +383,12 @@ describe FormalSum do
     end
     #
     context "of the FormalSum One" do
-      subject { FormalSum.new(One).degree }
+      subject { FormalSum.new(TmOne).degree }
       it { is_expected.to eq 0}
     end
     #
     context "of the FormalSum Zero" do
-      subject { FormalSum.new(Zero).degree }
+      subject { FormalSum.new(TmZero).degree }
       it { is_expected.to eq -1.0/0.0}
     end
     #
@@ -385,13 +403,9 @@ describe FormalSum do
   #------------------------------------
   describe "#homo_part" do
     context "for a FormalSum '29-a+3DVe-10oLfP+M-2bAc+1'" do
-      # before :all do
-      #   @mfs = FormalSum.new('29-a+3DVe-10oLfP+M-2bAc+1')
-      #   @marr = ["29+1", "-a+M", "0", "3DVe-2bAc", "-10oLfP"]
-      # end
       let(:arg) { '29-a+3DVe-10oLfP+M-2bAc+1' }
       let(:marr) { ["29+1", "-a+M", "0", "3DVe-2bAc", "-10oLfP"] }
-      #
+      #---
       context "for a single argument" do
         5.times do |k|
           context "degree-#{k} part" do
@@ -399,35 +413,33 @@ describe FormalSum do
             it { is_expected.to eq marr[k] }
           end
         end
-        #
+        #---
         context "too big degree part" do
           subject { fs.homo_part(5).terms }
-          it { is_expected.to eq [Zero] }
+          it { is_expected.to eq [TmZero] }
         end
-        #
+        #---
         context "negative degree parts" do
           subject { fs.homo_part(-1).terms }
-          it { is_expected.to eq [Zero] }
+          it { is_expected.to eq [TmZero] }
         end
-        #
       end
-      #
+      #---
       context "for more than one argument" do
         context "degree-(0..2) part" do
           subject { fs.homo_part(0..2).to_s }
           it { is_expected.to eq '29-a+M+1' }
         end
-        #
+        #---
         context "(degree-0,2, and 5) part" do
           subject { fs.homo_part(1,2,4).to_s }
           it { is_expected.to eq '-a-10oLfP+M'  }
         end
-        #
+        #---
         context "(degree-0 and higher than 3) part" do
           subject { fs.homo_part(0,3..fs.degree).to_s }
           it { is_expected.to eq '29+3DVe-10oLfP-2bAc+1' }
         end
-        #
       end
     end
   end

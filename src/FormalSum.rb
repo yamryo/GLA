@@ -1,42 +1,53 @@
 #
 # GLA/src/FormalSum.rb
 #
-# Time-stamp: <2014-03-14 08:57:22 (ryosuke)>
+# Time-stamp: <2016-04-03 22:24:18 (ryosuke)>
 #
 require('Term')
 
-#-------------------------------
+ZeroTerm = Term.new('1',0)
+
+#-----------------------------------
+module FS_module
+  #---
+  def initialize(arg)
+    @terms = [Term.new('1',arg)]
+  end
+  #---
+  attr_accessor :terms
+end
+#-----------------------------------
+#-----------------------------------
 class FormalSum
-#
-  Zero = Term.new('1', 0)
-  One = Term.new('1', 1)
-
+  include FS_module
+  #---
   InvalidArgument = Class.new(StandardError)
+  #---
+  Zero = self.new(0)
+  One = self.new(1)
+  #---
 
-  #-----------------------------------------
   def initialize(*arr)
-    @terms = [Zero]
+    super(0)
     arr.flatten.each{ |trm| self << trm }
     @terms.delete_at(0) unless @terms.size == 1
   end
-  #-----------------------------------------
-  attr_accessor :terms
 
   def [](int)
     @terms[int]
   end
 
   def deepcopy
-    # For the following arithmetic operations, 
+    # For the following arithmetic operations,
     # we need a deep copy method of an instance of this class.
-    # self.dup and even self.class.new(@terms) are too shallow. 
+    # self.dup and even self.class.new(@terms) are too shallow.
     terms_copy = []
     @terms.each do |t|
       terms_copy << Term.new(t[:word], t[:coeff])
     end
     return self.class.new(terms_copy)
   end
-  
+
   def opposite
     (self.deepcopy).opposite!
   end
@@ -53,13 +64,13 @@ class FormalSum
              else raise(InvalidArgument) end
     #
     (former.terms).concat(latter.terms)
-    former.terms.delete_at(0) if (former.terms[0] == Zero and former.terms.size > 1 )
+    former.terms.delete_at(0) if (former.terms[0] == ZeroTerm and former.terms.size > 1 )
     return former
   end
-  def -(another_fs) 
+  def -(another_fs)
     self + another_fs.opposite
   end
-    
+
   def *(another)
     case another
     when Numeric
@@ -100,7 +111,7 @@ class FormalSum
       raise(InvalidArgument)
     end
   end
-  
+
   def reverse
     self.class.new(@terms).reverse!
   end
@@ -126,7 +137,7 @@ class FormalSum
       when Array, Range
         ints << a.to_a.flatten.keep_if { |i| i.kind_of?(Integer) }
         ints.flatten!
-      else 
+      else
         raise InvalidArgument
       end
     end
@@ -134,7 +145,7 @@ class FormalSum
     #
     myterms = @terms.dup
     myterms.keep_if{ |t| ints.include?(t.degree) }
-    myterms << Zero if myterms.empty? 
+    myterms << ZeroTerm if myterms.empty?
     #
     return self.class.new(myterms)
   end
@@ -153,8 +164,8 @@ class FormalSum
     #
     @terms.each do |t|
       deg = t.degree
-      unless hp_hash.has_key?(deg) 
-        hp_hash[deg] = FormalSum.new(t) 
+      unless hp_hash.has_key?(deg)
+        hp_hash[deg] = FormalSum.new(t)
       else
         hp_hash[deg] << t
       end
@@ -174,7 +185,7 @@ class FormalSum
         #
       end
       #
-      tmp.terms.delete_at(0) unless tmp.terms == [Zero]
+      tmp.terms.delete_at(0) unless tmp.terms == [ZeroTerm]
       (@terms << tmp.terms).flatten!
     end
     #
@@ -186,7 +197,7 @@ class FormalSum
     mstr = '0' if mstr.size == 0
     return mstr
   end
-  
+
   def show
     @terms.map{ |t| t.show }.join('+')
   end
@@ -225,6 +236,6 @@ class FormalSum
   private :splitter
 #
 end
-#---------------------------------
+#-----------------------------------
 
 #End of File

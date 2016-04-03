@@ -1,64 +1,56 @@
 #
 # GLA/spec/LieBracket_spec.rb
 #
-# Time-stamp: <2016-04-01 18:30:35 (ryosuke)>
+# Time-stamp: <2016-04-03 22:49:40 (ryosuke)>
 require('spec_helper')
 
 require('LieBracket')
 
 describe LieBracket do
-  let(:fa) { FormalSum.new('a') }
-  let(:fb) { FormalSum.new('b') }
   let(:lab) { LieBracket.new(fa, fb) }
   let(:laa) { LieBracket.new(fa, fa) }
   let(:la_ab) { LieBracket.new(fa, lab) }
   let(:lab_a) { LieBracket.new(lab, fa) }
   let(:lb_ab) { LieBracket.new(fb, lab) }
-  #
-#---------------------------------
+  #---------------------------------
   describe "#initialize" do
-    context "with two Strings" do
-      subject{ LieBracket.new('a', 'b') }
-      it "goes well" do
+    #---
+    shared_examples "an orginal LieBracket" do
+      it do
         expect(subject.terms[0]).to be_a_kind_of Term
         expect(subject.couple).to be_a_kind_of Array
         expect(subject.coeff).to eq 1
-        expect(subject.to_s).to eq '[a,b]'
-        expect(subject.expand.to_s).to eq 'ab-ba'
+        expect(subject.expand.to_s).to eq "#{fa}#{fb}-#{fb}#{fa}"
+        expect(subject.to_s).to eq "[#{fa},#{fb}]"
       end
+    end
+    #---
+    context "with two Strings" do
+      let(:fa) { 'a' }
+      let(:fb) { 'b' }
+      subject{ lab }
+      it_behaves_like "an orginal LieBracket"
     end
     #
     context "with Word 'w' and String 's'" do
-      subject{ LieBracket.new(Word.new('w'), 's') }
-      it "goes well" do
-        expect(subject.terms[0]).to be_a_kind_of Term
-        expect(subject.couple).to be_a_kind_of Array
-        expect(subject.coeff).to eq 1
-        expect(subject.to_s).to eq '[w,s]'
-        expect(subject.expand.to_s).to eq 'ws-sw'
-      end
+      let(:fa) { FormalSum.new('w') }
+      let(:fb) { 's' }
+      subject{ lab }
+      it_behaves_like "an orginal LieBracket"
     end
     #
     context "with String 's' and Term 't'" do
-      subject{ LieBracket.new('s', Term.new('t')) }
-      it "goes well" do
-        expect(subject.terms[0]).to be_a_kind_of Term
-        expect(subject.couple).to be_a_kind_of Array
-        expect(subject.coeff).to eq 1
-        expect(subject.to_s).to eq '[s,t]'
-        expect(subject.expand.to_s).to eq 'st-ts'
-      end
+      let(:fa) { 's' }
+      let(:fb) { Term.new('t') }
+      subject{ lab }
+      it_behaves_like "an orginal LieBracket"
     end
     #
     context "with Generator 'g' and Term 't'" do
-      subject{ LieBracket.new(Generator.new('g'), Term.new('t')) }
-      it "goes well" do
-        expect(subject.terms[0]).to be_a_kind_of Term
-        expect(subject.couple).to be_a_kind_of Array
-        expect(subject.coeff).to eq 1
-        expect(subject.to_s).to eq '[g,t]'
-        expect(subject.expand.to_s).to eq 'gt-tg'
-      end
+      let(:fa) { Generator.new('g') }
+      let(:fb) { Term.new('t') }
+      subject{ lab }
+      it_behaves_like "an orginal LieBracket"
     end
     #
   end
@@ -66,41 +58,47 @@ describe LieBracket do
 
 #---------------------------------
 describe "#to_s" do
-    context "for a stardard Liebracket" do
-      it { expect(lab.to_s).to eq '[a,b]' }
-    end
-    context "for iterated Liebrackets" do
-      it { expect(la_ab.to_s).to eq '[a,[a,b]]'}
-      it { expect(lab_a.to_s).to eq '[[a,b],a]'}
-      it { expect(LieBracket.new(lab, lab).to_s).to eq '[[a,b],[a,b]]'}
-      it { expect(LieBracket.new(fa, lb_ab).to_s).to eq '[a,[b,[a,b]]]'}
-      it { expect(LieBracket.new(lab_a, fb).to_s).to eq '[[[a,b],a],b]'}
-    end
-    context "for Liebrackets with Numeric" do
-      it { expect(LieBracket.new(fa,5).to_s).to eq '[a,5]'}
-      it { expect(LieBracket.new(-2,lab).to_s).to eq '[-2,[a,b]]'}
-      it { expect(LieBracket.new(-2/3r,lab).to_s).to eq '[-2/3,[a,b]]'}
-    end
+  let(:fa) { 'a' }
+  let(:fb) { 'b' }
+  context "for a stardard Liebracket" do
+    it { expect(lab.to_s).to eq '[a,b]' }
+  end
+  context "for iterated Liebrackets" do
+    it { expect(la_ab.to_s).to eq '[a,[a,b]]'}
+    it { expect(lab_a.to_s).to eq '[[a,b],a]'}
+    it { expect(LieBracket.new(lab, lab).to_s).to eq '[[a,b],[a,b]]'}
+    it { expect(LieBracket.new(fa, lb_ab).to_s).to eq '[a,[b,[a,b]]]'}
+    it { expect(LieBracket.new(lab_a, fb).to_s).to eq '[[[a,b],a],b]'}
+  end
+  context "for Liebrackets with Numeric" do
+    it { expect(LieBracket.new(fa,5).to_s).to eq '[a,5]'}
+    it { expect(LieBracket.new(-2,lab).to_s).to eq '[-2,[a,b]]'}
+    it { expect(LieBracket.new(-2/3r,lab).to_s).to eq '[-2/3,[a,b]]'}
+  end
 end
 #---------------------------------
 
 #---------------------------------
 describe "#inspect_couple" do
-    before do
-      @inspect_regexp = /\[(#<(FormalSum|LieBracket|Term|Word|Generator):([a-z0-9]+)(.*)>[,]*){2}\]/
-    end
-    #
-    it { expect(lab.inspect_couple).to match @inspect_regexp }
-    it { expect(la_ab.inspect_couple).to match @inspect_regexp }
-    it { expect(LieBracket.new(Generator.new('g'), lab).inspect_couple).to match @inspect_regexp }
-    #-----
-    it { expect(LieBracket.new(Generator.new('g'),'b').inspect_couple).not_to match @inspect_regexp }
-    it { expect(LieBracket.new(fa,5).inspect_couple).not_to match @inspect_regexp }
+  let(:fa) { FormalSum.new('a') }
+  let(:fb) { FormalSum.new('b') }
+  before do
+    @inspect_regexp = /\[(#<(FormalSum|LieBracket|Term|Word|Generator):([a-z0-9]+)(.*)>[,]*){2}\]/
+  end
+  #
+  it { expect(lab.inspect_couple).to match @inspect_regexp }
+  it { expect(la_ab.inspect_couple).to match @inspect_regexp }
+  it { expect(LieBracket.new(Generator.new('g'), lab).inspect_couple).to match @inspect_regexp }
+  #-----
+  it { expect(LieBracket.new(Generator.new('g'),'b').inspect_couple).not_to match @inspect_regexp }
+  it { expect(LieBracket.new(fa,5).inspect_couple).not_to match @inspect_regexp }
 end
 #---------------------------------
 
 #---------------------------------
 describe "#expand" do
+  let(:fa) { 'a' }
+  let(:fb) { 'b' }
     context "[a,b]" do
       subject{ lab.expand }
       it { is_expected.to be_kind_of(FormalSum) }
@@ -144,6 +142,8 @@ end
 
 #---------------------------------
   describe "#* (multiply_by):" do
+  let(:fa) { 'a' }
+  let(:fb) { 'b' }
     context "to be non-destructive" do
       it { expect { lab*4 }.not_to change{ lab } }
     end
@@ -206,6 +206,8 @@ end
 
 #---------------------------------
 describe "#flip, #flip!" do
+  let(:fa) { 'a' }
+  let(:fb) { 'b' }
   subject { (lab*(2/3r)).flip }
     it { expect( subject.couple ).to eq lab.couple.reverse }
     it { expect( subject.coeff ).to eq (-2/3r) }
