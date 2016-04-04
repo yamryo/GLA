@@ -1,14 +1,14 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2014-11-04 23:36:29 (kaigishitsu)>
+# Time-stamp: <2016-04-04 14:49:14 (ryosuke)>
 #
 
 require('FormalSum')
 
 #-------------------------------
 class LieBracket < FormalSum
-  
+
   #-----------------
   def initialize(elm_1=One, elm_2=One)
     @coeff = 1
@@ -40,7 +40,7 @@ class LieBracket < FormalSum
 
   def coeff=(arg)
     raise(InvalidArgument) unless arg.kind_of?(Numeric)
-    arg = arg.truncate(0) if (arg.kind_of?(Rational) && arg.denominator == 1) 
+    arg = arg.truncate(0) if (arg.kind_of?(Rational) && arg.denominator == 1)
     @coeff = arg
   end
   def deepcopy
@@ -57,7 +57,7 @@ class LieBracket < FormalSum
   def *(another)
     case another
     when Numeric
-      return self.multiply_by(another)
+      return self.multiply_by!(another)
     # when Term, Word, String
     #   self.product_with(self.class.new(another))
     # when FormalSum
@@ -72,6 +72,11 @@ class LieBracket < FormalSum
     return mylb
     #return scalar.kind_of?(Fixnum) ? super(scalar).couple[0]*scalar : self
   end
+  def multiply_by!(scalar)
+    super(scalar)
+    @coeff = @coeff * scalar
+    return self
+  end
 
   def flip
     self.class.new(@couple[1], @couple[0])*(@coeff*(-1))
@@ -81,7 +86,7 @@ class LieBracket < FormalSum
     @coeff = @coeff*(-1)
     return self.opposite!
   end
-  
+
   def to_s
     rtn = @coeff.to_s+"["+(@couple.map{ |x| x.to_s }).join(',')+"]"
     return rtn.gsub(/^([-]*)1(\[)/, '\1\2')
@@ -93,7 +98,7 @@ class LieBracket < FormalSum
   def inspect_couple
     return "[#{@couple.map{ |x| x.inspect }.join(',')}]"
   end
-  
+
   def expand
     return FormalSum.new(self.terms)
   end

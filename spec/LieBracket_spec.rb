@@ -1,7 +1,7 @@
 #
 # GLA/spec/LieBracket_spec.rb
 #
-# Time-stamp: <2016-04-03 22:49:40 (ryosuke)>
+# Time-stamp: <2016-04-04 14:55:59 (ryosuke)>
 require('spec_helper')
 
 require('LieBracket')
@@ -160,10 +160,10 @@ end
       context "[a,b]*#{num}" do
         subject{ lab*num }
         it "includes an array of Terms" do
-          expect(subject.terms[0]).to be_a_kind_of Term
+          expect( subject.terms[0] ).to be_a_kind_of Term
         end
-        it{ expect(subject.to_s).to eq "#{num}[a,b]" }
-        it{ expect(subject.expand.to_s).to eq "#{num}ab-#{num}ba".gsub('--', '+') }
+        it{ expect( subject.to_s ).to eq "#{num}[a,b]" }
+        it{ expect( subject.expand.to_s ).to eq "#{num}ab-#{num}ba".gsub('--', '+') }
       end
     end
     #
@@ -187,15 +187,13 @@ end
     context "of a 2-degree lb with a rational number" do
       it "goes well" do
         ex_list = []
-        ex_list << {obj: lab_a, num: 5/3r,
-          str: '5/3[[a,b],a]', exp: '5/3aba-5/3baa-5/3aab+5/3aba'}
-        ex_list << {obj: lab_a, num: -4/8r,
-          str: '-1/2[[a,b],a]', exp: '-1/2aba+1/2baa+1/2aab-1/2aba'}
-        ex_list << {obj: lab_a, num: 5/1r,
-          str: '5[[a,b],a]', exp: '5/1aba-5/1baa-5/1aab+5/1aba'}
+        ex_list << {num: 5/3r, str: '5/3[[a,b],a]', exp: '5/3aba-5/3baa-5/3aab+5/3aba'}
+        ex_list << {num: -4/8r, str: '-1/2[[a,b],a]', exp: '-1/2aba+1/2baa+1/2aab-1/2aba'}
+        ex_list << {num: 5/1r, str: '5/1[[a,b],a]', exp: '5/1aba-5/1baa-5/1aab+5/1aba'}
         ex_list.each do |ex|
-          sbj = ex[:obj]*ex[:num]
+          sbj = LieBracket.new(lab,fa)*ex[:num]
           expect(sbj.to_s).to eq ex[:str]
+          #expect(sbj.inspect).to eq 'dummy'
           expect(sbj.expand.to_s).to eq ex[:exp]
         end
       end
