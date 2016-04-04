@@ -1,13 +1,14 @@
 #
 # GLA/spec/LieBracket_spec.rb
 #
-# Time-stamp: <2016-04-04 14:55:59 (ryosuke)>
+# Time-stamp: <2016-04-04 16:29:49 (ryosuke)>
 require('spec_helper')
 
 require('LieBracket')
 
 describe LieBracket do
   let(:lab) { LieBracket.new(fa, fb) }
+  let(:lba) { LieBracket.new(fb, fa) }
   let(:laa) { LieBracket.new(fa, fa) }
   let(:la_ab) { LieBracket.new(fa, lab) }
   let(:lab_a) { LieBracket.new(lab, fa) }
@@ -141,13 +142,13 @@ end
 #---------------------------------
 
 #---------------------------------
-  describe "#* (multiply_by):" do
+  describe "#* (multiply_by!):" do
   let(:fa) { 'a' }
   let(:fb) { 'b' }
-    context "to be non-destructive" do
-      it { expect { lab*4 }.not_to change{ lab } }
+    context "to be destructive" do
+      it { expect { lab*4 }.to change{ lab.coeff } }
     end
-    #
+    #---
     context "[a,b]*(-1)" do
       subject{ lab*(-1) }
       it "includes an array of Terms" do
@@ -156,6 +157,15 @@ end
       it{ expect(subject.to_s).to eq "-[a,b]" }
       it{ expect(subject.expand.to_s).to eq "-ab+ba" }
     end
+    context "[a,b]*(-1)*(1/2)" do
+      subject{ lab*(-1)*(1/2r) }
+      it "includes an array of Terms" do
+        expect(subject.terms[0]).to be_a_kind_of Term
+      end
+      it{ expect(subject.to_s).to eq "-1/2[a,b]" }
+      it{ expect(subject.expand.to_s).to eq "-1/2ab+1/2ba" }
+    end
+    #---
     [3, -4, 5/2r, -8/7r].each do |num|
       context "[a,b]*#{num}" do
         subject{ lab*num }
@@ -198,7 +208,53 @@ end
         end
       end
     end
+  end
+#---------------------------------
+
+#---------------------------------
+  describe "#+ and #- (addition):" do
+  let(:fa) { 'a' }
+  let(:fb) { 'b' }
+    context "to be non-destructive" do
+      it { expect { lab+fa }.not_to change{ lab.coeff } }
+    end
+    #---
+    context "[a,b]+a" do
+      subject{ lab+fa }
+      it{ is_expected.to be_kind_of FormalSum }
+      it{ expect(subject.to_s).to eq "ab-ba+a" }
+      #it{ expect(subject.expand.to_s).to eq "ab-ba+a" }
+    end
+    context "[a,b]-a" do
+      subject{ lab-fa }
+      it{ is_expected.to be_kind_of FormalSum }
+      it{ expect(subject.to_s).to eq "ab-ba-a" }
+      #it{ expect(subject.expand.to_s).to eq "ab-ba+a" }
+    end
+    #---
+    [3, -4, 5/2r, -8/7r].each do |num|
+      context "[a,b]+#{num}" do
+        subject{ lab+num }
+        it "includes an array of Terms" do
+          expect( subject.terms[0] ).to be_a_kind_of Term
+        end
+        it{ expect( subject.to_s ).to eq "ab-ba+#{num}".sub('+-', '-') }
+      end
+    end
     #
+    context "of 2 LieBrackets" do
+      it "goes well" do
+        ex_list = []
+        ex_list << {obj: lba, exp: 'ab-ba+ba-ab'}
+        ex_list << {obj: lab_a, exp: 'ab-ba+aba-baa-aab+aba'}
+        ex_list << {obj: LieBracket.new(LieBracket.new('a','b')*5, fb),
+                    exp: 'ab-ba+5abb-5bab-5bab+5bba'}
+        ex_list.each do |ex|
+          sbj = lab + ex[:obj]
+          expect(sbj.to_s).to eq ex[:exp]
+        end
+      end
+    end
   end
 #---------------------------------
 

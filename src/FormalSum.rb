@@ -1,7 +1,7 @@
 #
 # GLA/src/FormalSum.rb
 #
-# Time-stamp: <2016-04-03 22:24:18 (ryosuke)>
+# Time-stamp: <2016-04-04 16:23:00 (ryosuke)>
 #
 require('Term')
 
@@ -202,11 +202,15 @@ class FormalSum
     @terms.map{ |t| t.show }.join('+')
   end
 
+  def to_fs
+    return self
+  end
+
   #--- protected and private methods ---
   def <<(arg)
     case arg
     when Term then @terms << arg
-    when Generator, Word then @terms << Term.new(arg)
+    when Generator, Word, Fixnum, Rational then @terms << Term.new(arg)
     when String then splitter(arg).each{ |t| @terms << Term.new(t) }
     else
       raise InvalidArgument, "Your argument is a #{arg.class.name} class object."
