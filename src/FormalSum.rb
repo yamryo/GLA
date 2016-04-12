@@ -1,7 +1,7 @@
 #
 # GLA/src/FormalSum.rb
 #
-# Time-stamp: <2016-04-04 16:23:00 (ryosuke)>
+# Time-stamp: <2016-04-12 11:06:16 (ryosuke)>
 #
 require('Term')
 
@@ -84,23 +84,23 @@ class FormalSum
     end
   end
   def product_with(another_fs)
-    myfs = self.class.new
-    myterms = @terms.dup.reverse
-    #
-    while myterms.size > 0 do
-      former = myterms.pop
-      another_fs.terms.each do |latter|
-        myfs << former*latter
+    self.class.new.tap do |result|
+      myterms = @terms.dup.reverse
+      #
+      while myterms.size > 0 do
+        former = myterms.pop
+        another_fs.terms.each do |latter|
+          result << former*latter
+        end
       end
+      #
+      result.terms.delete_at(0) unless result.terms.empty?
     end
-    #
-    myfs.terms.delete_at(0) unless myfs.terms.size == 0
-    return myfs
   end
   def multiply_by(num)
-    myfs = self.deepcopy
-    myfs.terms.map! { |t| t.multiplied_by!(num) }
-    return myfs
+    self.deepcopy.tap do |result|
+      result.terms.map! { |t| t.multiplied_by!(num) }
+    end
   end
   def multiply_by!(num)
     case num
@@ -159,7 +159,6 @@ class FormalSum
   end
   def simplify!
     #collect same words into a sigle word, not delete zero words.
-
     hp_hash = Hash.new
     #
     @terms.each do |t|
@@ -193,13 +192,13 @@ class FormalSum
   end
 
   def to_s
-    mstr = (@terms.dup).delete_if{ |t| t[:coeff]==0}.join('+').gsub('+-','-')
+    mstr = (@terms.dup).delete_if{ |t| t[:coeff]==0 }.join('+').gsub('+-','-')
     mstr = '0' if mstr.size == 0
     return mstr
   end
 
   def show
-    @terms.map{ |t| t.show }.join('+')
+    @terms.map(&:show).join('+')
   end
 
   def to_fs
@@ -223,7 +222,7 @@ class FormalSum
   def splitter(str)
     myterms = []
     # binding.pry
-    myarr = str.split( %r{([+-])} ).delete_if{ |x| x.empty?}.reverse
+    myarr = str.split( %r{([+-])} ).delete_if(&:empty?).reverse
     while (myarr.size > 0) do
       mystr = myarr.pop
       #

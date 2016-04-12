@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2016-04-04 16:22:35 (ryosuke)>
+# Time-stamp: <2016-04-12 11:13:06 (ryosuke)>
 #
 
 require('FormalSum')
@@ -51,16 +51,16 @@ class LieBracket < FormalSum
     self.addition(another, true)
   end
   def addition(another, minus_flag)
-    former = self.to_fs
-    latter = case another
-             when self.class, FormalSum then another.to_fs
-             when Term, Word, String, Fixnum, Rational then FormalSum.new(another)
-             else raise(InvalidArgument, "#{another.class}") end
-    latter.opposite! if minus_flag
-    #---
-    (former.terms).concat(latter.terms)
-    former.terms.delete_at(0) if (former.terms[0] == ZeroTerm and former.terms.size > 1 )
-    return former
+    self.to_fs.tap do |former|
+      latter = case another
+               when self.class, FormalSum then another.to_fs
+               when Term, Word, String, Fixnum, Rational then FormalSum.new(another)
+               else raise(InvalidArgument, "#{another.class}") end
+      latter.opposite! if minus_flag
+      #---
+      (former.terms).concat(latter.terms)
+      former.terms.delete_at(0) if (former.terms[0] == ZeroTerm and former.terms.size > 1 )
+    end
   end
 
   def *(another)
@@ -76,10 +76,7 @@ class LieBracket < FormalSum
     end
   end
   def multiply_by(scalar)
-    mylb = super(scalar)
-    mylb.coeff = @coeff * scalar
-    return mylb
-    #return scalar.kind_of?(Fixnum) ? super(scalar).couple[0]*scalar : self
+    super(scalar).tap{ |result| result.coeff = @coeff * scalar }
   end
   def multiply_by!(scalar)
     super(scalar)
@@ -97,22 +94,22 @@ class LieBracket < FormalSum
   end
 
   def to_s
-    rtn = @coeff.to_s+"["+(@couple.map{ |x| x.to_s }).join(',')+"]"
-    return rtn.gsub(/^([-]*)1(\[)/, '\1\2')
+    str = @couple.map(&:to_s).join(',')
+    (@coeff.to_s + "[#{str}]").gsub(/^([-]*)1(\[)/, '\1\2')
   end
 #  def inspect
 #    string = "#<#{self.class.name}:0x" << ('%x' % (self.object_id << 1)) << '>'
 #    return string
 #  end
   def inspect_couple
-    return "[#{@couple.map{ |x| x.inspect }.join(',')}]"
+    "[#{@couple.map{ |x| x.inspect }.join(',')}]"
   end
 
   def to_fs
     self.expand
   end
   def expand
-    return FormalSum.new(self.terms)
+    FormalSum.new(self.terms)
   end
 
   #---
