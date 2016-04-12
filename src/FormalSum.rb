@@ -1,7 +1,7 @@
 #
 # GLA/src/FormalSum.rb
 #
-# Time-stamp: <2016-04-12 11:06:16 (ryosuke)>
+# Time-stamp: <2016-04-12 16:45:39 (ryosuke)>
 #
 require('Term')
 
@@ -41,11 +41,10 @@ class FormalSum
     # For the following arithmetic operations,
     # we need a deep copy method of an instance of this class.
     # self.dup and even self.class.new(@terms) are too shallow.
-    terms_copy = []
-    @terms.each do |t|
-      terms_copy << Term.new(t[:word], t[:coeff])
+    new_terms = @terms.each_with_object([]) do |t, arr|
+      arr << Term.new(t[:word], t[:coeff])
     end
-    return self.class.new(terms_copy)
+    return self.class.new(new_terms)
   end
 
   def opposite
@@ -129,13 +128,12 @@ class FormalSum
   end
 
   def homo_part(*arg)
-    ints = []
-    arg.each do |a|
+    ints = arg.each_with_object([]) do |a, ints|
       case a
       when Fixnum
         ints << a
       when Array, Range
-        ints << a.to_a.flatten.keep_if { |i| i.kind_of?(Integer) }
+        ints << a.to_a.flatten.keep_if{ |i| i.kind_of?(Integer) }
         ints.flatten!
       else
         raise InvalidArgument
@@ -193,8 +191,7 @@ class FormalSum
 
   def to_s
     mstr = (@terms.dup).delete_if{ |t| t[:coeff]==0 }.join('+').gsub('+-','-')
-    mstr = '0' if mstr.size == 0
-    return mstr
+    return (mstr.empty?) ? '0' : mstr
   end
 
   def show
@@ -220,15 +217,15 @@ class FormalSum
   protected :<<
 
   def splitter(str)
+    re_sign = %r{([+-])}
     myterms = []
-    # binding.pry
-    myarr = str.split( %r{([+-])} ).delete_if(&:empty?).reverse
+    myarr = str.split( re_sign ).delete_if(&:empty?).reverse
     while (myarr.size > 0) do
       mystr = myarr.pop
       #
-      unless mystr.match( %r{(^[+-]$)} ).nil? then
-        raise Error if myarr.size == 0
-        mystr = (mystr + myarr.pop)
+      if re_sign.match(mystr) then
+        raise StarndardError if myarr.empty?
+        mystr += myarr.pop
       end
       #
       myterms << mystr

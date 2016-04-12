@@ -1,7 +1,7 @@
 #
 # GLA/src/Word.rb
 #
-# Time-stamp: <2016-03-01 17:20:08 (ryosuke)>
+# Time-stamp: <2016-04-12 16:58:33 (ryosuke)>
 #
 require('Generator')
 
@@ -82,12 +82,12 @@ class Word < String
 
    def contract
      marr = self.each_gen.map{ |g| g } # split self into an Array of Generators
-
+     #
      size_diff = 1
      while (size_diff > 0 and marr.size > 1)
        previous_size = marr.size
        #
-       marr.each.with_index do |val, idx|
+       marr.each_with_index do |val, idx|
          if (idx < marr.size - 1) then
            pair = marr.slice!(idx,2)
            marr.insert(idx, pair[0]*pair[1]).flatten!
@@ -97,7 +97,7 @@ class Word < String
        size_diff = previous_size - marr.size
      end
      #
-     return self.replace( marr.map!{|g| g.to_char}.join )
+     return self.replace( marr.map!(&:to_char).join )
    end
 
    undef_method :upcase!, :downcase!, :sub!, :gsub!, :concat, :[]=
