@@ -59,7 +59,7 @@ class FormalSum
     former = self.deepcopy
     latter = case another_fs
              when self.class then another_fs.deepcopy
-             when Term, String, Fixnum then self.class.new(another_fs)
+             when Term, String, Integer then self.class.new(another_fs)
              else raise(InvalidArgument) end
     #
     (former.terms).concat(latter.terms)
@@ -128,9 +128,9 @@ class FormalSum
   end
 
   def homo_part(*arg)
-    ints = arg.each_with_object([]) do |a, ints|
+    iarray= arg.each_with_object([]) do |a, ints|
       case a
-      when Fixnum
+      when Integer
         ints << a
       when Array, Range
         ints << a.to_a.flatten.keep_if{ |i| i.kind_of?(Integer) }
@@ -139,10 +139,10 @@ class FormalSum
         raise InvalidArgument
       end
     end
-    ints.uniq.keep_if{ |i| i>=0 }
+    iarray.uniq.keep_if{ |i| i>=0 }
     #
     myterms = @terms.dup
-    myterms.keep_if{ |t| ints.include?(t.degree) }
+    myterms.keep_if{ |t| iarray.include?(t.degree) }
     myterms << ZeroTerm if myterms.empty?
     #
     return self.class.new(myterms)
@@ -206,7 +206,7 @@ class FormalSum
   def <<(arg)
     case arg
     when Term then @terms << arg
-    when Generator, Word, Fixnum, Rational then @terms << Term.new(arg)
+    when Generator, Word, Integer, Rational then @terms << Term.new(arg)
     when String then splitter(arg).each{ |t| @terms << Term.new(t) }
     else
       raise InvalidArgument, "Your argument is a #{arg.class.name} class object."
