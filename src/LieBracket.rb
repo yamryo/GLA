@@ -1,7 +1,7 @@
 #
 # GLA/src/LieBracket.rb
 #
-# Time-stamp: <2016-04-12 11:13:06 (ryosuke)>
+# Time-stamp: <2016-04-12 16:53:13 (ryosuke)>
 #
 
 require('FormalSum')
@@ -59,7 +59,7 @@ class LieBracket < FormalSum
       latter.opposite! if minus_flag
       #---
       (former.terms).concat(latter.terms)
-      former.terms.delete_at(0) if (former.terms[0] == ZeroTerm and former.terms.size > 1 )
+      former.terms.delete_at(0) if (former.terms.first == ZeroTerm and former.terms.size > 1 )
     end
   end
 
@@ -79,9 +79,7 @@ class LieBracket < FormalSum
     super(scalar).tap{ |result| result.coeff = @coeff * scalar }
   end
   def multiply_by!(scalar)
-    super(scalar)
-    @coeff = @coeff * scalar
-    return self
+    super(scalar).tap{ |slf| @coeff *= scalar }
   end
 
   def flip

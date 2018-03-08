@@ -1,7 +1,7 @@
 #
 # GLA/src/FormalSum.rb
 #
-# Time-stamp: <2016-04-12 11:06:16 (ryosuke)>
+# Time-stamp: <2016-04-12 16:45:39 (ryosuke)>
 #
 require('Term')
 
@@ -41,11 +41,10 @@ class FormalSum
     # For the following arithmetic operations,
     # we need a deep copy method of an instance of this class.
     # self.dup and even self.class.new(@terms) are too shallow.
-    terms_copy = []
-    @terms.each do |t|
-      terms_copy << Term.new(t[:word], t[:coeff])
+    new_terms = @terms.each_with_object([]) do |t, arr|
+      arr << Term.new(t[:word], t[:coeff])
     end
-    return self.class.new(terms_copy)
+    return self.class.new(new_terms)
   end
 
   def opposite
@@ -60,7 +59,7 @@ class FormalSum
     former = self.deepcopy
     latter = case another_fs
              when self.class then another_fs.deepcopy
-             when Term, String, Fixnum then self.class.new(another_fs)
+             when Term, String, Integer then self.class.new(another_fs)
              else raise(InvalidArgument) end
     #
     (former.terms).concat(latter.terms)
@@ -129,22 +128,21 @@ class FormalSum
   end
 
   def homo_part(*arg)
-    ints = []
-    arg.each do |a|
+    iarray= arg.each_with_object([]) do |a, ints|
       case a
-      when Fixnum
+      when Integer
         ints << a
       when Array, Range
-        ints << a.to_a.flatten.keep_if { |i| i.kind_of?(Integer) }
+        ints << a.to_a.flatten.keep_if{ |i| i.kind_of?(Integer) }
         ints.flatten!
       else
         raise InvalidArgument
       end
     end
-    ints.uniq.keep_if{ |i| i>=0 }
+    iarray.uniq.keep_if{ |i| i>=0 }
     #
     myterms = @terms.dup
-    myterms.keep_if{ |t| ints.include?(t.degree) }
+    myterms.keep_if{ |t| iarray.include?(t.degree) }
     myterms << ZeroTerm if myterms.empty?
     #
     return self.class.new(myterms)
@@ -193,8 +191,7 @@ class FormalSum
 
   def to_s
     mstr = (@terms.dup).delete_if{ |t| t[:coeff]==0 }.join('+').gsub('+-','-')
-    mstr = '0' if mstr.size == 0
-    return mstr
+    return (mstr.empty?) ? '0' : mstr
   end
 
   def show
@@ -209,7 +206,7 @@ class FormalSum
   def <<(arg)
     case arg
     when Term then @terms << arg
-    when Generator, Word, Fixnum, Rational then @terms << Term.new(arg)
+    when Generator, Word, Integer, Rational then @terms << Term.new(arg)
     when String then splitter(arg).each{ |t| @terms << Term.new(t) }
     else
       raise InvalidArgument, "Your argument is a #{arg.class.name} class object."
@@ -220,15 +217,15 @@ class FormalSum
   protected :<<
 
   def splitter(str)
+    re_sign = %r{([+-])}
     myterms = []
-    # binding.pry
-    myarr = str.split( %r{([+-])} ).delete_if(&:empty?).reverse
+    myarr = str.split( re_sign ).delete_if(&:empty?).reverse
     while (myarr.size > 0) do
       mystr = myarr.pop
       #
-      unless mystr.match( %r{(^[+-]$)} ).nil? then
-        raise Error if myarr.size == 0
-        mystr = (mystr + myarr.pop)
+      if re_sign.match(mystr) then
+        raise StarndardError if myarr.empty?
+        mystr += myarr.pop
       end
       #
       myterms << mystr
